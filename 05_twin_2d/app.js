@@ -165,6 +165,7 @@ function step(s){
   s.lastSt=stage(s);
 }
 function stage(s){
+  if(s.feedSt) return s.feedSt;                     // data file: the row's stage
   if(s.trip>0) return "Trip: purge";
   if(loadOn(s)) return "Part load";
   if(ngOn(s)) return "Fuel switch";
@@ -479,7 +480,10 @@ function followSensors(s){
 }
 function snapSensors(){ const st=stage(S); for(const k in EASE) delete EASE[k]; for(const r of ROWS) SHOWN[r.col]=reading(r,st).v; }
 // readings shown = the eased value from the last simulated minute (time has to run for a reading to move)
-function shown(r,st){ const x=reading(r,st); if(!x.knob && r.col in SHOWN){ x.v=SHOWN[r.col]; x.ease=EASE[r.col]; } return x; }
+// Data viewer (source Data file, below): FEED.row = the shown minute's values, indexed like S.hist[i].v.
+const FEED={mode:"twin",rows:[],i:0,row:null,lastT:-Infinity};
+function shown(r,st){ if(FEED.row){ const x=FEED.row[IDX.get(r.col)]; return {v:x===x?x:null,f:r.fits[st]}; }
+  const x=reading(r,st); if(!x.knob && r.col in SHOWN){ x.v=SHOWN[r.col]; x.ease=EASE[r.col]; } return x; }
 const val=(col)=>{ const r=byCol[col]; return r? shown(r,stage(S)).v:null; };
 const fmt=(v,u)=>v==null?"–":(u==="°C"||u==="ln/min"||u==="V"? Math.round(v).toString(): Math.abs(v)>=100? v.toFixed(0): Math.abs(v)>=10? v.toFixed(1): v.toFixed(2));
 
@@ -553,9 +557,10 @@ function renderReadings(){
       bar=`<div class="band" style="left:${X(p10)};width:calc(${X(p90)} - ${X(p10)})"></div>${v!=null?`<div class="dot" style="left:calc(${X(v)} - 1px)"></div>`:""}`;
       note=`${nm(st)}: plant p10–p90 ${fmt(p10,r.unit)}–${fmt(p90,r.unit)} ${r.unit}, ${n} min`; }
     else note=`No plant data for this sensor in ${nm(st)}.`;
-    if(CALC[r.col]) note="Twin model value · "+note;
+    if(FEED.row) note="Data file · "+note;
+    else if(CALC[r.col]) note="Twin model value · "+note;
     else if(knob && r.col!=="T_stack_C") note="Set by knob · "+note;
-    if(r.col==="T_stack_C") note="Twin model value · "+note;
+    if(r.col==="T_stack_C" && !FEED.row) note="Twin model value · "+note;
     if(ease){ const gone=S.t-ease.t0;
       note=(gone<ease.d?`Holds the ${ease.pst} level ${Math.ceil(ease.d-gone)} more min (plant delay), then moves over ${Math.round(ease.D)} min`
         :`Moving from the ${ease.pst} level ${ease.def?"at this sensor's usual plant pace (no plant timing for this change)":"at the plant's pace"}: ${Math.round(gone-ease.d)} of ${Math.round(ease.D)} min`)+" · "+note; }
@@ -602,9 +607,9 @@ function plotOne(e,win,i,lo,hi,t0){
   if(c.width!==Math.round(w*dpr)||c.height!==Math.round(h*dpr)){ c.width=Math.round(w*dpr); c.height=Math.round(h*dpr); }
   const g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
   const u=e.r.unit, trip=TRIP[e.r.col], pad=(hi-lo)*0.08, y0=lo>=0? Math.max(0,lo-pad): lo-pad, y1=hi+pad;
-  const L=64, R=24, Tp=8, B=26, pw=w-L-R, ph=h-Tp-B, t1=S.t;
+  const L=52, R=10, Tp=8, B=26, pw=w-L-R, ph=h-Tp-B, t1=S.t;
   const X=t=>L+(t-t0)/PLOT_WIN*pw, Y=v=>Tp+ph-(v-y0)/(y1-y0)*ph;
-  g.font="12px "+css("--f-mono"); g.lineWidth=1;
+  g.font="11px "+css("--f-mono"); g.lineWidth=1;
   { g.strokeStyle=css("--line"); g.fillStyle=css("--muted"); const nk=big?5:3;
     for(let k=0;k<=nk;k++){ const v=y0+(y1-y0)*k/nk, y=Y(v); g.beginPath(); g.moveTo(L,y+.5); g.lineTo(L+pw,y+.5); g.stroke(); g.textAlign="right"; g.fillText(fmt(v,u),L-5,y+3); }
     g.textAlign="center"; for(let k=Math.ceil(t0/240)*240;k<=t1;k+=240){ if(k<0) continue; g.fillText(String(Math.floor(k%1440/60)).padStart(2,"0")+":00",X(k),h-4); }
@@ -787,7 +792,7 @@ function stackColor(T){ const f=Math.min(1,Math.max(0,(T-T_AMB)/775)), m=(a,b)=>
 function render(){
   const st=stage(S);
   const d=Math.floor(S.t/1440)+1, hh=String(Math.floor(S.t%1440/60)).padStart(2,"0"), mm=String(Math.floor(S.t%60)).padStart(2,"0");
-  $("clock").textContent=`Day ${d} · ${hh}:${mm}`;
+  $("clock").textContent=FEED.mode==="twin"? `Day ${d} · ${hh}:${mm}`: feedClock(`Day ${d} · ${hh}:${mm}`);
   $("stage").querySelector("i").style.background=STAGES[st]; $("stage").querySelector("span").textContent=nm(st)+(S.estop?" · emergency stop":"");
   stBar.querySelectorAll("button").forEach(b=>{ if(b.dataset.stage===st) b.setAttribute("aria-current","step"); else b.removeAttribute("aria-current"); });
   stBar.querySelectorAll("[data-link]").forEach(b=>{ const k=linkStep(st,b.dataset.stage); b.setAttribute("aria-disabled",k.act?"false":"true"); b.title=k.act?`Go on to ${lc(nm(b.dataset.stage))} (next link from ${lc(nm(st))})`:k.msg; });
@@ -829,7 +834,7 @@ function render(){
   $("scenLbl").textContent=S.rejAt!=null&&S.t-S.rejAt<5?playMsg:S.trip>0?`Emergency purge: air, N₂ and H₂ only, ${Math.ceil(S.trip)} min left.`
     :S.fsAt!=null&&!play?`Fuel switch: natural gas on, part load in ${Math.max(0,FS_MIN-(S.t-S.fsAt))} min.`
     :unloading(S)&&!play?`Unloading after part load: current 0, natural gas on, hot standby in ${Math.max(0,UNLOAD_MIN-(S.t-S.unloadAt))} min. Trip / emergency purge allowed.`:playMsg;
-  $("slopeSrc").textContent=`Heat balance · air in ${Math.round(S.Tin)} °C`+(S.rsAt!=null?` · stage change: slope blending in, ${S.t-S.rsAt} of ${S.rsD} min (plant bend time)`:"")+(S.kept?` · keeper holding ${KEEP} °C (air ${Math.round(S.air)}, target ${Math.round(S.target)} °C)`:"");
+  $("slopeSrc").textContent=FEED.row? `From the data file · slope over 10 min · air in ${Math.round(S.Tin)} °C`: `Heat balance · air in ${Math.round(S.Tin)} °C`+(S.rsAt!=null?` · stage change: slope blending in, ${S.t-S.rsAt} of ${S.rsD} min (plant bend time)`:"")+(S.kept?` · keeper holding ${KEEP} °C (air ${Math.round(S.air)}, target ${Math.round(S.target)} °C)`:"");
   renderReadings(); drawTrend(); renderBend();
 }
 // ---------- bend panel ----------
@@ -864,9 +869,9 @@ function drawBend(ps,tw){
   if(c.width!==w*dpr||c.height!==h*dpr){ c.width=w*dpr; c.height=h*dpr; }
   const g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
   const t0=BENDS.tm[0], t1=BENDS.tm[1], ys=[...(ps?ps.curve:[]),...(tw?tw.y:[])].filter(v=>v!=null&&isFinite(v));
-  const lo=Math.min(-10,...ys), hi=Math.max(10,...ys), L=56,R=24,Tp=8,B=26,pw=w-L-R,ph=h-Tp-B;
+  const lo=Math.min(-10,...ys), hi=Math.max(10,...ys), L=44,R=10,Tp=8,B=26,pw=w-L-R,ph=h-Tp-B;
   const X=t=>L+(t-t0)/(t1-t0)*pw, Y=v=>Tp+ph-(v-lo)/(hi-lo)*ph;
-  g.font="12px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
+  g.font="11px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
   const stp=[5,10,20,50,100,200].find(s=>(hi-lo)/s<=6)||500;
   for(let v=Math.ceil(lo/stp)*stp;v<=hi;v+=stp){ g.beginPath(); g.moveTo(L,Y(v)+.5); g.lineTo(L+pw,Y(v)+.5); g.stroke(); g.textAlign="right"; g.fillText((v>0?"+":"")+v+"°",L-6,Y(v)+4); }
   g.textAlign="center"; for(let t=-45;t<=60;t+=15) g.fillText((t>0?"+":"")+t,X(t),h-8);
@@ -887,8 +892,8 @@ function drawTrend(){
   if(!w) return;
   if(c.width!==w*dpr||c.height!==h*dpr){ c.width=w*dpr; c.height=h*dpr; }
   const g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
-  const L=56,R=24,Tp=8,B=34,pw=w-L-R,ph=h-Tp-B,t1=S.t,t0=t1-1440, X=t=>L+(t-t0)/1440*pw, Y=T=>Tp+ph-(T/900)*ph;
-  g.font="12px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
+  const L=44,R=10,Tp=8,B=34,pw=w-L-R,ph=h-Tp-B,t1=S.t,t0=t1-1440, X=t=>L+(t-t0)/1440*pw, Y=T=>Tp+ph-(T/900)*ph;
+  g.font="11px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
   [0,200,400,600,800].forEach(v=>{ g.beginPath(); g.moveTo(L,Y(v)+.5); g.lineTo(L+pw,Y(v)+.5); g.stroke(); g.textAlign="right"; g.fillText(v+"°",L-6,Y(v)+4); });
   g.textAlign="center"; for(let k=Math.ceil(t0/240)*240;k<=t1;k+=240){ if(k<0) continue; g.fillText(String(Math.floor(k%1440/60)).padStart(2,"0")+":00",X(k),h-6); }
   g.setLineDash([4,4]); g.strokeStyle=css("--n2"); g.beginPath(); g.moveTo(L,Y(210)); g.lineTo(L+pw,Y(210)); g.stroke(); g.setLineDash([]);
@@ -911,8 +916,8 @@ function drawPower(pts,t0,t1){
   if(c.width!==w*dpr||c.height!==h*dpr){ c.width=w*dpr; c.height=h*dpr; }
   const g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
   const ps=pts.filter(p=>p.v).map(p=>[p.t,kW(p.v)]), top=Math.max(5,Math.ceil(Math.max(0,...ps.map(p=>p[1]))/5)*5);
-  const L=64,R=24,Tp=8,B=22,pw=w-L-R,ph=h-Tp-B, X=t=>L+(t-t0)/1440*pw, Y=v=>Tp+ph-(v/top)*ph;
-  g.font="12px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
+  const L=44,R=10,Tp=8,B=22,pw=w-L-R,ph=h-Tp-B, X=t=>L+(t-t0)/1440*pw, Y=v=>Tp+ph-(v/top)*ph;
+  g.font="11px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
   [0,top/2,top].forEach(v=>{ g.beginPath(); g.moveTo(L,Y(v)+.5); g.lineTo(L+pw,Y(v)+.5); g.stroke(); g.textAlign="right"; g.fillText(v+" kW",L-6,Y(v)+4); });
   g.textAlign="center"; for(let k=Math.ceil(t0/240)*240;k<=t1;k+=240){ if(k<0) continue; g.fillText(String(Math.floor(k%1440/60)).padStart(2,"0")+":00",X(k),h-6); }
   if(ps.length<2) return;
@@ -932,7 +937,113 @@ function histCsv(){ const cols=[...IDX];
 $("saveBtn").onclick=()=>{ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([histCsv()],{type:"text/csv"}));
   a.download=`sofc_twin_day${Math.floor(S.t/1440)+1}_${String(Math.floor(S.t%1440/60)).padStart(2,"0")}h.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); };
 $("play").onclick=()=>{ running=!running; $("play").textContent=running?"Pause":"Play"; last=performance.now(); };
-function loop(now){ const dt=(now-last)/1000; last=now; if(running){ acc+=dt*(+$("speed").value); const n=Math.floor(acc); if(n>0){ acc-=n; tick(Math.min(n,120)); render(); } } requestAnimationFrame(loop); }
+
+// ---------- data viewer: a data file (2026-11-06) ----------
+// Source "Data file": one CSV (or .csv.gz) with the twin's column names, e.g. this app's Save data file or
+// 04_synthetic_data/twin_6month/sofc_twin_6month.csv.gz, or a plant logger day file (YYYYMMDD.txt: tab, decimal comma, 1 Hz).
+// One row per minute (first sample of each minute). The rows take the place of the simulated minutes, so the drawing,
+// readings, plots, trends and Save data all show them; knobs, playbook and stage bar are locked meanwhile.
+const KEEP_MIN=2880, DEC=new TextDecoder();
+const COL=n=>IDX.get(n), FLOW=n=>COL(`ct_FIRC_${n}_PV_ProcessValue`), Z=x=>x===x?x:0;
+const I_STACK=COL("T_stack_C"), I_EAPH=COL("EIRC_2_01_ActV_In_ThreePhasePower"), I_TIN=COL("TIRC_2_06"), TOT=["P_total_kW","I_total_A","V_total_V"].map(COL);
+const HEAT_I=["pi_IIR_5_1_3_ActVal","pi_IIR_3_1_1_ActVal"].map(COL);
+// a row in the twin's state fields, so stage(), the flow lines and the knob read-outs work unchanged
+function rowState(v){
+  const cur=PW_IDX.map(([i])=>v[i]).filter(x=>x===x);
+  return {air:Z(v[FLOW(111)])+Z(v[FLOW(112)]),pox:Z(v[FLOW(12)]),n2:Z(v[FLOW(13)]),h2:Z(v[FLOW(15)]),ng:Z(v[FLOW(14)]),
+    I:cur.length?cur.reduce((a,b)=>a+b,0)/cur.length:0, Tin:v[I_TIN]===v[I_TIN]?v[I_TIN]:S.Tin,
+    // shortcut: heaters on = EAPH > 0.2 kW (operating_states.py EAPH_ON_W) or ERH / EAGH current > 0.5 A; use a heater-enable tag if one is logged
+    heaters:Z(v[I_EAPH])>0.2||HEAT_I.some(i=>Z(v[i])>0.5)};
+}
+// "2027-01-01 00:00" or logger "13.11.2025 00:00:01" → minutes, clock time kept as written (UTC maths, no time zone shift)
+function tsMin(s){ s=(s||"").replace(/"/g,"").trim(); let m=s.match(/^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)/);
+  if(m) return Date.UTC(+m[1],m[2]-1,+m[3],+m[4],+m[5])/6e4;
+  m=s.match(/^(\d\d)\.(\d\d)\.(\d{4}) (\d\d):(\d\d)/); return m? Date.UTC(+m[3],m[2]-1,+m[1],+m[4],+m[5])/6e4: NaN; }
+const clockOf=(t,day)=>t>=1e6? new Date(t*6e4).toISOString().slice(0,16).replace("T"," "): day;
+const feedClock=day=>FEED.row? `${FEED.name} · ${clockOf(S.t,day)}`: "Loading…";
+// Header line → column map; then each line → {t, T, dT, st, v} (null for the header, a blank or an already-seen minute).
+function rowParser(){
+  let sep, raw, map, tI, mI, sI, tc; const back=[];
+  return line=>{
+    line=line.replace(/\r$/,"");
+    if(!map){
+      line=line.replace(/^﻿/,""); sep=line.includes("\t")?"\t":","; raw=sep==="\t";
+      const cols=line.split(sep).map(c=>c.trim().replace(/^"|"$/g,""));
+      map=cols.map(c=>IDX.has(c)?IDX.get(c):-1); tI=cols.findIndex(c=>c==="timestamp"||c==="Date Time"); mI=cols.indexOf("minute"); sI=cols.indexOf("plant_stage");
+      if(tI<0&&mI<0) throw new Error("no timestamp, Date Time or minute column in the first line");
+      // logger files have no T_stack_C: median of the stack TCs; TIR_4_6_25 reads ambient on every day (stage_signals.py)
+      tc=cols.map((c,i)=>/^TIR_4_6_\d+$/.test(c)&&c!=="TIR_4_6_25"?i:-1).filter(i=>i>=0);
+      return null;
+    }
+    if(!line.trim()) return null;
+    const a=line.split(sep), t=tI>=0? tsMin(a[tI]): +a[mI];
+    if(!isFinite(t)||t<=FEED.lastT) return null;
+    FEED.lastT=t;
+    const num=s=>s? +(raw? s.replace(",","."): s): NaN, v=new Float32Array(ALLROWS.length).fill(NaN);
+    for(let i=0;i<a.length;i++){ const k=map[i]; if(k<0) continue; const x=num(a[i]); if(x===x&&!(raw&&x===-1)) v[k]=x; }   // -1 = logger fill value
+    if(raw&&v[I_EAPH]===v[I_EAPH]) v[I_EAPH]/=1000;                                                                      // logger W → kW (tools/prep.py)
+    if(v[I_STACK]!==v[I_STACK]&&tc.length){ const T=tc.map(i=>num(a[i])).filter(x=>x>0&&x<1000).sort((p,q)=>p-q), n=T.length;
+      if(n) v[I_STACK]=n%2? T[n>>1]: (T[n/2-1]+T[n/2])/2; }
+    if(v[TOT[0]]!==v[TOT[0]]){ const p=PW_IDX.reduce((s,[i,u])=>s+Z(v[i])*Z(v[u]),0), I=PW_IDX.reduce((s,[i])=>s+Z(v[i]),0);
+      v[TOT[0]]=p/1000; v[TOT[1]]=I; v[TOT[2]]=I>0? p/I: PW_IDX.reduce((s,[,u])=>s+Z(v[u]),0)/5; }
+    const T=v[I_STACK]; back.push(T); if(back.length>11) back.shift();
+    const dT=back.length>1&&T===T&&back[0]===back[0]? (T-back[0])*60/(back.length-1): 0;   // °C/h over the last 10 rows
+    // stage: the file's plant_stage, else the twin's own stage rules on the row (no trip purge: trips are not in the row)
+    const st=sI>=0&&a[sI]? a[sI].replace(/"/g,"").trim(): stage({...rowState(v),T:Z(T),slope:dT,trip:0});
+    return {t,T:Z(T),dT,st,v};
+  };
+}
+function eachLine(buf,onLine){ let s=0; for(let i;(i=buf.indexOf(10,s))>=0;s=i+1) onLine(DEC.decode(buf.subarray(s,i))); return s; }   // → bytes used up
+async function readFile(f,onLine){
+  let st=f.stream(); if(/\.gz$/i.test(f.name)) st=st.pipeThrough(new DecompressionStream("gzip"));
+  const rd=st.getReader(); let carry=new Uint8Array(0);
+  for(let r;!(r=await rd.read()).done;){ const b=new Uint8Array(carry.length+r.value.length); b.set(carry); b.set(r.value,carry.length); carry=b.slice(eachLine(b,onLine)); }
+  if(carry.length) onLine(DEC.decode(carry));
+}
+// show row i (1-based): the last 48 h up to it become the history, the row becomes the plant state
+function show(i){
+  const rows=FEED.rows; if(!rows.length) return;
+  FEED.i=i=Math.max(1,Math.min(rows.length,i));
+  const r=rows[i-1]; S.hist=rows.slice(Math.max(0,i-KEEP_MIN),i); FEED.row=r.v;
+  Object.assign(S,rowState(r.v),{t:r.t,T:r.T,dT:r.dT,slope:r.dT,feedSt:r.st||"Shutdown",trip:0,estop:false});
+  if(S.border&&S.border.t>S.t) S.border=null;
+  noteBorder(S); $("seek").value=i;
+}
+const lock=on=>[document.querySelector(".ctl"),$("stages"),$("startBtn")].forEach(e=>e.inert=on);
+function enterFeed(mode){
+  if(FEED.mode==="twin") FEED.snap={...S};
+  Object.assign(FEED,{mode,rows:[],i:0,row:null,lastT:-Infinity,ready:false});
+  S.border=null; $("source").value=mode; $("seek").hidden=false; lock(true); render();
+}
+function leaveFeed(){
+  if(FEED.mode==="twin") return;
+  Object.assign(FEED,{mode:"twin",rows:[],row:null,ready:false});
+  Object.assign(S,FEED.snap,{feedSt:null}); snapSensors();
+  $("source").value="twin"; $("seek").hidden=true; lock(false); render();
+}
+async function loadFile(f){
+  enterFeed("file"); FEED.name=f.name;
+  const parse=rowParser(), rows=FEED.rows;
+  await readFile(f,line=>{ const r=parse(line); if(r&&rows.push(r)%20000===0) $("clock").textContent=`Loading ${f.name} · ${rows.length} min`; });
+  if(!rows.length) throw new Error("no rows with a time");
+  $("seek").max=rows.length; FEED.ready=true; show(1); render();
+}
+$("source").onchange=e=>{
+  const m=e.target.value; e.target.value=FEED.mode;    // stays on the old source until the new one is open (a cancel changes nothing)
+  if(m==="twin") return leaveFeed();
+  $("fileIn").click();
+};
+$("fileIn").onchange=async e=>{ const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  try{ await loadFile(f); }catch(err){ leaveFeed(); alert(`Could not read ${f.name}: ${err.message}`); } };
+$("seek").oninput=e=>{ show(+e.target.value); render(); };
+
+function loop(now){ const dt=(now-last)/1000; last=now;
+  if(running&&(FEED.mode==="twin"||FEED.ready)){ acc+=dt*(+$("speed").value); const n=Math.floor(acc);
+    if(n>0){ acc-=n;
+      if(FEED.mode==="twin") tick(Math.min(n,120));
+      else { show(FEED.i+n); if(FEED.i>=FEED.rows.length){ running=false; $("play").textContent="Play"; } }   // end of the file: pause
+      render(); } }
+  requestAnimationFrame(loop); }
 window.addEventListener("resize",()=>{ drawTrend(); renderBend(); drawPlots(true); });
 
 playMsg="Plant in shutdown: stack at room temperature, air off. Press Start plant to begin the cold start.";

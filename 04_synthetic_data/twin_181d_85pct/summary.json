@@ -1,0 +1,22 @@
+{
+ "period": "2027-01-01T00:00 to 2027-07-01T00:00",
+ "days": 181,
+ "minutes": 260640,
+ "availability_target_pct": 85,
+ "availability_pct": 85,
+ "minutes_per_stage": {
+  "Part load": 176424,
+  "Fuel switch": 76,
+  "Hot standby": 45045,
+  "Air-flow cooling": 2035,
+  "Shutdown": 36326,
+  "Heat-up air": 273,
+  "Heat-up N₂+H₂": 461
+ },
+ "part_loads": 5,
+ "hot_standbys": 5,
+ "cold_shutdowns": 1,
+ "trips": 0,
+ "shutdown_stay_min": 36325,
+ "heatup_min": 735
+}

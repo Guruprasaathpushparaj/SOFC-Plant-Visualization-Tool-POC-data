@@ -26,6 +26,21 @@ and clickable parts that show their sensor readings.
 **Save data** (top bar, 2026-11-05) downloads the recorded minutes (up to the last 48 simulated hours) as CSV:
 `minute, plant_stage`, then one column per sensor (114: 111 plant columns + 3 twin-calculated load-bank totals `P_total_kW`, `I_total_A`, `V_total_V`; empty = no reading). `histCsv()` in app.js.
 
+## View generated data (2026-11-06)
+
+**Source** (top bar) picks what the drawing, readings, time plots and trends show:
+
+- **Twin**: the simulation (default).
+- **Data file…**: open a CSV or `.csv.gz` with one row per minute and the twin's column names, e.g.
+  `04_synthetic_data/twin_6month/sofc_twin_6month.csv.gz` (6 months), a **Save data** file, or a plant logger
+  day file (`02_data/common/YYYYMMDD.txt`). Play / speed (up to 1 day per s) run through it, the slider next to the
+  clock jumps anywhere. Stage = the file's `plant_stage` column, else the twin's stage rules on that row.
+Knobs, playbook and stage bar are locked while a file is shown; **Twin** brings the simulation back
+where it was. Logger day files: first sample of each minute, stack T = median of the stack TCs (TIR 4.6.25 left out),
+EAPH power W → kW, heaters on = EAPH > 0.2 kW or ERH / EAGH current > 0.5 A. On 2026-03-30 this stage rule matches
+the plant stage labels on 98 % of minutes (23 min of hot standby read as air flow cooling); trips are not detected.
+Check: `node 05_twin_2d/tools/feed_check.js` (6-month file, one logger day file).
+
 ## Files
 
 | File | What it is |
@@ -39,6 +54,7 @@ and clickable parts that show their sensor readings.
 | `tools/prep.py` | Rebuilds `data/sensors.js` from `02_data/downsampled` and `03_data_analysis/plant_stages/plant_stages_1min.parquet` |
 | `data/bends.js` | Plant warming speed per stage × 100 °C band × air level, and the stage-border bend/jerk per border type (generated) |
 | `tools/bends.py` | Rebuilds `data/bends.js` from the same two sources |
+| `tools/feed_check.js` | Self-check of the data viewer (Data file) |
 
 ## Rebuild the data
 

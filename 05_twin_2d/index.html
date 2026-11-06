@@ -7,11 +7,11 @@
 <script>try{if(localStorage.getItem("theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#0F121A">
 </head>
 <body>
 
@@ -22,15 +22,23 @@
       <p class="sub">Simplified redraw of the plant layout. Click any part to see its sensors. Readings follow the model stack temperature and what the plant showed in the same stage over 39 days.</p>
     </div>
     <div class="bar">
+      <select id="source" aria-label="Data source" title="Twin = simulation · Data file = play back a CSV (e.g. the generated 6-month data)">
+        <option value="twin">Twin</option>
+        <option value="file">Data file…</option>
+      </select>
+      <input type="file" id="fileIn" accept=".csv,.gz,.txt" hidden>
       <span class="clock" id="clock">Day 1 · 00:00</span>
+      <input type="range" id="seek" min="1" max="1" value="1" hidden aria-label="Position in the data file">
       <button id="play" type="button">Pause</button>
       <select id="speed" aria-label="Simulation speed">
         <option value="5">5 min per s</option>
         <option value="20" selected>20 min per s</option>
         <option value="60">1 h per s</option>
+        <option value="360">6 h per s</option>
+        <option value="1440">1 day per s</option>
       </select>
       <button id="saveBtn" type="button" title="Download every recorded minute (up to the last 48 h) as a CSV file">Save data</button>
-      <button id="themeBtn" type="button" aria-label="Switch light or dark theme" title="Light or dark"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M201.54,54.46A104,104,0,0,0,54.46,201.54,104,104,0,0,0,201.54,54.46ZM40,128a88,88,0,0,1,80-87.63V215.63A88.13,88.13,0,0,1,40,128Zm96,87.63V40.37a88,88,0,0,1,0,175.26Z"/></svg></button>
+      <button id="themeBtn" type="button" aria-label="Switch light or dark theme" title="Light / dark">◐</button>
     </div>
   </header>
 

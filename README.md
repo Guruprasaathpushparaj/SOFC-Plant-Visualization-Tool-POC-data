@@ -18,7 +18,8 @@ We used **39 days of plant logger data** (2025-10-30 → 2026-03-30) to:
 | **See the plant come alive** | [05_twin_2d/](05_twin_2d/): double-click `app.bat` (see [How to start the apps](#how-to-start-the-apps)) |
 | **Learn how the plant is meant to work** | [01_docs/](01_docs/): plant drawings, the stage definitions (`operational-modes.md`) and the sensor/safety map (`component_sensor_map_en.md`) |
 | **Re-run or check the analysis** | [03_data_analysis/](03_data_analysis/): Jupyter notebooks + the Python scripts behind them (see its README) |
-| **Make synthetic data** | [04_synthetic_data/](04_synthetic_data/) (see its README) |
+| **Make synthetic data** | [04_synthetic_data/](04_synthetic_data/) (see its README): stitched real episodes, or months of twin data at a chosen availability (`dataset_app.bat`) |
+| **Play back a data file in the twin** | [05_twin_2d/](05_twin_2d/): top bar **Source → Data file…**, open a generated `.csv.gz`, a Save data file or a logger day file |
 
 ---
 
@@ -61,6 +62,15 @@ operating stages per minute
      ├──► analysis notebooks (start-up, shutdown, slopes, heaters, availability …) ─► 06_deliverables/
      ├──► 04_synthetic_data/  (episode library → random stage pattern → synthetic day)
      └──► 05_twin_2d/tools/prep.py, bends.py  (sensor fits for the digital twin)
+                │
+                ▼
+          05_twin_2d/app.js (the twin)
+                │  04_synthetic_data/twin_dataset.js   (runs the twin headless: any days, availability, stage counts)
+                ▼
+          04_synthetic_data/twin_<days>d_<avail>pct_<P>pl_<C>cs/sofc_twin_dataset.csv.gz
+                │  twin Source → Data file…
+                ▼
+          played back in 05_twin_2d
 ```
 
 ## The 8 plant stages (the key idea in this project)
@@ -86,7 +96,8 @@ Python 3.13, then once from this folder:
 python -m pip install -r requirements.txt
 ```
 
-The 2D twin needs no Python, only Edge or Chrome.
+The 2D twin needs no Python, only Edge or Chrome. The twin dataset maker (`04_synthetic_data/twin_dataset.js`) also needs
+[Node.js](https://nodejs.org) on the PATH; its app needs streamlit (in `requirements.txt`).
 
 ## How to start the apps
 
@@ -99,7 +110,12 @@ The 2D twin needs no Python, only Edge or Chrome.
 | Browser | Double-click `05_twin_2d/start.bat` (needs Python). It serves the page at http://localhost:8765 and opens it. Close the black window to stop it |
 | Plain file | Double-click `05_twin_2d/index.html` |
 
-The twin opens in Shutdown. Press **Start plant** to run a cold start.
+The twin opens in Shutdown. Press **Start plant** to run a cold start. To watch a data file instead of the simulation, pick
+**Source → Data file…** in the top bar (play speed up to 1 day per second, slider to jump); **Source → Twin** goes back.
+
+**Twin dataset app** (`04_synthetic_data/dataset_app.bat`): double-click it. It opens in its own Edge or Chrome window. Pick
+days and availability, press **Make dataset**, then download the result. Close the minimized "SOFC dataset app" window to stop it.
+Command line instead: `node 04_synthetic_data/twin_dataset.js --days 181 --availability 95` (all options in `04_synthetic_data/README.md`).
 
 **Synthetic-data pattern app** (`04_synthetic_data/pattern_app.py`):
 
