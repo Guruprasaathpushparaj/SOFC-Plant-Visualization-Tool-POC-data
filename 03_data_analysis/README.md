@@ -39,6 +39,7 @@ and read data from `../02_data/`.
 | `trip_check.py` | Find safety trips and check trip limits |
 | `heater_temps.py`, `slopes_jerk.py` | Code behind notebooks 13 and 14 |
 | `availability.py` | Plant availability (run: `python scripts/availability.py`) → `availability/` |
+| `rated_power_extrapolation.py` | Every part-load sensor stretched by power to 60 kW, V×I solved per string, gas by Faraday → `rated_power/` |
 | `efficiency_check.py` | Calculated efficiency / fuel use |
 | `correlation_common.py` | Correlation across all columns → `correlation/` |
 

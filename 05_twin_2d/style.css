@@ -40,6 +40,12 @@ button[aria-disabled="true"]:not([aria-current]){opacity:.35;cursor:not-allowed}
 button[aria-disabled="true"]:not([aria-current]):hover{background:transparent;border-color:var(--line)}
 .panel{background:var(--panel);border:2px solid var(--edge);border-radius:6px;padding:12px 14px;min-width:0}
 .panel.hi{background:var(--hi)}
+/* v2.2 highlight: schematic and stack trend are the two things to watch: blue edge, soft glow, blue label */
+.panel.focus{--acc:var(--sel);border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 18%,transparent)}
+.panel.focus>.lbl{color:var(--acc)}
+/* stack trend: warm amber (heat) so it reads apart from the blue schematic */
+.panel.focus.stack{--acc:var(--heat);background:color-mix(in srgb,var(--heat) 6%,var(--panel))}
+.panel.pwr{border-top:3px solid var(--elec)}
 .lbl{font-family:var(--f-display);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 6px}
 .status{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;align-items:stretch;padding:0}
 .status>div{padding:12px 16px;border-left:2px solid var(--edge)} .status>div:first-child{border-left:0}
@@ -135,7 +141,7 @@ canvas{display:block;width:100%;height:230px}
 .stages button[aria-current="step"]{background:var(--sel);color:#fff;border-color:var(--sel)}
 .stages button[aria-current="step"] small{color:#fff;opacity:.8}
 /* right column stays in view; its sensor list scrolls inside */
-.side{display:grid;gap:6px;min-width:0;position:sticky;top:6px;max-height:calc(100vh - 12px);grid-template-rows:auto minmax(0,1fr)}
+.side{display:grid;gap:6px;min-width:0;position:sticky;top:6px;max-height:calc(100vh - 12px);grid-template-rows:auto auto minmax(0,1fr)}
 .side canvas{height:clamp(240px,36vh,480px)}
 .side #power{height:150px}
 .side .read{overflow-y:auto;min-height:0}

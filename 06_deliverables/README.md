@@ -16,3 +16,4 @@ Then read the folders in number order. Inside each folder, the **bold** file is 
 
 Excel files: `01_plant_and_sensors/sensor-list-traced-and-rated.xlsx` (every listed sensor, traced and rated),
 `04_plant_behaviour_and_performance/all-curve-slopes.xlsx` (slope of every changing curve per stage).
+`04_plant_behaviour_and_performance/rated-power-60kw-sensors-explained.pdf`: every sensor stretched from part load to 60 kW (table: `03_data_analysis/rated_power/sensor_extrapolation.xlsx`).

@@ -1,7 +1,7 @@
 // Dataset of any length, availability and stage counts from the 2D twin (05_twin_2d/app.js, unchanged), run headless in Node.
 // Story: Start up (cold start from 25 °C at minute 0) → hot standby → … → hot standby → Shut down (cool to <40 °C, air off,
 // plant off to the end). In between: part loads (PL) and cold shutdowns (CS: Shut down from hot standby, cool, air off, stay,
-// Start plant, heat up). Each PL and CS starts and ends in hot standby (twin rules: fuel switch only from hot standby, part load
+// Start plant, heat up). Each PL and CS starts and ends in hot standby (twin v3.0 rules: the heat up ends in hot standby = natural gas on, no current; part load
 // always unloads to hot standby), so hot standbys = part loads + cold shutdowns + 1. No trips.
 // Availability = (part load + hot standby + fuel switch) / period, as 03_data_analysis/scripts/availability.py. The available minutes
 // are exactly availability × period: PL and HS share them (PL 4 : HS 1, each varied by a fixed ±20 % cycle), and the last hot
@@ -53,14 +53,16 @@ ctx.window=ctx; ctx.addEventListener=()=>{}; ctx.innerHeight=800; ctx.devicePixe
 for(const f of ["data/sensors.js","data/bends.js"]) vm.runInContext(fs.readFileSync(path.join(TWIN,f),"utf8"),ctx);
 const src=fs.readFileSync(path.join(TWIN,"app.js"),"utf8"), END_LINE='select("stack"); render(); requestAnimationFrame(loop);';
 if(!src.includes(END_LINE)) stop("05_twin_2d/app.js changed its last line: update END_LINE in twin_dataset.js.");
-vm.runInContext(src.replace(END_LINE,"window.__twin={S,tick,startNow,startPlay,stage,applyRules,followPartLoad,manual,IDX};"),ctx);
-const {S,tick,startNow,startPlay,stage,applyRules,followPartLoad,manual,IDX}=ctx.__twin;
+vm.runInContext(src.replace(END_LINE,"window.__twin={S,tick,startNow,startPlay,stage,applyRules,followPartLoad,manual,jump,IDX};"),ctx);
+const {S,tick,startNow,startPlay,stage,applyRules,followPartLoad,manual,jump,IDX}=ctx.__twin;
+// Twin v3.0 stage keys: hot standby = "Fuel switch" (natural gas on, no current); the heat up ends there by itself.
+const HS="Fuel switch";
 
 // ---- the UI buttons, as their click handlers do it ----
 const press={
-  load:()=>{ S.trip=0; S.estop=false; S.unloadAt=null; startPlay("load"); applyRules(S); followPartLoad(S); },   // Go to part load (from HS)
-  unload:()=>{ manual(); S.I=0; applyRules(S); followPartLoad(S); },                                            // current knob → 0: 10-min unloading, then HS
-  down:()=>{ S.trip=0; S.estop=false; S.unloadAt=null; startPlay("down"); applyRules(S); followPartLoad(S); },   // Shut down
+  load:()=>jump("Part load"),                                                                                    // Go to part load (from HS)
+  unload:()=>{ manual(); S.I=0; applyRules(S); followPartLoad(S); },                                            // current knob → 0: hot standby (gas stays on)
+  down:()=>{ S.trip=0; S.estop=false; startPlay("down"); applyRules(S); followPartLoad(S); },   // Shut down
   start:()=>startNow(),                                                                                          // Start plant
 };
 
@@ -90,13 +92,13 @@ const SHARE=Math.floor((DOWN-DOWN_MIN)/(C+1));                     // extra not-
 let heatup=null;
 for(let i=0;i<SEQ.length;i++){
   const b=SEQ[i];
-  if(b==="SU"){ press.start(); runUntil(()=>stage(S)==="Hot standby"); heatup=rec; }
+  if(b==="SU"){ press.start(); runUntil(()=>stage(S)===HS); heatup=rec; }
   else if(b==="PL"){ press.load(); run(DUR[i]); }
   else if(b==="HS"){
     if(SEQ[i-1]==="PL") press.unload();                              // after start up / a cold restart the heat-up already ends in hot standby
     run(SEQ[i+1]==="SD"? AV-availNow(): DUR[i]);                      // the last hot standby ends on the exact available minute
   }
-  else if(b==="CS"){ press.down(); runUntil(()=>stage(S)==="Shutdown"); run(SHARE); press.start(); runUntil(()=>stage(S)==="Hot standby"); }
+  else if(b==="CS"){ press.down(); runUntil(()=>stage(S)==="Shutdown"); run(SHARE); press.start(); runUntil(()=>stage(S)===HS); }
   else { press.down(); run(N); }                                     // final shutdown: cooling, air off below 40 °C, plant off to the end
 }
 if(stage(S)!=="Shutdown") fail(`The final shutdown did not reach plant off (air off below 40 °C) before the end: it needs more not available time. Use a lower availability or more days.`);
@@ -106,7 +108,7 @@ gz.end();
 const visits=st=>events.filter(e=>e.stage===st).length;
 const summary={period:`${new Date(START).toISOString().slice(0,16).replace("T"," ")} to ${new Date(END).toISOString().slice(0,16).replace("T"," ")}`,days:DAYS,minutes:rec,
   availability_target_pct:AVAIL,availability_pct:+(100*availNow()/rec).toFixed(3),order:SEQ.join(" "),minutes_per_stage:stMin,
-  part_loads:visits("Part load"),hot_standbys:visits("Hot standby"),cold_shutdowns:C,shutdowns:visits("Shutdown"),trips:visits("Trip: purge"),
+  part_loads:visits("Part load"),hot_standbys:visits(HS),cold_shutdowns:C,shutdowns:visits("Shutdown"),trips:visits("Trip: purge"),
   first_stage:events[0].stage,last_stage:events[events.length-1].stage,startup_min:heatup,folder:path.basename(OUT)};
 const assert=(c,m)=>{ if(!c) fail("Self check failed: "+m+"\n"+JSON.stringify(summary,null,1)); };
 assert(rec===N,"length"); assert(availNow()===AV,`available minutes ${availNow()} vs ${AV}`);

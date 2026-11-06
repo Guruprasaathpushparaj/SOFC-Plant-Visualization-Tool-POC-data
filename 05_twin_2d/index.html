@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SOFC Plant Twin v2.1</title>
+<title>SOFC Plant Twin v3.0</title>
 <script>try{if(localStorage.getItem("theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
 <div class="wrap">
   <header>
     <div>
-      <h1>SOFC Plant Twin v2.1</h1>
+      <h1>SOFC Plant Twin v3.0</h1>
       <p class="sub">Simplified redraw of the plant layout. Click any part to see its sensors. Readings follow the model stack temperature and what the plant showed in the same stage over 39 days.</p>
     </div>
     <div class="bar">
@@ -50,7 +50,7 @@
   </section>
 
   <section class="panel hi" aria-label="Plant stages">
-    <p class="lbl">Plant stages · no jumps: every button is a real move from the stack temperature the twin has now; heat up N₂+H₂, hot standby, fuel switch and part load are linked (reached only from the stage before)</p>
+    <p class="lbl">Plant stages · no jumps: every button is a real move from the stack temperature the twin has now; heat up (air, then N₂+H₂) ends in hot standby (natural gas on, no power drawn); part load and rated power only by button (linked: reached only from the stage before)</p>
     <div class="stagerow">
       <button type="button" class="start" id="startBtn">Start plant</button>
       <span class="sep" aria-hidden="true"></span>
@@ -60,7 +60,7 @@
 
   <div class="top">
     <div class="main">
-    <section class="panel draw" aria-label="Plant schematic">
+    <section class="panel draw focus" aria-label="Plant schematic">
       <svg id="pid" viewBox="0 0 1200 680" role="group" aria-label="Plant schematic. Each part is a button that shows its sensor readings.">
         <rect class="zone" data-group="fpm" x="8" y="128" width="434" height="544" rx="4" fill="var(--zone)"/>
         <rect class="zone" data-group="pgm" x="450" y="128" width="742" height="544" rx="4" fill="var(--zone2)"/>
@@ -81,6 +81,7 @@
         <p class="lbl">Playbook</p>
         <div class="scen">
           <button type="button" data-scen="load">Go to part load</button>
+          <button type="button" data-scen="rated">Go to rated power</button>
           <button type="button" data-scen="down">Shut down</button>
           <button type="button" class="trip" id="tripBtn">Trip / Emergency purge</button>
           <button type="button" class="estop" id="estopBtn" title="Everything off at once, air included">Emergency stop</button>
@@ -105,12 +106,14 @@
     </div>
 
     <div class="side">
-    <section class="panel hi" aria-label="Trend">
+    <section class="panel focus stack" aria-label="Stack temperature trend">
       <p class="lbl">Stack temperature, last 24 h</p>
       <canvas id="trend" aria-label="Stack temperature, last 24 hours"></canvas>
-      <p class="lbl" style="margin:10px 0 4px">Load bank total power (Σ V × I, 5 strings), last 24 h</p>
-      <canvas id="power" aria-label="Load bank total power, last 24 hours"></canvas>
       <div class="legend" id="legend"></div>
+    </section>
+    <section class="panel pwr" aria-label="Power trend">
+      <p class="lbl">Load bank total power (Σ V × I, 5 strings), last 24 h</p>
+      <canvas id="power" aria-label="Load bank total power, last 24 hours"></canvas>
     </section>
     <section class="panel read" aria-live="polite">
       <p class="lbl">Sensor readings</p>

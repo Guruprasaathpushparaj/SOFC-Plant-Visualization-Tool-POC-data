@@ -1,5 +1,19 @@
 # SOFC Plant Twin (2D, local)
 
+**Version 3.0 (2026-11-06)** – new stage set. Start plant → **Heat up** (on air, then on N₂ + H₂ from 210 °C) → **Hot standby**
+(the old fuel switch: natural gas on, no current, no power drawn; the heat up ends there by itself near 506 °C) →
+**Part load** → **Rated power** (both only by button: *Go to part load* from hot standby, *Go to rated power* from part load,
+or the stage bar). Air flow cooling, shutdown, trip purge, keeper and cooling rules as before. Part load / rated power are
+always followed by hot standby (gas stays on); trip purge only from hot standby, part load or rated power, then back to hot
+standby. The old 10-min fuel-switch wait before part load and the 10-min unloading window after it are gone.
+Rated power has no plant data: 29.2 A per string, NG 166, air 10000 ln/min (≈ 51 kW); sensors use their part-load lines,
+string voltage follows the current (`string_vi_fit.csv`). As the 50 kW study found, the stack reaches the 720 °C trip
+(~30 min after the step from part load at 623 °C). Internal stage keys stay the plant-data names (`"Fuel switch"` = hot
+standby, `"Heat-up air"`/`"Heat-up N₂+H₂"` = heat up, new `"Rated power"`), so Save data CSVs and `twin_dataset.js`
+write those keys; plant files play back with the new display names.
+
+**Version 2.2 (2026-11-06)** – highlight on the plant schematic and the stack temperature trend (blue edge and glow); load bank power moved out of the stack panel into its own panel below it. Release tag `v2.2`.
+
 **Version 2.1 (2026-11-06)** – play back a data file in the twin (top bar **Source → Data file…**: generated `.csv.gz`, Save data CSV or logger day file; seek slider; 6 h/s and 1 day/s speeds); twin dataset maker `04_synthetic_data/twin_dataset.js` + `dataset_app.bat`; v36 colours restored. Release tag `v2.1`.
 
 **Version 2.0 (2026-11-06, internal build v36)** – DC/DC per string, load bank totals (Σ P, Σ I, V) and load bank power trend. Release tag `v2.0`.

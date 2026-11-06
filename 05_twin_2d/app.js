@@ -1,8 +1,15 @@
 (function(){
 const DATA=window.SOFC_SENSORS;
-const STAGES={"Heat-up air":"#E8B04A","Heat-up N₂+H₂":"#C46A12","Hot standby":"#B4472B","Fuel switch":"#7B4FA0","Part load":"#2E8B57","Air-flow cooling":"#3A7CA5","Shutdown":"#8C96A3","Trip: purge":"#C2185B"};
+// Stage keys stay the plant-data stage names (sensors.js fits/flows and bends.js borders are keyed by them). Since v3.0
+// (2026-11-06, user) the twin SHOWS them as: Heat up = Heat-up air → Heat-up N₂+H₂ (its end, the forming-gas "Hot standby" key,
+// lasts one minute: the twin opens the gas there); Hot standby = the "Fuel switch" key (natural gas on, no current, no power drawn);
+// Part load; Rated power (new key, no plant data); Air flow cooling; Shutdown; Trip. Part load and rated power only by button.
+const HU="#E8B04A";
+const STAGES={"Heat-up air":HU,"Heat-up N₂+H₂":HU,"Hot standby":HU,"Fuel switch":"#B4472B","Part load":"#2E8B57","Rated power":"#7B4FA0","Air-flow cooling":"#3A7CA5","Shutdown":"#8C96A3","Trip: purge":"#C2185B"};
 // Display names: the trip stage is shown as "Trip / Emergency purge". Data keys stay "Trip: purge".
-const NAME={"Trip: purge":"Trip / Emergency purge","Heat-up air":"Heat up air","Heat-up N₂+H₂":"Heat up N₂+H₂","Air-flow cooling":"Air flow cooling"}, nm=st=>NAME[st]||st;
+const NAME={"Trip: purge":"Trip / Emergency purge","Heat-up air":"Heat up","Heat-up N₂+H₂":"Heat up","Hot standby":"Heat up","Fuel switch":"Hot standby","Air-flow cooling":"Air flow cooling"}, nm=st=>NAME[st]||st;
+// with the heat-up phase (stage pill, bend panel): "Heat up · air", "Heat up · N₂+H₂", "Heat up · N₂+H₂ end"
+const PHASE={"Heat-up air":"air","Heat-up N₂+H₂":"N₂+H₂","Hot standby":"N₂+H₂ end"}, nmp=st=>PHASE[st]?`${nm(st)} · ${PHASE[st]}`:nm(st);
 const T_AMB=25, AIR_COOL=20, T_FORMING=210, I_POWER=1, NG_ON=20, N2_ON=100, H2_ON=5;
 const FLOWS=DATA.flows;
 
@@ -27,16 +34,19 @@ const SP_FS=580, SP_PL=600;                       // plant median air-heater tar
 // When on, above KEEP it raises the cathode air (+200 ln/min per min) to 10000, then lowers the air-heater target (−5 °C per min, min 500);
 // below KEEP−5 it hands back (target, then air) to the settings it started from. 660 keeps the safety TC under ~700 (trip 720).
 const KEEP=660, KEEP_BAND=5, KEEP_AIR=200, KEEP_SP=5, AIR_MAX=10000, SP_MIN=500, STACK_TRIP=720, STACK_SAFETY="TIRZ_8_1_3";
-// Trip purge is allowed only from hot standby or part load (rule set 2026-11-04), and also in fuel switch when it comes straight
-// after part load (the unloading window below; plant trip #2 purged just after load with the gas still on). In any other stage
-// the Trip buttons are locked and a 720 °C stack-safety reading only warns: no purge starts. After the purge the twin goes back
-// to hot standby. Purge 16 min (plant purges 15–17 min).
-// Part load is always followed by hot standby (rule set 2026-11-04): any way out of part load other than a trip unloads to hot standby.
-// Taking the current off while the gas is still on first gives a short fuel-switch unloading window, as on the plant (19 + 30 Mar:
-// part load → fuel switch 9–10 min at 0 A → hot standby), then hot standby.
-const PURGE_FROM=["Hot standby","Part load"], PURGE_MIN=16, SP_HS=500, UNLOAD_MIN=10;   // SP_HS = hot-standby air-heater target (stack settles ~506 °C)
+// Trip purge is allowed only from hot standby, part load or rated power. In any other stage the Trip buttons are locked and a
+// 720 °C stack-safety reading only warns: no purge starts. After the purge the twin goes back to hot standby. Purge 16 min
+// (plant purges 15–17 min). Part load and rated power are always followed by hot standby (or each other, or a trip purge).
+const PURGE_FROM=["Fuel switch","Part load","Rated power"], LOADS=["Part load","Rated power"], PURGE_MIN=16;
+const SP_HS=500;   // heat-up air-heater target: the stack settles ~506 °C, where the heat up ends and the gas opens
 // Shut down cools at 9000 ln/min and turns the air off at 40 °C (plant full cool-down after trip #8: air 9000, 664 → 41 °C in 18 h).
 const SD_AIR=9000, AIR_OFF_T=40;
+// Rated power (v3.0): the plant never went above 16.2 A / 34 kW, so there is no plant data. 50 kW DC = 29.2 A per string,
+// NG 166 ln/min (03_data_analysis/rated_power, 50 kW work 2026-11-06), air 10000 (plant max); POx and air heater as part load.
+// That work found no steady point under the 720 °C trip at 50 kW, so the twin is expected to trip there.
+// The stage reads Rated power above the plant's highest part-load current (16.2 A).
+const I_RATED_MIN=17;
+FLOWS["Rated power"]={...FLOWS["Part load"],air:AIR_MAX,14:166,I:29.2};
 const S={t:0,T:T_AMB,Tin:T_AMB,dT:0,slope:0,air:0,pox:0,n2:0,h2:0,ng:0,I:0,heaters:false,target:500,fgAuto:true,trip:0,mark:0,keeper:true,kept:false,plantCool:true,coolAt:null,lastSt:"Shutdown",hist:[]};
 const ngOn=s=>s.ng>NG_ON, fgOn=s=>s.n2>N2_ON&&s.h2>H2_ON, heatOn=s=>s.heaters&&s.trip<=0, loadOn=s=>ngOn(s)&&s.I>=I_POWER;
 // EAPH inlet = air leaving the recuperators (fitted 2026-11-04 on the 39 days, 8 replay stretches held out:
@@ -154,7 +164,7 @@ function step(s){
   followRec(s,h);
   followTin(s,h);
   if(!s.plantCool||!freeCooling(s)) s.coolAt=null;                       // plant cooling slope: only straight out of hot standby
-  else if(s.coolAt==null && s.lastSt==="Hot standby") s.coolAt=s.t;
+  else if(s.coolAt==null && (s.lastSt==="Fuel switch"||s.lastSt==="Hot standby")) s.coolAt=s.t;
   const raw=s.coolAt!=null? hsCoolRate(s): rate(s), stNow=stage(s);
   if(stNow!==s.lastSt && s.rsAt!==s.t && s.coolAt!==s.t && Math.abs(raw-s.dT)>BLEND_MIN)
     Object.assign(s,{rsAt:s.t,rsFrom:s.dT,rsD:borderD(s.lastSt,stNow),rsBorder:`${s.lastSt}>${stNow}`});
@@ -167,7 +177,7 @@ function step(s){
 function stage(s){
   if(s.feedSt) return s.feedSt;                     // data file: the row's stage
   if(s.trip>0) return "Trip: purge";
-  if(loadOn(s)) return "Part load";
+  if(loadOn(s)) return s.I>I_RATED_MIN? "Rated power":"Part load";
   if(ngOn(s)) return "Fuel switch";
   if(s.air<=AIR_COOL) return "Shutdown";
   if(!s.heaters) return "Air-flow cooling";
@@ -180,72 +190,53 @@ const F=n=>FLOWS[n]||{};
 const PLAYS={
   cold:[
     {say:"Cold start (plant settings): air 6000 ln/min, heaters on, air heater 300 °C, outlet ramps 60 °C/h.", when:()=>true, act:s=>Object.assign(s,{air:F("Heat-up air").air,heaters:true,target:300,fgAuto:true,ng:0,pox:0,I:0})},
-    {say:"Stack at 210 °C: N₂ + H₂ join, air heater up to 500 °C; the stack settles into hot standby near 505 °C.", when:s=>s.T>=T_FORMING, act:s=>{s.target=500;}},
-  ],
-  load:[
-    {say:`Fuel switch: NG ${F("Fuel switch")[14]} ln/min, POx air ${F("Fuel switch")[12]}; N₂ + H₂ close, air heater target ${SP_FS} °C. Waiting 10 min (plant median).`, when:()=>true, act:s=>{Object.assign(s,{ng:F("Fuel switch")[14],pox:F("Fuel switch")[12],fgAuto:true,heaters:true,target:SP_FS}); s.mark=s.t;}},
-    {say:`Part load (plant median): air ${F("Part load").air}, NG ${F("Part load")[14]}, POx ${F("Part load")[12]} ln/min, ${F("Part load").I} A per string, air heater target ${SP_PL} °C.`, when:s=>s.t-s.mark>=10, act:s=>Object.assign(s,{air:F("Part load").air,ng:F("Part load")[14],pox:F("Part load")[12],I:F("Part load").I,heaters:true,target:SP_PL})},
+    {say:"Stack at 210 °C: N₂ + H₂ join, air heater up to 500 °C; the heat up ends when the stack settles near 505 °C.", when:s=>s.T>=T_FORMING, act:s=>{s.target=SP_HS;}},
+    // the heat up always ends in hot standby: the minute the stack stops warming on N₂ + H₂ (old forming-gas plateau), the gas opens
+    {say:`Heat up done → hot standby: natural gas ${F("Fuel switch")[14]} ln/min, POx air ${F("Fuel switch")[12]}, N₂ + H₂ close, air heater ${SP_FS} °C, no current (no power drawn). Part load only by its button.`, when:s=>stage(s)==="Hot standby", act:s=>toStandby(s)},
   ],
   down:[
     {say:`Shut down: NG and POx closed, current 0, heaters off, air ${SD_AIR} ln/min until the stack is below ${AIR_OFF_T} °C. N₂ + H₂ stay while above 210 °C.`, when:()=>true, act:s=>Object.assign(s,{ng:0,pox:0,I:0,heaters:false,air:SD_AIR,fgAuto:true})},
     {say:`Below ${AIR_OFF_T} °C: air off, plant in shutdown.`, when:s=>s.T<AIR_OFF_T, act:s=>{s.air=0;}},
   ],
-  // after a trip purge (only from hot standby or part load): back to hot standby
+  // after a trip purge (only from hot standby, part load or rated power): back to hot standby
   afterTrip:[
-    {say:`Purge done: back to hot standby: air ${F("Hot standby").air|0} ln/min, heaters on, air heater ${SP_HS} °C, N₂ + H₂ on, gas and current stay off.`, when:()=>true, act:s=>toStandby(s)},
+    {say:`Purge done: back to hot standby: air ${F("Fuel switch").air|0} ln/min, heaters on, air heater ${SP_FS} °C, natural gas ${F("Fuel switch")[14]} ln/min, no current.`, when:()=>true, act:s=>toStandby(s)},
   ],
 };
-// Hot-standby settings (plant median flows): used when part load ends and after a trip purge.
+// Hot-standby settings (plant fuel-switch medians: natural gas on, no current): end of heat up, after part load / rated power, after a trip purge.
 function toStandby(s){
-  const f=F("Hot standby");
-  Object.assign(s,{air:f.air,ng:0,pox:0,I:0,heaters:true,target:SP_HS,fgAuto:true,fsAt:null,unloadAt:null,kept:false});
-  applyRules(s); s.slope=Math.min(s.slope,rate(s),0);   // the stack is coming down from part load: no heat-up label (the slope itself blends, see step)
+  const f=F("Fuel switch");
+  Object.assign(s,{air:f.air,ng:f[14],pox:f[12],I:0,heaters:true,target:SP_FS,fgAuto:true,kept:false});
+  applyRules(s);
 }
+// Part load / rated power settings (n = stage key); only from the buttons (stage bar or Go to …).
+function toLoad(s,n){ const f=F(n); Object.assign(s,{air:f.air,ng:f[14],pox:f[12],I:f.I,heaters:true,target:SP_PL,kept:false}); }
+const loadMsg=n=>`${nm(n)}: air ${F(n).air|0}, NG ${F(n)[14]|0}, POx ${F(n)[12]|0} ln/min, ${F(n).I} A per string, air heater ${SP_PL} °C.`
+  +(n==="Rated power"?" No plant data at this power: readings are part load look-ups (string voltage from the current), and the stack is expected to reach the 720 °C trip.":"");
 let play=null, playStep=0, playMsg="";
 function startPlay(n){ play=PLAYS[n]; playStep=0; runPlay(); }
 function runPlay(){ if(!play) return; while(playStep<play.length && play[playStep].when(S)){ play[playStep].act(S); playMsg=play[playStep].say; playStep++; } if(playStep>=play.length) play=null; }
 function manual(){ play=null; S.estop=false; playMsg="Manual control."; }
-// Fuel switch is always followed by part load: FS_MIN after natural gas comes on (plant median gas → first current 10 min).
-const FS_MIN=10;
-function toPartLoad(s){ const f=F("Part load"); Object.assign(s,{air:f.air,ng:f[14],pox:f[12],I:f.I,heaters:true,target:SP_PL}); playMsg=`Fuel switch done after ${FS_MIN} min → part load: air ${Math.round(f.air)}, NG ${Math.round(f[14])}, POx ${Math.round(f[12])} ln/min, ${f.I} A per string.`; }
-function followFuelSwitch(s){
-  const ng=ngOn(s);
-  if(ng&&!s.ngWas) s.fsAt=s.t;
-  if(!ng||loadOn(s)) s.fsAt=null;
-  s.ngWas=ng;
-  if(s.fsAt!=null && s.t-s.fsAt>=FS_MIN && !play){ toPartLoad(s); s.fsAt=null; }
-}
-// Part load is always followed by hot standby: if the twin leaves part load for anything other than hot standby or a trip
-// purge (Shut down, natural gas off, heaters or air changed), it unloads to hot-standby settings instead.
-// Current off with the gas still on → fuel switch: the twin stays there UNLOAD_MIN (gas on, 0 A; a trip purge is allowed
-// in this window), then goes to hot standby. Current back up → part load again. An emergency stop overrides all of this.
+// Part load and rated power are always followed by hot standby (or each other, or a trip purge): if the twin leaves them any
+// other way (Shut down, natural gas off, heaters or air changed), it unloads to hot-standby settings instead. Current to 0
+// with the gas on is hot standby itself. An emergency stop overrides all of this.
 function followPartLoad(s){
-  if(s.estop){ s.plWas=false; s.unloadAt=null; return; }
+  if(s.estop){ s.plWas=false; return; }
   const st=stage(s);
-  if(s.unloadAt!=null){
-    if(st==="Part load"||st==="Trip: purge") s.unloadAt=null;
-    else if(st!=="Fuel switch" || s.t-s.unloadAt>=UNLOAD_MIN){
-      const done=s.t-s.unloadAt>=UNLOAD_MIN; play=null; toStandby(s);
-      playMsg=`${done?`Unloading done after ${UNLOAD_MIN} min`:"Natural gas closed"}: part load is followed by hot standby: natural gas and POx closed, N₂ + H₂ back, air ${Math.round(s.air)} ln/min, heaters on, air heater ${SP_HS} °C.`;
-    }
-  } else if(s.plWas && st==="Fuel switch"){
-    s.unloadAt=s.t; s.I=0;
-    playMsg=`Load off: current 0, natural gas stays on ${UNLOAD_MIN} min (plant 9–10 min), then hot standby. A trip / emergency purge is allowed in this window.`;
-  } else if(s.plWas && st!=="Part load" && st!=="Hot standby" && st!=="Trip: purge"){
+  if(s.plWas && !LOADS.includes(st) && st!=="Fuel switch" && st!=="Trip: purge"){
     play=null; toStandby(s);
-    playMsg=`Part load is always followed by hot standby (not ${lc(nm(st))}): current 0, natural gas and POx closed, N₂ + H₂ back, air ${Math.round(s.air)} ln/min, heaters on, air heater ${SP_HS} °C. Shut down works from hot standby.`;
+    playMsg=`${nm(s.plWas)} is always followed by hot standby (not ${lc(nm(st))}): current 0, natural gas ${Math.round(s.ng)} ln/min stays on, air ${Math.round(s.air)} ln/min, heaters on, air heater ${SP_FS} °C. Shut down works from hot standby.`;
   }
-  s.plWas=stage(s)==="Part load";
+  s.plWas=LOADS.includes(stage(s))&&stage(s);
 }
-function tick(n){ for(let i=0;i<n;i++){ runPlay(); followFuelSwitch(S); step(S); if(S.purgeDone){ S.purgeDone=false; startPlay("afterTrip"); } followPartLoad(S); S.hist.push({t:S.t,T:S.T,st:stage(S)}); noteBorder(S); followSensors(S); S.hist[S.hist.length-1].v=recordAll(); checkTrip(S); } if(S.hist.length>2880) S.hist.splice(0,S.hist.length-2880); }
-// Trip purge: only from hot standby, part load, or fuel switch straight after part load (unloading window).
-const unloading=s=>s.unloadAt!=null&&stage(s)==="Fuel switch";
-const canPurge=s=>s.trip<=0&&!s.estop&&(PURGE_FROM.includes(stage(s))||unloading(s));
+function tick(n){ for(let i=0;i<n;i++){ step(S); runPlay(); if(S.purgeDone){ S.purgeDone=false; startPlay("afterTrip"); } followPartLoad(S); S.hist.push({t:S.t,T:S.T,st:stage(S)}); noteBorder(S); followSensors(S); S.hist[S.hist.length-1].v=recordAll(); checkTrip(S); } if(S.hist.length>2880) S.hist.splice(0,S.hist.length-2880); }
+// Trip purge: only from hot standby, part load or rated power.
+const canPurge=s=>s.trip<=0&&!s.estop&&PURGE_FROM.includes(stage(s));
 const lc=t=>t[0].toLowerCase()+t.slice(1);
-const noPurgeMsg=s=>s.estop?"Trip / emergency purge is locked after an emergency stop.":`Trip / emergency purge is allowed only from hot standby, part load, or fuel switch straight after part load, not from ${lc(nm(stage(s)))}${stage(s)==="Fuel switch"?" on the way up to load":""}.`;
+const noPurgeMsg=s=>s.estop?"Trip / emergency purge is locked after an emergency stop.":`Trip / emergency purge is allowed only from hot standby, part load or rated power, not from ${lc(nm(stage(s)))}.`;
 function startPurge(s,msg){
   if(!canPurge(s)) return false;
-  play=null; s.noPurgeWarn=false; Object.assign(s,{trip:PURGE_MIN,heaters:false,unloadAt:null}); applyRules(s); playMsg=msg;
+  play=null; s.noPurgeWarn=false; Object.assign(s,{trip:PURGE_MIN,heaters:false}); applyRules(s); playMsg=msg;
   return true;
 }
 // Plant safety trip: stack safety thermocouple TIRZ 8.1.3 at 720 °C → emergency purge, then back to hot standby.
@@ -333,7 +324,7 @@ PIPES.push(["bus","M807 24H1085","--elec","load",loadOn]);   // DC/DC outputs jo
 const PARTS={
   air:{title:"Cathode air supply",desc:"Two mass flow controllers (MFC-Air-1, -2) feed the cathode air; the streams merge before the three way valve."},
   twv:{title:"three way valve TWV-CA",desc:"Splits the cathode air between the recuperators (APH) and the direct path to the electric air heater. Driven by temperature, not a knob."},
-  pox:{title:"POx air",desc:"Partial oxidation air to the reformer. On with natural gas (fuel switch, part load)."},
+  pox:{title:"POx air",desc:"Partial oxidation air to the reformer. On with natural gas (hot standby, part load, rated power)."},
   n2:{title:"Nitrogen (forming gas)",desc:"N₂ for forming gas and purge. Rule: on above 210 °C while no natural gas."},
   h2:{title:"Hydrogen (forming gas)",desc:"H₂ part of the forming gas that keeps the anode reduced."},
   ng:{title:"Natural gas line",desc:"Desulphuriser, booster compressor, 15 bar storage, then MFC-Fuel FIRC 1.4 to the ejector."},
@@ -434,7 +425,13 @@ DATA.components.load=[{tag:"Σ P",col:"P_total_kW",desc:"Load bank total power (
 Object.assign(KNOB,CALC);
 for(let i=1;i<=5;i++) KNOB[`PLC_hostSetp_ctrl_ctEIRC4${i}_rCurrMonitor`]=s=>loadOn(s)?s.I:0;
 const TRIP={"TIRZ_8_1_1":1050,"TIRZ_8_1_3":720,"TIRZ_8_1_9":930,"TIRZ_8_1_10":300,"TIRZ_8_2_1":950,"TIRZ_8_2_2":950,"TIRZ_8_2_3":950,"TIRZ_8_2_4":950,"TIRZ_8_2_5":860};
+// Rated power has no plant data: every sensor uses its part-load line, except the string voltages, which follow the current
+// (V = V0 + b·I per string, fitted on the plant part-load minutes: 03_data_analysis/rated_power/string_vi_fit.csv → 51 kW at 29.2 A).
+// shortcut: part-load look-ups for all other sensors at rated power; replace with rated-power fits if the plant ever runs there.
+Object.values(DATA.components).flat().forEach(r=>{ if(r.fits["Part load"]) r.fits["Rated power"]=r.fits["Part load"]; });
+const VI={}; [[486.66,-4.662],[492.27,-4.866],[482.52,-5.476],[477.36,-3.809],[501.16,-4.746]].forEach(([v0,b],k)=>VI[STR[k][1]]=I=>v0+b*I);
 function reading(r,st){
+  if(st==="Rated power" && VI[r.col]) return {v:VI[r.col](S.I),f:r.fits[st]};
   const f=r.fits[st];
   if(KNOB[r.col]) return {v:KNOB[r.col](S),f,knob:true};
   if(!f) return {v:null,f:null};
@@ -630,45 +627,37 @@ window.addEventListener("scroll",onScroll,{passive:true});
 
 // ---------- stage bar: jump straight into a stage ----------
 // Stage order of the stage bar; flows for a move = plant medians per stage (plant_stages_1min.parquet, 39 days).
-const ORDER=["Heat-up air","Heat-up N₂+H₂","Hot standby","Fuel switch","Part load","Air-flow cooling","Shutdown"];
-// Linked stages (rule set 2026-11-04, user): Heat-up N₂+H₂, Hot standby, Fuel switch and Part load can never be jumped to.
-// They are links in one chain, Start plant → Heat-up air → Heat-up N₂+H₂ → Hot standby → Fuel switch → Part load
-// (→ back to hot standby), and each is reached only by the real move from the stage before it:
-//   Heat-up N₂+H₂  comes by itself during heat-up air when the stack reaches 210 °C (N₂ + H₂ open, air heater to 500 °C)
-//   Hot standby    comes by itself when heat-up N₂+H₂ stops warming (~506 °C); from fuel switch or part load: unload to it
-//   Fuel switch    from hot standby only: natural gas opens (plant fuel-switch settings), part load follows after 10 min
-//   Part load      from fuel switch only: current on now (the twin would also go there by itself after 10 min)
-// Heat-up air, Air-flow cooling and Shutdown are real moves from the current stack temperature too (moveStep), not jumps.
-const LINK_HINT={"Heat-up N₂+H₂":`at ${T_FORMING} °C`,"Hot standby":"after heat-up","Fuel switch":"from hot standby","Part load":"after fuel switch"};
-const LINK_FROM={"Heat-up N₂+H₂":["Heat-up air","a cool-down between 210 and 500 °C"],"Hot standby":["Heat-up N₂+H₂","Fuel switch","Part load"],"Fuel switch":["Hot standby"],"Part load":["Fuel switch"]};
-const LINK_PATH="Start plant → Heat-up air → Heat-up N₂+H₂ → Hot standby → Fuel switch → Part load";
+// Stage bar (v3.0): Heat up → Hot standby → Part load → Rated power, then Air flow cooling, Shutdown, Trip. Button keys:
+// "Heat-up air" = Heat up (start / restart), "Fuel switch" = Hot standby.
+const ORDER=["Heat-up air","Fuel switch","Part load","Rated power","Air-flow cooling","Shutdown"];
+// Linked stages (no jump, only the real move from the stage before):
+//   Hot standby  comes by itself when the heat up ends (~506 °C on N₂ + H₂: natural gas opens, no current);
+//                from part load or rated power: current off, gas stays on
+//   Part load    from hot standby (or down from rated power): button only
+//   Rated power  from part load: button only
+// Heat up, Air flow cooling and Shutdown are real moves from the current stack temperature too (moveStep), not jumps.
+const LINK_HINT={"Fuel switch":"after heat up","Part load":"from hot standby","Rated power":"from part load"};
+const LINK_FROM={"Fuel switch":["Heat-up air","Part load","Rated power"],"Part load":["Fuel switch","Rated power"],"Rated power":["Part load"]};
+const LINK_PATH="Start plant → Heat up (air, then N₂+H₂) → Hot standby → Part load → Rated power";
 function linkStep(cur,st){
   if(cur===st) return {msg:`Already in ${lc(nm(st))}.`};
   if(S.trip>0) return {msg:`Emergency purge running: the twin goes back to hot standby by itself when it ends.`};
   if(S.estop) return {msg:`After an emergency stop the plant restarts from shutdown: ${LINK_PATH}.`};
-  if(st==="Heat-up N₂+H₂" && canRestart(S))
-    return S.T>=T_FORMING? {act:()=>warmStart(S)}
-      : {msg:`Restart at ${Math.round(S.T)} °C is below ${T_FORMING} °C, so it starts in heat-up air (press Start plant or Heat-up air); N₂ + H₂ join at ${T_FORMING} °C.`};
-  if(st==="Heat-up N₂+H₂" && cur==="Heat-up air")
-    return {msg:`Heat-up N₂+H₂ comes by itself when the stack reaches ${T_FORMING} °C (now ${Math.round(S.T)} °C): N₂ + H₂ open and the air heater goes to 500 °C.`};
-  if(st==="Hot standby" && cur==="Heat-up N₂+H₂")
-    return {msg:`Hot standby comes by itself when the stack stops warming near 506 °C (now ${Math.round(S.T)} °C, ${S.dT>=0?"+":"−"}${Math.abs(S.dT).toFixed(0)} °C/h).`};
-  if(st==="Hot standby" && (cur==="Fuel switch"||cur==="Part load"))
-    return {act:()=>{ toStandby(S); S.plWas=false; S.unloadAt=null; }, msg:`Back to hot standby: natural gas, POx and current off, N₂ + H₂ back, air ${F("Hot standby").air|0} ln/min, heaters on, air heater ${SP_HS} °C.`};
-  if(st==="Fuel switch" && cur==="Hot standby")
-    return {act:()=>startPlay("load")};
-  if(st==="Part load" && cur==="Fuel switch" && !unloading(S))
-    return {act:()=>{ toPartLoad(S); S.fsAt=null; }, msg:`Part load from fuel switch: air ${F("Part load").air|0}, NG ${F("Part load")[14]|0}, POx ${F("Part load")[12]|0} ln/min, ${F("Part load").I} A per string, air heater ${SP_PL} °C.`};
+  if(st==="Fuel switch" && nm(cur)==="Heat up")
+    return {msg:`Hot standby comes by itself when the heat up ends near ${SP_HS} °C (now ${Math.round(S.T)} °C, ${S.dT>=0?"+":"−"}${Math.abs(S.dT).toFixed(0)} °C/h): natural gas opens, no current.`};
+  if(st==="Fuel switch" && LOADS.includes(cur))
+    return {act:()=>toStandby(S), msg:`Back to hot standby: current 0 (no power drawn), natural gas ${F("Fuel switch")[14]|0} and POx ${F("Fuel switch")[12]|0} ln/min stay on, air ${F("Fuel switch").air|0} ln/min, air heater ${SP_FS} °C.`};
+  if((st==="Part load" && (cur==="Fuel switch"||cur==="Rated power")) || (st==="Rated power" && cur==="Part load"))
+    return {act:()=>toLoad(S,st), msg:loadMsg(st)};
   return {msg:`${nm(st)} is a linked stage: no jump, it is reached only from ${LINK_FROM[st].map(x=>lc(nm(x))).join(" or ")} (${LINK_PATH}). Now in ${lc(nm(cur))}.`};
 }
-const linkOpen=(cur,st)=>!!linkStep(cur,st).act;
 function jump(st){
-  // Part load is always followed by hot standby (a trip purge is the only other way out): from part load, a stage-bar
-  // click on any other stage unloads the plant to hot-standby settings instead of jumping there.
+  // Part load and rated power are always followed by hot standby (a trip purge is the only other way out): from there, a
+  // stage-bar click on any other stage unloads the plant to hot-standby settings instead of jumping there.
   const cur=stage(S);
-  if(cur==="Part load" && st!=="Part load" && st!=="Hot standby"){
+  if(LOADS.includes(cur) && !LOADS.includes(st) && st!=="Fuel switch"){
     play=null; toStandby(S); S.plWas=false; S.rejAt=S.t;
-    playMsg=`Part load is always followed by hot standby (except a trip), so not straight to ${lc(nm(st))}: current 0, natural gas and POx closed, N₂ + H₂ back, air ${Math.round(S.air)} ln/min, heaters on, air heater ${SP_HS} °C. From hot standby you can go on to ${lc(nm(st))}.`;
+    playMsg=`${nm(cur)} is always followed by hot standby (except a trip), so not straight to ${lc(nm(st))}: current 0, natural gas stays on, air ${Math.round(S.air)} ln/min, heaters on, air heater ${SP_FS} °C. From hot standby you can go on to ${lc(nm(st))}.`;
     render(); return;
   }
   // Linked stages: no jump, only the real move from the stage before (or a message why not).
@@ -693,32 +682,31 @@ function jump(st){
 //   Shutdown          heaters, gas, current and air off (N₂ + H₂ by the 210 °C rule); the stack cools slowly from where it is
 //   Air-flow cooling  heaters, gas and current off, plant median air; from hot standby with the plant's cooling slope
 //   Heat-up air       from shutdown = Start plant; while cooling down below hot standby = restart (heat-up air or N₂+H₂ by temperature)
-// Part load first unloads to hot standby (rule above); the unloading window after part load and a running purge lock these moves.
+// Part load and rated power first unload to hot standby (rule above); a running purge locks these moves.
 function moveStep(cur,st){
   const T=Math.round(S.T);
   if(cur===st) return {msg:`Already in ${lc(nm(st))}.`};
   if(S.trip>0) return {msg:"Emergency purge running: the twin goes back to hot standby by itself when it ends."};
-  if(unloading(S)) return {msg:`Unloading after part load: the twin goes to hot standby first (in ${Math.max(0,UNLOAD_MIN-(S.t-S.unloadAt))} min); ${lc(nm(st))} from there.`};
   if(st==="Shutdown") return {act:()=>{
-      Object.assign(S,{heaters:false,air:0,ng:0,pox:0,I:0,fgAuto:true,estop:false,fsAt:null,unloadAt:null,kept:false,plWas:false}); applyRules(S);
+      Object.assign(S,{heaters:false,air:0,ng:0,pox:0,I:0,fgAuto:true,estop:false,kept:false,plWas:false}); applyRules(S);
     }, msg:`Shutdown from ${lc(nm(cur))} at ${T} °C: heaters, gas, current and air off (N₂ + H₂ by the ${T_FORMING} °C rule). No jump: the stack cools slowly from ${T} °C by itself, as in the plant data (air off, about −2 °C/h near 200 °C, twin ${(-LOSS*(S.T-T_AMB)).toFixed(1)} °C/h now).`};
   if(st==="Air-flow cooling") return {act:()=>{
-      Object.assign(S,{heaters:false,air:F(st).air||6000,ng:0,pox:0,I:0,fgAuto:true,estop:false,fsAt:null,unloadAt:null,kept:false,plWas:false}); applyRules(S);
-    }, msg:cur==="Hot standby"
-      ?`Cooling from hot standby at ${T} °C: heaters off, air ${Math.round(F(st).air||6000)} ln/min. ${S.plantCool?`The stack follows the plant's hot standby → cooling slope (POC data): about ${Math.round(-HSC_C6*Math.pow((F(st).air||6000)/6000,HSC_N)*(S.T-T_AMB)*Math.sqrt(Math.max(S.T-T_AMB,0)/475))} °C/h after the first few minutes, slower as it cools.`:"Cooling slope from the heat balance (plant slope switched off)."}`
+      Object.assign(S,{heaters:false,air:F(st).air||6000,ng:0,pox:0,I:0,fgAuto:true,estop:false,kept:false,plWas:false}); applyRules(S);
+    }, msg:cur==="Fuel switch"
+      ?`Cooling from hot standby at ${T} °C: natural gas and heaters off, air ${Math.round(F(st).air||6000)} ln/min. ${S.plantCool?`The stack follows the plant's hot standby → cooling slope (POC data): about ${Math.round(-HSC_C6*Math.pow((F(st).air||6000)/6000,HSC_N)*(S.T-T_AMB)*Math.sqrt(Math.max(S.T-T_AMB,0)/475))} °C/h after the first few minutes, slower as it cools.`:"Cooling slope from the heat balance (plant slope switched off)."}`
       :`Air-flow cooling from ${lc(nm(cur))} at ${T} °C: heaters, gas and current off, air ${Math.round(F(st).air||6000)} ln/min. No jump: the stack cools from ${T} °C at the heat-balance rate.`};
   if(st==="Heat-up air"){
     if(canRestart(S)) return {act:()=>warmStart(S)};
     if(cur==="Shutdown") return {act:()=>startNow()};
-    return {msg:`Heat-up air starts from shutdown (Start plant) or from a cool-down below hot standby ${SP_HS} °C; now in ${lc(nm(cur))} at ${T} °C.`};
+    return {msg:`Heat up starts from shutdown (Start plant) or from a cool-down below ${SP_HS} °C; now in ${lc(nm(cur))} at ${T} °C.`};
   }
   return {msg:`No move to ${lc(nm(st))} from ${lc(nm(cur))}.`};
 }
 const MOVE_HINT={"Heat-up air":"start / restart","Air-flow cooling":"heaters off","Shutdown":"air off"};
 const stBar=document.getElementById("stages");
-// after Part load the arrow points back to hot standby (part load → hot standby, except a trip)
-stBar.innerHTML=ORDER.map((s,i)=>`${!i?"":ORDER[i-1]==="Part load"?'<span class="arr back" title="Part load is always followed by hot standby (except a trip)">↩ Hot standby</span><span class="sep" aria-hidden="true"></span>':'<span class="arr" aria-hidden="true">→</span>'}<button type="button" data-stage="${s}"${s in LINK_HINT?' data-link="1"':""}><i style="background:${STAGES[s]}"></i>${nm(s)}<small>${s in LINK_HINT?LINK_HINT[s]:MOVE_HINT[s]}</small></button>`).join("")
-  +`<span class="sep" aria-hidden="true"></span><button type="button" data-stage="Trip: purge" data-purge="1"><i style="background:${STAGES["Trip: purge"]}"></i>${nm("Trip: purge")}<small>from HS / PL / FS after PL</small></button>`;
+// after Rated power the arrow points back to hot standby (part load / rated power → hot standby, except a trip)
+stBar.innerHTML=ORDER.map((s,i)=>`${!i?"":ORDER[i-1]==="Rated power"?'<span class="arr back" title="Part load and rated power are always followed by hot standby (except a trip)">↩ Hot standby</span><span class="sep" aria-hidden="true"></span>':'<span class="arr" aria-hidden="true">→</span>'}<button type="button" data-stage="${s}"${s in LINK_HINT?' data-link="1"':""}><i style="background:${STAGES[s]}"></i>${nm(s)}<small>${s in LINK_HINT?LINK_HINT[s]:MOVE_HINT[s]}</small></button>`).join("")
+  +`<span class="sep" aria-hidden="true"></span><button type="button" data-stage="Trip: purge" data-purge="1"><i style="background:${STAGES["Trip: purge"]}"></i>${nm("Trip: purge")}<small>from HS / PL / RP</small></button>`;
 stBar.querySelectorAll("button").forEach(b=>b.onclick=()=>b.dataset.purge?tripNow():jump(b.dataset.stage));
 
 // ---------- knobs ----------
@@ -726,7 +714,9 @@ const KN=[["air","Cathode air","--air",0,10000,500,"ln/min"],["pox","POx air","-
   ["h2","Hydrogen","--h2",0,70,5,"ln/min"],["ng","Natural gas","--ng",0,200,5,"ln/min"],["I","Current per string","--elec",0,42,0.1,"A"],["target","Air heater target","--heat",100,700,10,"°C"]];
 const kWrap=document.getElementById("knobs");
 kWrap.innerHTML=KN.map(([k,n,c,mi,ma,st])=>`<div class="row"><div class="hd"><label for="k_${k}"><i style="background:var(${c})"></i>${n}</label><span class="num" id="v_${k}"></span></div><input type="range" id="k_${k}" min="${mi}" max="${ma}" step="${st}"></div>`).join("");
-KN.forEach(([k])=>document.getElementById("k_"+k).addEventListener("input",e=>{ manual(); if(k==="n2"||k==="h2") S.fgAuto=false; S[k]=+e.target.value; applyRules(S); followPartLoad(S); render(); }));
+// current knob: only in part load / rated power (both by button only); in part load it stays below rated power
+KN.forEach(([k])=>document.getElementById("k_"+k).addEventListener("input",e=>{ manual(); if(k==="n2"||k==="h2") S.fgAuto=false; S[k]=+e.target.value;
+  if(k==="I"&&stage(S)==="Part load") S.I=Math.min(S.I,I_RATED_MIN); applyRules(S); followPartLoad(S); render(); }));
 const $=id=>document.getElementById(id);
 $("hOn").onclick=()=>{manual(); S.heaters=true; followPartLoad(S); render();};
 $("hOff").onclick=()=>{manual(); S.heaters=false; followPartLoad(S); render();};
@@ -740,9 +730,11 @@ $("kpOff").onclick=()=>{ S.keeper=false; S.kept=false; render(); };
 // On applies from the next hot-standby exit.
 $("pcOn").onclick=()=>{ S.plantCool=true; render(); };
 $("pcOff").onclick=()=>{ S.plantCool=false; render(); };
+// Go to part load / Go to rated power = the same linked moves as the stage-bar buttons
+const GO={load:"Part load",rated:"Rated power"};
 document.querySelectorAll("[data-scen]").forEach(b=>b.onclick=()=>{
-  if(b.dataset.scen==="load" && (stage(S)!=="Hot standby"||S.estop||S.trip>0)){ playMsg=`Go to part load works only from hot standby: fuel switch and part load are linked stages (${LINK_PATH}). Now in ${lc(nm(stage(S)))}.`; S.rejAt=S.t; render(); return; }
-  S.trip=0; S.estop=false; S.unloadAt=null; startPlay(b.dataset.scen); applyRules(S); followPartLoad(S); render(); });
+  if(GO[b.dataset.scen]) return jump(GO[b.dataset.scen]);
+  S.trip=0; S.estop=false; startPlay(b.dataset.scen); applyRules(S); followPartLoad(S); render(); });
 function tripNow(){ if(S.trip<=0 && !startPurge(S,`Trip from ${lc(nm(stage(S)))}: emergency purge ${PURGE_MIN} min, then back to hot standby.`)){ playMsg=noPurgeMsg(S); S.rejAt=S.t; } render(); }
 $("tripBtn").onclick=tripNow;
 // Emergency stop (any stage, also during a purge): everything off at once, air included: air, N₂, H₂, natural gas, POx,
@@ -750,7 +742,7 @@ $("tripBtn").onclick=tripNow;
 // Shutdown (air off) and the stack cools slowly by itself. Any knob, playbook, stage-bar click or Start plant resets it.
 function eStop(){
   play=null;
-  Object.assign(S,{trip:0,air:0,pox:0,n2:0,h2:0,ng:0,I:0,heaters:false,fgAuto:false,fsAt:null,unloadAt:null,kept:false,plWas:false,ngWas:false,estop:true,noPurgeWarn:false,rejAt:null});
+  Object.assign(S,{trip:0,air:0,pox:0,n2:0,h2:0,ng:0,I:0,heaters:false,fgAuto:false,kept:false,plWas:false,estop:true,noPurgeWarn:false,rejAt:null});
   playMsg=`Emergency stop at ${Math.round(S.T)} °C: everything off, air included (air, N₂, H₂, natural gas, POx, current, heaters). The stack now cools slowly with no air. Start plant, Shut down, a knob or a stage-bar click resets the twin.`;
   render();
 }
@@ -761,24 +753,24 @@ $("estopBtn").onclick=eStop;
 const START_FROM=["Shutdown"];
 const canStart=s=>s.trip<=0&&START_FROM.includes(stage(s));
 function toAmbient(s){
-  Object.assign(s,{T:T_AMB,Tin:T_AMB,dT:0,slope:0,air:0,pox:0,n2:0,h2:0,ng:0,I:0,heaters:false,fgAuto:true,fsAt:null,unloadAt:null,kept:false,ngWas:false,plWas:false,estop:false,rsAt:null,reheat:false});
+  Object.assign(s,{T:T_AMB,Tin:T_AMB,dT:0,slope:0,air:0,pox:0,n2:0,h2:0,ng:0,I:0,heaters:false,fgAuto:true,kept:false,plWas:false,estop:false,rsAt:null,reheat:false});
   s.Rb=null; followRec(s,0); applyRules(s); snapSensors();
 }
 // Restart during a cool-down below hot standby (see canRestart): heat-up from today's stack temperature, the stage by temperature.
 function warmStart(s){
   const from=s.dT, was=Math.round(s.T), st=s.T>=T_FORMING?"Heat-up N₂+H₂":"Heat-up air";
-  Object.assign(s,{estop:false,rejAt:null,fsAt:null,unloadAt:null,kept:false,plWas:false,coolAt:null});
+  Object.assign(s,{estop:false,rejAt:null,kept:false,plWas:false,coolAt:null});
   startPlay("cold"); applyRules(s);                       // plant cold-start settings; at 210 °C and up the 500 °C step runs at once
   Object.assign(s,{rsAt:s.t,rsFrom:from,rsD:RS_D[st],reheat:st==="Heat-up N₂+H₂"});
-  playMsg=`Restart during the cool-down at ${was} °C (below hot standby ${SP_HS} °C) → ${lc(nm(st))}: air ${Math.round(s.air)} ln/min, heaters on, `
+  playMsg=`Restart during the cool-down at ${was} °C (below ${SP_HS} °C) → ${lc(nmp(st))}: air ${Math.round(s.air)} ln/min, heaters on, `
     +(st==="Heat-up air"?`air heater 300 °C (500 °C and N₂ + H₂ from ${T_FORMING} °C).`:`N₂ + H₂ on, air heater 500 °C.`)
     +` As on the plant, the air heater ramps 60 °C/h from today's air-in (${Math.round(s.Tin)} °C); the stack slope blends smoothly from ${from>=0?"+":"−"}${Math.abs(from).toFixed(0)} °C/h into the heat-up slope over ${s.rsD} min (plant bend time).`;
 }
 function startNow(){
   if(canRestart(S)){ warmStart(S); render(); return; }
   if(!canStart(S)){ playMsg=S.trip>0?"Start is locked while the emergency purge runs."
-      :coolingDown(S)?`Stack ${Math.round(S.T)} °C is still above hot standby (${SP_HS} °C): a restart during the cool-down works once the stack is below ${SP_HS} °C (heat-up air below ${T_FORMING} °C, heat-up N₂+H₂ above).`
-      :`The plant is not in shutdown (${lc(nm(stage(S)))}): Start works only from shutdown, or while cooling down below hot standby.`; S.rejAt=S.t; render(); return; }
+      :coolingDown(S)?`Stack ${Math.round(S.T)} °C is still above ${SP_HS} °C: a restart during the cool-down works once the stack is below ${SP_HS} °C (heat up on air below ${T_FORMING} °C, on N₂+H₂ above).`
+      :`The plant is not in shutdown (${lc(nm(stage(S)))}): Start works only from shutdown, or while cooling down below ${SP_HS} °C.`; S.rejAt=S.t; render(); return; }
   const warm=S.T-T_AMB>=1, was=Math.round(S.T);
   S.rejAt=null; toAmbient(S); startPlay("cold"); applyRules(S);
   if(warm) playMsg=`Stack was ${was} °C: plant set to ambient ${T_AMB} °C first (start always from ambient). `+playMsg;
@@ -793,13 +785,13 @@ function render(){
   const st=stage(S);
   const d=Math.floor(S.t/1440)+1, hh=String(Math.floor(S.t%1440/60)).padStart(2,"0"), mm=String(Math.floor(S.t%60)).padStart(2,"0");
   $("clock").textContent=FEED.mode==="twin"? `Day ${d} · ${hh}:${mm}`: feedClock(`Day ${d} · ${hh}:${mm}`);
-  $("stage").querySelector("i").style.background=STAGES[st]; $("stage").querySelector("span").textContent=nm(st)+(S.estop?" · emergency stop":"");
-  stBar.querySelectorAll("button").forEach(b=>{ if(b.dataset.stage===st) b.setAttribute("aria-current","step"); else b.removeAttribute("aria-current"); });
+  $("stage").querySelector("i").style.background=STAGES[st]; $("stage").querySelector("span").textContent=nmp(st)+(S.estop?" · emergency stop":"");
+  stBar.querySelectorAll("button").forEach(b=>{ if(nm(b.dataset.stage)===nm(st)) b.setAttribute("aria-current","step"); else b.removeAttribute("aria-current"); });
   stBar.querySelectorAll("[data-link]").forEach(b=>{ const k=linkStep(st,b.dataset.stage); b.setAttribute("aria-disabled",k.act?"false":"true"); b.title=k.act?`Go on to ${lc(nm(b.dataset.stage))} (next link from ${lc(nm(st))})`:k.msg; });
-  stBar.querySelectorAll("button[data-stage]:not([data-link]):not([data-purge])").forEach(b=>{ const t=b.dataset.stage, k=st==="Part load"&&t!=="Part load"?{act:1}:moveStep(st,t);
-    b.setAttribute("aria-disabled",k.act?"false":"true"); b.title=st==="Part load"?"Part load unloads to hot standby first":k.act?`Go to ${lc(nm(t))} from ${Math.round(S.T)} °C (no jump)`:k.msg; });
-  const lb=document.querySelector('[data-scen="load"]'), lOk=st==="Hot standby"&&!S.estop&&S.trip<=0;
-  lb.setAttribute("aria-disabled",lOk?"false":"true"); lb.title=lOk?"Fuel switch, then part load after 10 min":"Go to part load works only from hot standby (linked stages)";
+  const ld=LOADS.includes(st);
+  stBar.querySelectorAll("button[data-stage]:not([data-link]):not([data-purge])").forEach(b=>{ const t=b.dataset.stage, k=ld?{act:1}:moveStep(st,t);
+    b.setAttribute("aria-disabled",k.act?"false":"true"); b.title=ld?`${nm(st)} unloads to hot standby first`:k.act?`Go to ${lc(nm(t))} from ${Math.round(S.T)} °C (no jump)`:k.msg; });
+  Object.entries(GO).forEach(([g,n])=>{ const b=document.querySelector(`[data-scen="${g}"]`), k=linkStep(st,n); b.setAttribute("aria-disabled",k.act?"false":"true"); b.title=k.msg; });
   $("tStack").textContent=Math.round(S.T); $("slope").textContent=(S.dT>=0?"+":"−")+Math.abs(S.dT).toFixed(0);
   const erh=val("TIRZ_8_2_5"), stz=val("TIRZ_8_1_3"), want=S.T>T_FORMING&&!ngOn(S), fg=fgOn(S);
   const chk=[
@@ -825,15 +817,14 @@ function render(){
   KN.forEach(([k,,,,,,u])=>{ const i=$("k_"+k); i.value=S[k]; $("v_"+k).textContent=`${k==="I"?S[k].toFixed(1):Math.round(S[k])} ${u}`; });
   const rOk=canRestart(S), sOk=canStart(S)||rOk, sb=$("startBtn");
   sb.setAttribute("aria-disabled",sOk?"false":"true");
-  sb.title=rOk?`Restart from ${Math.round(S.T)} °C (below hot standby): ${S.T>=T_FORMING?"heat-up N₂+H₂, air heater 500 °C":"heat-up air, air heater 300 °C"}, smooth slope turn`
-    :sOk?"Cold start from ambient 25 °C: air 6000 ln/min, heaters on, air heater 300 °C, then 500 °C from 210 °C":"Start works only from shutdown, or while cooling down below hot standby";
+  sb.title=rOk?`Restart from ${Math.round(S.T)} °C (below ${SP_HS} °C): ${S.T>=T_FORMING?"heat up on N₂+H₂, air heater 500 °C":"heat up on air, air heater 300 °C"}, smooth slope turn`
+    :sOk?"Cold start from ambient 25 °C: air 6000 ln/min, heaters on, air heater 300 °C, then 500 °C and N₂+H₂ from 210 °C; at the end natural gas opens (hot standby)":`Start works only from shutdown, or while cooling down below ${SP_HS} °C`;
   const pOk=canPurge(S);
-  [$("tripBtn"),stBar.querySelector("[data-purge]")].forEach(b=>{ b.setAttribute("aria-disabled",pOk?"false":"true"); b.title=pOk?`Emergency purge ${PURGE_MIN} min, then back to hot standby`:S.trip>0?"Purge running":S.estop?"Locked after an emergency stop":"Trip / emergency purge only from hot standby, part load, or fuel switch straight after part load"; });
-  $("k_I").disabled=!ngOn(S); $("k_n2").disabled=$("k_h2").disabled=S.fgAuto||S.trip>0;
+  [$("tripBtn"),stBar.querySelector("[data-purge]")].forEach(b=>{ b.setAttribute("aria-disabled",pOk?"false":"true"); b.title=pOk?`Emergency purge ${PURGE_MIN} min, then back to hot standby`:S.trip>0?"Purge running":S.estop?"Locked after an emergency stop":"Trip / emergency purge only from hot standby, part load or rated power"; });
+  $("k_I").disabled=!ld; $("k_n2").disabled=$("k_h2").disabled=S.fgAuto||S.trip>0;
   [["hOn",S.heaters],["hOff",!S.heaters],["fgA",S.fgAuto],["fgM",!S.fgAuto],["jOn",jerkOn],["jOff",!jerkOn],["kpOn",S.keeper],["kpOff",!S.keeper],["pcOn",S.plantCool],["pcOff",!S.plantCool]].forEach(([id,on])=>$(id).setAttribute("aria-pressed",on?"true":"false"));
   $("scenLbl").textContent=S.rejAt!=null&&S.t-S.rejAt<5?playMsg:S.trip>0?`Emergency purge: air, N₂ and H₂ only, ${Math.ceil(S.trip)} min left.`
-    :S.fsAt!=null&&!play?`Fuel switch: natural gas on, part load in ${Math.max(0,FS_MIN-(S.t-S.fsAt))} min.`
-    :unloading(S)&&!play?`Unloading after part load: current 0, natural gas on, hot standby in ${Math.max(0,UNLOAD_MIN-(S.t-S.unloadAt))} min. Trip / emergency purge allowed.`:playMsg;
+    :playMsg;
   $("slopeSrc").textContent=FEED.row? `From the data file · slope over 10 min · air in ${Math.round(S.Tin)} °C`: `Heat balance · air in ${Math.round(S.Tin)} °C`+(S.rsAt!=null?` · stage change: slope blending in, ${S.t-S.rsAt} of ${S.rsD} min (plant bend time)`:"")+(S.kept?` · keeper holding ${KEEP} °C (air ${Math.round(S.air)}, target ${Math.round(S.target)} °C)`:"");
   renderReadings(); drawTrend(); renderBend();
 }
@@ -846,7 +837,7 @@ function renderBend(){
   if(!b){ $("bTitle").textContent="No stage change yet"; $("bNote").textContent=""; $("bTab").innerHTML=""; drawBend(null,null); markAll(null); return; }
   const P=plantBend(b), tw=twinBend(b), ps=P&&P.sig.stack, ph=P&&P.sig.heaters;
   const d=Math.floor(b.t/1440)+1, hh=String(Math.floor(b.t%1440/60)).padStart(2,"0"), mm=String(b.t%60).padStart(2,"0");
-  $("bTitle").textContent=`${nm(b.from)} → ${nm(b.to)}`;
+  $("bTitle").textContent=`${nmp(b.from)} → ${nmp(b.to)}`;
   const since=S.t-b.t+1;
   $("bNote").textContent=`Day ${d} · ${hh}:${mm}, ${since} min ago. `
     +(P?`The plant made this change ${P.n}× cleanly in 39 days.`:"The plant never made this change cleanly in the 39 days, so there is nothing to compare with.")
@@ -885,7 +876,7 @@ function drawBend(ps,tw){
 }
 const ALL=BENDS.borders.filter(e=>e.sig.stack);
 $("bAll").innerHTML=`<tr><th>Border</th><th>n</th><th>Stack °C/h</th><th>Bend time</th><th>Jerk</th></tr>`
-  +ALL.map((e,i)=>{ const s=e.sig.stack; return `<tr data-i="${i}"><td>${nm(e.from)} → ${nm(e.to)}</td><td>${e.n}</td><td>${sgn(s.pre)} → ${sgn(s.post)}</td><td>${s.bend?`${s.bend[1]-s.bend[0]} min`:"–"}</td><td>${num(s.jerk)}</td></tr>`; }).join("");
+  +ALL.map((e,i)=>{ const s=e.sig.stack; return `<tr data-i="${i}"><td>${nmp(e.from)} → ${nmp(e.to)}</td><td>${e.n}</td><td>${sgn(s.pre)} → ${sgn(s.post)}</td><td>${s.bend?`${s.bend[1]-s.bend[0]} min`:"–"}</td><td>${num(s.jerk)}</td></tr>`; }).join("");
 function markAll(b){ $("bAll").querySelectorAll("tr[data-i]").forEach(r=>{ const e=ALL[+r.dataset.i]; r.classList.toggle("cur",!!b&&e.from===b.from&&e.to===b.to); }); }
 function drawTrend(){
   const c=$("trend"), dpr=window.devicePixelRatio||1, w=c.clientWidth, h=c.clientHeight;
@@ -915,7 +906,7 @@ function drawPower(pts,t0,t1){
   if(!w) return;
   if(c.width!==w*dpr||c.height!==h*dpr){ c.width=w*dpr; c.height=h*dpr; }
   const g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
-  const ps=pts.filter(p=>p.v).map(p=>[p.t,kW(p.v)]), top=Math.max(5,Math.ceil(Math.max(0,...ps.map(p=>p[1]))/5)*5);
+  const ps=pts.filter(p=>p.v).map(p=>[p.t,kW(p.v)]), top=Math.max(10,Math.ceil(Math.max(0,...ps.map(p=>p[1]))/10)*10);   // multiple of 10: the mid label stays a whole number that fits (27.5 kW was clipped)
   const L=44,R=10,Tp=8,B=22,pw=w-L-R,ph=h-Tp-B, X=t=>L+(t-t0)/1440*pw, Y=v=>Tp+ph-(v/top)*ph;
   g.font="11px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
   [0,top/2,top].forEach(v=>{ g.beginPath(); g.moveTo(L,Y(v)+.5); g.lineTo(L+pw,Y(v)+.5); g.stroke(); g.textAlign="right"; g.fillText(v+" kW",L-6,Y(v)+4); });
@@ -925,7 +916,7 @@ function drawPower(pts,t0,t1){
   const [et,ev]=ps[ps.length-1]; g.fillStyle=col; g.beginPath(); g.arc(X(et),Y(ev),3.5,0,7); g.fill();
   g.textAlign="left"; g.fillText(`now ${ev.toFixed(1)} kW`,L+6,Tp+12);
 }
-$("legend").innerHTML=Object.entries(STAGES).map(([k,v])=>`<span><i style="background:${v}"></i>${nm(k)}</span>`).join("");
+$("legend").innerHTML=[...new Map(Object.entries(STAGES).map(([k,v])=>[nm(k),v]))].map(([k,v])=>`<span><i style="background:${v}"></i>${k}</span>`).join("");
 
 let running=true,last=performance.now(),acc=0;
 $("themeBtn").onclick=()=>{ const d=document.documentElement, l=d.dataset.theme!=="light"; l? d.dataset.theme="light": delete d.dataset.theme; try{ localStorage.setItem("theme",l?"light":"dark"); }catch(e){} drawTrend(); renderBend(); drawPlots(true); };
