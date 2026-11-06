@@ -326,7 +326,8 @@ const PIPES=[ // id, path, fluid colour, part it belongs to, on()
   ["flueO2","M570 390V345","--flue","aph2",s=>airOn(s)||anyFuel(s)],                // APH2 flue out (TIR 7.3.2)
   ["exh","M570 345H472","--flue","exhaust",s=>airOn(s)||anyFuel(s)],                // joined → exhaust (TIR 7.04)
 ];
-for(let i=0;i<5;i++){ const x=807+i*57; PIPES.push([`el${i}`,`M${x} 175V82`,"--elec","load",loadOn]); }
+for(let i=0;i<5;i++){ const x=807+i*57; PIPES.push([`el${i}`,`M${x} 175V111`,"--elec","dcdc",loadOn],[`bus${i}`,`M${x} 40V24`,"--elec","load",loadOn]); }
+PIPES.push(["bus","M807 24H1085","--elec","load",loadOn]);   // DC/DC outputs join on one bus to the load bank
 
 const PARTS={
   air:{title:"Cathode air supply",desc:"Two mass-flow controllers (MFC-Air-1, -2) feed the cathode air; the streams merge before the 3-way valve."},
@@ -342,8 +343,9 @@ const PARTS={
   reformer:{title:"Reformer",desc:"Converts natural gas (with recycle and POx air) to H₂ + CO for the anode."},
   erh:{title:"Reformer housing heater ERH",desc:"3.3 kW heater on the reformer/burner housing. Safety trip 860 °C."},
   eagh:{title:"Anode gas heater EAGH",desc:"1.3 kW line heater between reformer outlet and stack anode inlet."},
-  stack:{title:"SOFC stack module",desc:"5 strings × 4 stacks. Stack temperature is the twin's model value; other readings follow the plant data."},
-  load:{title:"Electrical loads",desc:"One programmable load per string (14 kW, 600 V, 42 A each)."},
+  stack:{title:"SOFC stack module",desc:"5 strings × 4 stacks. Stack temperature is the twin's model value; other readings follow the plant data. String current and voltage (EIRC 4.x) and the stack voltage per module (Σ stacks M1–M5) are listed at the end."},
+  dcdc:{title:"DC/DC converters (per string)",desc:"One converter per string (14 kW, 600 V, 42 A each): current, voltage and stack voltage of each string as logged by the plant."},
+  load:{title:"Load bank (total)",desc:"Combined output of the five strings. All three are twin-calculated sensors (no plant tag): Σ P = Σ V × I, Σ I = sum of string currents, V = Σ P ÷ Σ I (current-weighted string voltage; mean string voltage when no current flows)."},
   eaoh3:{title:"Off-gas heater EAOH3 (recycle)",desc:"Heats the anode off-gas that returns to the ejector."},
   eaoh1:{title:"Off-gas heater EAOH1",desc:"Anode off-gas branch 1 to the burner."},
   eaoh2:{title:"Off-gas heater EAOH2",desc:"Anode off-gas branch 2 to the burner."},
@@ -402,7 +404,13 @@ part("stack","",g=>{ el("rect",{class:"sh",x:770,y:150,width:300,height:110,rx:6
   live.stack=el("text",{x:920,y:254,"text-anchor":"middle",style:"fill:#fff;font-family:var(--f-mono);font-size:13px"},g,"");
   el("text",{x:765,y:186,"text-anchor":"end",class:"m"},g,"cathode in"); el("text",{x:765,y:232,"text-anchor":"end",class:"m"},g,"anode in");
   el("text",{x:1076,y:168,class:"m"},g,"cathode out"); el("text",{x:1076,y:252,class:"m"},g,"anode out"); });
-part("load","",g=>{ for(let i=0;i<5;i++){ const x=785+i*57; box(g,x,40,45,42); el("text",{x:x+22.5,y:58,"text-anchor":"middle","font-size":"10"},g,`L4.${i+1}`); } live.load=el("text",{x:1080,y:66,class:"v"},g,""); el("text",{x:1080,y:50,class:"m"},g,"per string"); });
+// DC/DC converters: one box per string (4.1–4.5) with current, voltage and P = V × I.
+part("dcdc","",g=>{ el("text",{x:772,y:72,"text-anchor":"end",class:"t"},g,"DC/DC"); el("text",{x:772,y:86,"text-anchor":"end",class:"m"},g,"per string"); live.dcdc=[];
+  for(let i=0;i<5;i++){ const x=780.5+i*57, cx=x+26.5; box(g,x,40,53,71); el("text",{x:cx,y:53,"text-anchor":"middle","font-size":"10","font-weight":"600"},g,`4.${i+1}`);
+    live.dcdc.push([66,80,94].map(y=>el("text",{x:cx,y,"text-anchor":"middle",class:"v","font-size":"9.5"},g,""))); } });
+// Load bank: the combined output on the bus (calculated sensors Σ P, Σ I, V).
+part("load","",g=>{ box(g,1085,13,100,98); el("text",{x:1135,y:30,"text-anchor":"middle","font-size":"10","font-weight":"600"},g,"Load bank");
+  live.load=[55,75,95].map(y=>el("text",{x:1135,y,"text-anchor":"middle",class:"v"},g,"")); });
 
 document.getElementById("fluidLegend").innerHTML=[["--air","Cathode air"],["--pox","POx air"],["--h2","H₂"],["--n2","N₂"],["--ng","Natural gas"],["--fuel","Fuel / off-gas"],["--flue","Flue gas"],["--elec","Power"],["--heat","Heater on"]]
   .map(([c,n])=>`<span><i style="background:var(${c})"></i>${n}</span>`).join("");
@@ -411,7 +419,17 @@ document.getElementById("fluidLegend").innerHTML=[["--air","Cathode air"],["--po
 const KNOB={"ct_FIRC_111_PV_ProcessValue":s=>s.air/2,"ct_FIRC_112_PV_ProcessValue":s=>s.air/2,"ct_FIRC_12_PV_ProcessValue":s=>s.pox,
   "ct_FIRC_13_PV_ProcessValue":s=>s.n2,"ct_FIRC_14_PV_ProcessValue":s=>s.ng,"ct_FIRC_15_PV_ProcessValue":s=>s.h2,"T_stack_C":s=>s.T};
 // EAPH box: model values (A outlet = air-in, D inlet = recuperator air, B power from the air heat), not the per-stage table
-const CALC={"TIRC_2_06":s=>s.Tin,"TIR_2_05":eaphIn,"EIRC_2_01_ActV_In_ThreePhasePower":eaphPower};
+const STR=[1,2,3,4,5].map(n=>[`PLC_hostSetp_ctrl_ctEIRC4${n}_rCurrMonitor`,`PLC_hostSetp_ctrl_ctEIRC4${n}_rVoltMonitor`]);
+const sumI=()=>STR.reduce((a,[i])=>a+(val(i)??0),0), sumP=()=>STR.reduce((a,[i,u])=>a+(val(i)??0)*(val(u)??0),0);
+const CALC={"TIRC_2_06":s=>s.Tin,"TIR_2_05":eaphIn,"EIRC_2_01_ActV_In_ThreePhasePower":eaphPower,
+  P_total_kW:()=>sumP()/1000, I_total_A:sumI,
+  // shortcut: no bus voltage is logged, so V is the current-weighted string voltage (keeps Σ P = V × Σ I); use the real bus voltage if one is found
+  V_total_V:()=>{ const I=sumI(); return I>0? sumP()/I: STR.reduce((a,[,u])=>a+(val(u)??0),0)/5; }};
+// Per-string rows (plant tags) → DC/DC part; the load bank keeps only the three twin-made totals (no plant tag, no plant range).
+DATA.components.dcdc=DATA.components.load;
+DATA.components.load=[{tag:"Σ P",col:"P_total_kW",desc:"Load bank total power (Σ V × I, 5 strings)",unit:"kW",fits:{}},
+  {tag:"Σ I",col:"I_total_A",desc:"Load bank total current (sum of the 5 string currents)",unit:"A",fits:{}},
+  {tag:"V",col:"V_total_V",desc:"Load bank voltage (Σ P ÷ Σ I; mean string voltage at 0 A)",unit:"V",fits:{}}];
 Object.assign(KNOB,CALC);
 for(let i=1;i<=5;i++) KNOB[`PLC_hostSetp_ctrl_ctEIRC4${i}_rCurrMonitor`]=s=>loadOn(s)?s.I:0;
 const TRIP={"TIRZ_8_1_1":1050,"TIRZ_8_1_3":720,"TIRZ_8_1_9":930,"TIRZ_8_1_10":300,"TIRZ_8_2_1":950,"TIRZ_8_2_2":950,"TIRZ_8_2_3":950,"TIRZ_8_2_4":950,"TIRZ_8_2_5":860};
@@ -477,7 +495,7 @@ function recordAll(){ const st=stage(S), a=new Float32Array(ALLROWS.length); ALL
 const GROUPS={
   fpm:{chip:"Supply (FPM)",title:"FPM · supply (group)",desc:"All sensors of the supply zone: cathode air, POx air, hydrogen, nitrogen and natural gas lines.",parts:["air","pox","h2","n2","ng"]},
   pgm:{chip:"Process module (PGM)",title:"PGM · process module (group)",desc:"All sensors of the process module: 3-way valve, recuperators, air heater, fuel path, stack, off-gas heaters, burner and exhaust.",parts:["twv","aph1","aph2","eaph","ejector","reformer","erh","eagh","stack","eaoh3","eaoh1","eaoh2","tox","exhaust"]},
-  loads:{chip:"Electrical loads",title:"Electrical loads (group)",desc:"All sensors of the five string loads: current and voltages per string.",parts:["load"]},
+  loads:{chip:"Electrical loads",title:"Electrical loads (group)",desc:"All electrical sensors: current and voltages per string at the DC/DC converters, then the load bank totals.",parts:["dcdc","load"]},
   all:{chip:"All sensors",title:"All sensors in the twin",desc:"Every sensor the twin shows, part by part.",parts:Object.keys(DATA.components).filter(k=>PARTS[k])},
 };
 const isGroup=id=>id.startsWith("g:");
@@ -494,6 +512,8 @@ const openPlot=new Set();
 function selRows(){
   const parts=isGroup(selected)? GROUPS[selected.slice(2)].parts: [selected], seen=new Set(), out=[];
   parts.forEach(p=>(DATA.components[p]||[]).forEach(r=>{ if(!seen.has(r.col)){ seen.add(r.col); out.push({r,part:p}); } }));
+  // stack panel also lists the string current/voltage rows of the DC/DC part (same rows, not copies, so history/CSV stay single)
+  if(selected==="stack") DATA.components.dcdc.forEach(r=>{ if(!seen.has(r.col)){ seen.add(r.col); out.push({r,part:"dcdc"}); } });
   return out;
 }
 function select(id,pipe){
@@ -787,13 +807,16 @@ function render(){
   PIPES.forEach(([id,,,,on])=>flowEls[id].classList.toggle("on",!!on(S)));
   HEATERS.forEach(h=>partEls[h].classList.toggle("hot",heatOn(S)));
   $("stackShape").setAttribute("fill",stackColor(S.T)); $("stackShape").style.fill=stackColor(S.T);
-  live.stack.textContent=`${Math.round(S.T)} °C · ${loadOn(S)?S.I.toFixed(1):"0"} A`;
+  live.stack.textContent=`${Math.round(S.T)} °C`;
   live.air.textContent=`${Math.round(S.air/2)} + ${Math.round(S.air/2)} ln/min`;
   live.pox.textContent=`${Math.round(S.pox)} ln/min`; live.h2.textContent=`${Math.round(S.h2)} ln/min`; live.n2.textContent=`${Math.round(S.n2)} ln/min`; live.ng.textContent=`${Math.round(S.ng)} ln/min`;
   const v=(c)=>{const x=val(c); return x==null?"–":Math.round(x);};
   live.eaph.textContent=`${v("TIRC_2_06")} °C`; live.erh.textContent=`${v("TIRC_5_17")} °C`; live.eagh.textContent=`${v("TIRC_3_1_1")} °C`;
   live.tox.textContent=`${v("TIRC_5_09")} °C`; live.eaoh.textContent=`${v("TIRC_6_1_1")} °C`;
-  live.load.textContent=`${loadOn(S)?S.I.toFixed(1):"0.0"} A`;
+  live.dcdc.forEach(([tI,tV,tP],k)=>{ const I=val(STR[k][0])??0, V=val(STR[k][1])??0;
+    tI.textContent=`${I.toFixed(1)} A`; tV.textContent=`${Math.round(V)} V`; tP.textContent=`${(V*I/1000).toFixed(2)} kW`; });
+  const [lP,lV,lI]=live.load;
+  lP.textContent=`${(val("P_total_kW")??0).toFixed(1)} kW`; lV.textContent=`${Math.round(val("V_total_V")??0)} V`; lI.textContent=`${(val("I_total_A")??0).toFixed(1)} A`;
   KN.forEach(([k,,,,,,u])=>{ const i=$("k_"+k); i.value=S[k]; $("v_"+k).textContent=`${k==="I"?S[k].toFixed(1):Math.round(S[k])} ${u}`; });
   const rOk=canRestart(S), sOk=canStart(S)||rOk, sb=$("startBtn");
   sb.setAttribute("aria-disabled",sOk?"false":"true");
@@ -877,6 +900,25 @@ function drawTrend(){
     g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(X(p.t),Y(p.T)):g.moveTo(X(p.t),Y(p.T))); g.lineTo(X(pts[pts.length-1].t),Tp+ph); g.lineTo(X(pts[0].t),Tp+ph); g.fillStyle=gr; g.fill();
     g.strokeStyle=col; g.lineWidth=2; g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(X(p.t),Y(p.T)):g.moveTo(X(p.t),Y(p.T))); g.stroke();
     const e=pts[pts.length-1]; g.fillStyle=col; g.beginPath(); g.arc(X(e.t),Y(e.T),3.5,0,7); g.fill(); }
+  drawPower(pts,t0,t1);
+}
+// Load bank total power under the stack trend: Σ V × I of the 5 strings from each recorded minute (same 24 h axis).
+const PW_IDX=[1,2,3,4,5].map(n=>[IDX.get(`PLC_hostSetp_ctrl_ctEIRC4${n}_rCurrMonitor`),IDX.get(`PLC_hostSetp_ctrl_ctEIRC4${n}_rVoltMonitor`)]);
+const kW=v=>PW_IDX.reduce((s,[i,u])=>s+((v[i]||0)*(v[u]||0)),0)/1000;   // NaN (no reading) counts as 0
+function drawPower(pts,t0,t1){
+  const c=$("power"), dpr=window.devicePixelRatio||1, w=c.clientWidth, h=c.clientHeight;
+  if(!w) return;
+  if(c.width!==w*dpr||c.height!==h*dpr){ c.width=w*dpr; c.height=h*dpr; }
+  const g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+  const ps=pts.filter(p=>p.v).map(p=>[p.t,kW(p.v)]), top=Math.max(5,Math.ceil(Math.max(0,...ps.map(p=>p[1]))/5)*5);
+  const L=44,R=10,Tp=8,B=22,pw=w-L-R,ph=h-Tp-B, X=t=>L+(t-t0)/1440*pw, Y=v=>Tp+ph-(v/top)*ph;
+  g.font="11px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
+  [0,top/2,top].forEach(v=>{ g.beginPath(); g.moveTo(L,Y(v)+.5); g.lineTo(L+pw,Y(v)+.5); g.stroke(); g.textAlign="right"; g.fillText(v+" kW",L-6,Y(v)+4); });
+  g.textAlign="center"; for(let k=Math.ceil(t0/240)*240;k<=t1;k+=240){ if(k<0) continue; g.fillText(String(Math.floor(k%1440/60)).padStart(2,"0")+":00",X(k),h-6); }
+  if(ps.length<2) return;
+  const col=css("--elec"); g.strokeStyle=col; g.lineWidth=2; g.beginPath(); ps.forEach(([t,v],i)=>i?g.lineTo(X(t),Y(v)):g.moveTo(X(t),Y(v))); g.stroke();
+  const [et,ev]=ps[ps.length-1]; g.fillStyle=col; g.beginPath(); g.arc(X(et),Y(ev),3.5,0,7); g.fill();
+  g.textAlign="left"; g.fillText(`now ${ev.toFixed(1)} kW`,L+6,Tp+12);
 }
 $("legend").innerHTML=Object.entries(STAGES).map(([k,v])=>`<span><i style="background:${v}"></i>${nm(k)}</span>`).join("");
 

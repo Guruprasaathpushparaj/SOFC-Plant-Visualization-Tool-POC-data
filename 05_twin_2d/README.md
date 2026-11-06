@@ -1,5 +1,7 @@
 # SOFC Plant Twin (2D, local)
 
+**Version v36 (2026-11-06)** – DC/DC per string, load bank totals (Σ P, Σ I, V) and load bank power trend. Git tag `twin-v36`.
+
 A small local website: redrawn plant schematic, knobs and playbooks, a fitted stack heat model with recuperator and air heater,
 and clickable parts that show their sensor readings.
 
@@ -22,7 +24,7 @@ and clickable parts that show their sensor readings.
 ## Save a dataset
 
 **Save data** (top bar, 2026-11-05) downloads the recorded minutes (up to the last 48 simulated hours) as CSV:
-`minute, plant_stage`, then one column per sensor (111, plant column names, empty = no reading). `histCsv()` in app.js.
+`minute, plant_stage`, then one column per sensor (114: 111 plant columns + 3 twin-calculated load-bank totals `P_total_kW`, `I_total_A`, `V_total_V`; empty = no reading). `histCsv()` in app.js.
 
 ## Files
 
@@ -51,7 +53,7 @@ Run it after new day files are added or the plant stages are relabelled (`03_dat
 
 - Sensor panel (2026-11-04): click a part, a line (it highlights and shows the sensors of the part it belongs to) or a
   zone background (FPM supply, PGM process module, electrical loads) to list its sensors; chips above the list pick a
-  zone or "All sensors" (111). In a group the list is split part by part. Every shown reading is recorded once per
+  zone or "All sensors" (114). Electrical (2026-11-06): DC/DC converters = per-string current, voltage, stack voltage (plant tags, also listed under the stack); load bank = the 3 calculated totals Σ P, Σ I, V = Σ P ÷ Σ I. In a group the list is split part by part. Every shown reading is recorded once per
   simulated minute (`recordAll()` → `S.hist[i].v`); a reading that changed in the last 24 h gets a small time plot
   (stage colour strip, same 24 h axis as the stack trend), tap to enlarge with axes and the trip line. Steady readings
   get no plot. Plots redraw at most 4×/s and only when on screen.
