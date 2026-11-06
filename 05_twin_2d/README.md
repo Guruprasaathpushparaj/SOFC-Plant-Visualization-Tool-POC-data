@@ -10,7 +10,7 @@ Rated power has no plant data: 29.2 A per string, NG 166, air 10000 ln/min (≈ 
 string voltage follows the current (`string_vi_fit.csv`). As the 50 kW study found, the stack reaches the 720 °C trip
 (~30 min after the step from part load at 623 °C). Internal stage keys stay the plant-data names (`"Fuel switch"` = hot
 standby, `"Heat-up air"`/`"Heat-up N₂+H₂"` = heat up, new `"Rated power"`), so Save data CSVs and `twin_dataset.js`
-write those keys; plant files play back with the new display names.
+write those keys; plant files play back with the new display names. Release tag `v3.0`.
 
 **Version 2.2 (2026-11-06)** – highlight on the plant schematic and the stack temperature trend (blue edge and glow); load bank power moved out of the stack panel into its own panel below it. Release tag `v2.2`.
 
