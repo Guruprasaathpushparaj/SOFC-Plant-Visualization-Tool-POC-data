@@ -24,6 +24,7 @@ and read data from `../02_data/`.
 | 12 | `stage_vs_other_correlation.ipynb` | Do the non-stage sensors follow the stage sensors? | `stage_corr/` |
 | 13 | `heater_temperatures.ipynb` | Stack temperature vs the gas-line heaters | `heater_temperatures/` |
 | 14 | `slopes_jerk.ipynb` | Heating/cooling slopes and bends at stage borders | `slopes_jerk/` |
+| 15 | `rated_power_extrapolation.ipynb` | Every part-load sensor stretched by power to 60 kW, V–I per string, gas by Faraday | `rated_power/` |
 
 ## scripts/: the shared code
 
@@ -39,7 +40,7 @@ and read data from `../02_data/`.
 | `trip_check.py` | Find safety trips and check trip limits |
 | `heater_temps.py`, `slopes_jerk.py` | Code behind notebooks 13 and 14 |
 | `availability.py` | Plant availability (run: `python scripts/availability.py`) → `availability/` |
-| `rated_power_extrapolation.py` | Every part-load sensor stretched by power to 60 kW, V×I solved per string, gas by Faraday → `rated_power/` |
+| `rated_power_extrapolation.py` | Every part-load sensor stretched by power to 60 kW, V×I solved per string at equal string current (40.18 A at 60 kW, as the twin), gas by Faraday → `rated_power/` |
 | `efficiency_check.py` | Calculated efficiency / fuel use |
 | `correlation_common.py` | Correlation across all columns → `correlation/` |
 

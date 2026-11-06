@@ -125,10 +125,11 @@ def ng_faraday(I, fu_pct):
 
 def electrical(d, t):
     """Make the string V and I agree with P = sum V*I: separate straight lines in P give only ~50 kW at 60.
-    Per string V = a + b*I (robust); currents keep their part-load share; solve the common scale u."""
+    Per string V = a + b*I (robust); every string carries the same current (user, 2026-11-06: the part-load
+    split, string 4.4 at ~73 %, was an operator setting, and it put four strings above the 42 A El.Load rating);
+    solve the common current u. Same rated point as the twin (05_twin_2d/app.js, 40.17 A at 60 kW)."""
     rows = []
-    share = t.set_index("sensor").loc[CURR, "at_34kW"].values
-    share = share / share.mean()
+    share = np.ones(len(CURR))
     ab = []
     for v, i in zip(VOLT, CURR):
         ok = d[v].notna() & d[i].notna() & (d[i] > 0.5)

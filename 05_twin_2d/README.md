@@ -1,14 +1,23 @@
 # SOFC Plant Twin (2D, local)
 
+**Version 3.1 (2026-11-06)** – near-trip alarm: when any of the 9 trip-limited temperatures (TIRZ 8.1.x / 8.2.x) is within
+40 K of its trip or above it, its reading is shown bold red in the sensor list and its block on the drawing blinks red
+(steady red tint with reduced motion). Display only: the twin still changes nothing by temperature.
+
 **Version 3.0 (2026-11-06)** – new stage set. Start plant → **Heat up** (on air, then on N₂ + H₂ from 210 °C) → **Hot standby**
 (the old fuel switch: natural gas on, no current, no power drawn; the heat up ends there by itself near 506 °C) →
 **Part load** → **Rated power** (both only by button: *Go to part load* from hot standby, *Go to rated power* from part load,
 or the stage bar). Air flow cooling, shutdown, trip purge, keeper and cooling rules as before. Part load / rated power are
 always followed by hot standby (gas stays on); trip purge only from hot standby, part load or rated power, then back to hot
 standby. The old 10-min fuel-switch wait before part load and the 10-min unloading window after it are gone.
-Rated power has no plant data: 29.2 A per string, NG 166, air 10000 ln/min (≈ 51 kW); sensors use their part-load lines,
-string voltage follows the current (`string_vi_fit.csv`). As the 50 kW study found, the stack reaches the 720 °C trip
-(~30 min after the step from part load at 623 °C). Internal stage keys stay the plant-data names (`"Fuel switch"` = hot
+Rated power = **60 kW DC in total** (no plant data): 40.18 A per string (equal) on the string V–I lines (`string_vi_fit.csv`;
+El.Load 4.1–4.5 rated 42 A / 14 kW each), NG 211 ln/min (60 kW row of `electrical_60kW.csv`, same equal split); sensors use their
+part-load lines, string voltage follows the current (262–324 V, 0.55–0.68 V/cell, below the plant's 0.72 V limit). Rated power **stays until a button is pressed**, and any button then goes to
+hot standby (also *Go to part load*; the trip button still purges by hand). Rated power runs on plant settings (air 10000,
+air heater 600 °C as part load). **Nothing changes by temperature, in any stage** (user: keep the physics behind the data
+intact): no automatic 720 °C trip (the reading only warns; trip purge by button), stack keeper off by default (switch
+still there; never acts in rated power). The fitted heat balance is left as it is, so the stack settles where the physics
+takes it (the stack trend scale grows above 900 °C). Internal stage keys stay the plant-data names (`"Fuel switch"` = hot
 standby, `"Heat-up air"`/`"Heat-up N₂+H₂"` = heat up, new `"Rated power"`), so Save data CSVs and `twin_dataset.js`
 write those keys; plant files play back with the new display names. Release tag `v3.0`.
 

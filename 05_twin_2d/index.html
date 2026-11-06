@@ -3,22 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SOFC Plant Twin v3.0</title>
+<title>SOFC Plant Twin v3.1</title>
+<meta name="description" content="2D twin of the SOFC plant: run the stages, read every sensor against 39 days of plant data, play back a data file.">
 <script>try{if(localStorage.getItem("theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400..600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
-<meta name="theme-color" content="#0F121A">
+<meta name="theme-color" content="#121519">
 </head>
 <body>
 
 <div class="wrap">
   <header>
     <div>
-      <h1>SOFC Plant Twin v3.0</h1>
+      <h1>SOFC Plant Twin v3.1</h1>
       <p class="sub">Simplified redraw of the plant layout. Click any part to see its sensors. Readings follow the model stack temperature and what the plant showed in the same stage over 39 days.</p>
     </div>
     <div class="bar">
@@ -43,7 +44,7 @@
   </header>
 
   <section class="panel status" aria-label="Plant status">
-    <div><p class="lbl">Plant stage</p><span class="pill" id="stage"><i></i><span>–</span></span></div>
+    <div><p class="lbl">Plant stage</p><span class="pill" id="stage"><i></i><span>…</span></span></div>
     <div><p class="lbl">Stack temperature</p><span class="big" id="tStack">25</span><span class="unit">°C</span></div>
     <div><p class="lbl">Heating rate</p><span class="big" id="slope">0</span><span class="unit">°C/h</span><p class="src-tag" id="slopeSrc"></p></div>
     <div><p class="lbl">Rule checks</p><ul class="checks" id="checks"></ul></div>
@@ -122,7 +123,7 @@
       <p class="desc" id="pDesc"></p>
       <p class="psum" id="pSum"></p>
       <ul class="rows" id="pRows"></ul>
-      <p class="src-note">Bar: plant range in this stage over 39 days (light band p10–p90, track p2–p98); tick = twin reading. Flows set by a knob read the knob. After a stage change, slow sensors move to the new level at the plant's pace. Plot under a reading: that sensor in the twin over the last 24 h (same time axis as the stack trend, colour strip = stage); only drawn for readings that changed. Tap a plot to enlarge it.</p>
+      <p class="src-note">Bar: plant range in this stage over 39 days (light band p10 to p90, track p2 to p98); tick = twin reading. Flows set by a knob read the knob. After a stage change, slow sensors move to the new level at the plant’s pace. Plot under a reading: that sensor in the twin over the last 24 h (same time axis as the stack trend, colour strip = stage); only drawn for readings that changed. Tap a plot to enlarge it.</p>
     </section>
     </div>
   </div>
