@@ -2,7 +2,7 @@
 const DATA=window.SOFC_SENSORS;
 const STAGES={"Heat-up air":"#E8B04A","Heat-up N₂+H₂":"#C46A12","Hot standby":"#B4472B","Fuel switch":"#7B4FA0","Part load":"#2E8B57","Air-flow cooling":"#3A7CA5","Shutdown":"#8C96A3","Trip: purge":"#C2185B"};
 // Display names: the trip stage is shown as "Trip / Emergency purge". Data keys stay "Trip: purge".
-const NAME={"Trip: purge":"Trip / Emergency purge"}, nm=st=>NAME[st]||st;
+const NAME={"Trip: purge":"Trip / Emergency purge","Heat-up air":"Heat up air","Heat-up N₂+H₂":"Heat up N₂+H₂","Air-flow cooling":"Air flow cooling"}, nm=st=>NAME[st]||st;
 const T_AMB=25, AIR_COOL=20, T_FORMING=210, I_POWER=1, NG_ON=20, N2_ON=100, H2_ON=5;
 const FLOWS=DATA.flows;
 
@@ -330,27 +330,27 @@ for(let i=0;i<5;i++){ const x=807+i*57; PIPES.push([`el${i}`,`M${x} 175V111`,"--
 PIPES.push(["bus","M807 24H1085","--elec","load",loadOn]);   // DC/DC outputs join on one bus to the load bank
 
 const PARTS={
-  air:{title:"Cathode air supply",desc:"Two mass-flow controllers (MFC-Air-1, -2) feed the cathode air; the streams merge before the 3-way valve."},
-  twv:{title:"3-way valve TWV-CA",desc:"Splits the cathode air between the recuperators (APH) and the direct path to the electric air heater. Temperature-driven, not a knob."},
-  pox:{title:"POx air",desc:"Partial-oxidation air to the reformer. On with natural gas (fuel switch, part load)."},
+  air:{title:"Cathode air supply",desc:"Two mass flow controllers (MFC-Air-1, -2) feed the cathode air; the streams merge before the three way valve."},
+  twv:{title:"three way valve TWV-CA",desc:"Splits the cathode air between the recuperators (APH) and the direct path to the electric air heater. Driven by temperature, not a knob."},
+  pox:{title:"POx air",desc:"Partial oxidation air to the reformer. On with natural gas (fuel switch, part load)."},
   n2:{title:"Nitrogen (forming gas)",desc:"N₂ for forming gas and purge. Rule: on above 210 °C while no natural gas."},
   h2:{title:"Hydrogen (forming gas)",desc:"H₂ part of the forming gas that keeps the anode reduced."},
   ng:{title:"Natural gas line",desc:"Desulphuriser, booster compressor, 15 bar storage, then MFC-Fuel FIRC 1.4 to the ejector."},
-  aph1:{title:"Air pre-heater APH-1",desc:"Recuperator, in parallel with APH-2: cathode air picks up heat from its own flue-gas stream (burner outlet 1, TIR 7.1.1)."},
-  aph2:{title:"Air pre-heater APH-2",desc:"Recuperator, in parallel with APH-1, fed by burner outlet 2 (TIR 7.1.2). Both air outlets join in the riser to the electric air heater; both flue outlets join and go to the exhaust."},
+  aph1:{title:"Air preheater APH-1",desc:"Recuperator, in parallel with APH-2: cathode air picks up heat from its own flue gas stream (burner outlet 1, TIR 7.1.1)."},
+  aph2:{title:"Air preheater APH-2",desc:"Recuperator, in parallel with APH-1, fed by burner outlet 2 (TIR 7.1.2). Both air outlets join in the riser to the electric air heater; both flue outlets join and go to the exhaust."},
   eaph:{title:"Electric air heater EAPH",desc:"40 kW electric heater; its outlet TIRC 2.06 is the stack cathode inlet temperature."},
-  ejector:{title:"Ejector",desc:"Natural gas drives the ejector and pulls anode off-gas back through EAOH3 (recycle)."},
+  ejector:{title:"Ejector",desc:"Natural gas drives the ejector and pulls anode off gas back through EAOH3 (recycle)."},
   reformer:{title:"Reformer",desc:"Converts natural gas (with recycle and POx air) to H₂ + CO for the anode."},
   erh:{title:"Reformer housing heater ERH",desc:"3.3 kW heater on the reformer/burner housing. Safety trip 860 °C."},
   eagh:{title:"Anode gas heater EAGH",desc:"1.3 kW line heater between reformer outlet and stack anode inlet."},
   stack:{title:"SOFC stack module",desc:"5 strings × 4 stacks. Stack temperature is the twin's model value; other readings follow the plant data. String current and voltage (EIRC 4.x) and the stack voltage per module (Σ stacks M1–M5) are listed at the end."},
   dcdc:{title:"DC/DC converters (per string)",desc:"One converter per string (14 kW, 600 V, 42 A each): current, voltage and stack voltage of each string as logged by the plant."},
-  load:{title:"Load bank (total)",desc:"Combined output of the five strings. All three are twin-calculated sensors (no plant tag): Σ P = Σ V × I, Σ I = sum of string currents, V = Σ P ÷ Σ I (current-weighted string voltage; mean string voltage when no current flows)."},
-  eaoh3:{title:"Off-gas heater EAOH3 (recycle)",desc:"Heats the anode off-gas that returns to the ejector."},
-  eaoh1:{title:"Off-gas heater EAOH1",desc:"Anode off-gas branch 1 to the burner."},
-  eaoh2:{title:"Off-gas heater EAOH2",desc:"Anode off-gas branch 2 to the burner."},
-  tox:{title:"After-burner (TOX)",desc:"Burns anode off-gas with the cathode off-gas; the hot flue gas leaves through two outlets, one to each APH."},
-  exhaust:{title:"Exhaust",desc:"The two APH flue-gas outlets join and leave through the roof exhaust. Safety trip 300 °C."},
+  load:{title:"Load bank (total)",desc:"Combined output of the five strings. All three are twin calculated sensors (no plant tag): Σ P = Σ V × I, Σ I = sum of string currents, V = Σ P ÷ Σ I (current weighted string voltage; mean string voltage when no current flows)."},
+  eaoh3:{title:"Off gas heater EAOH3 (recycle)",desc:"Heats the anode off gas that returns to the ejector."},
+  eaoh1:{title:"Off gas heater EAOH1",desc:"Anode off gas branch 1 to the burner."},
+  eaoh2:{title:"Off gas heater EAOH2",desc:"Anode off gas branch 2 to the burner."},
+  tox:{title:"Afterburner (TOX)",desc:"Burns anode off gas with the cathode off gas; the hot flue gas leaves through two outlets, one to each APH."},
+  exhaust:{title:"Exhaust",desc:"The two APH flue gas outlets join and leave through the roof exhaust. Safety trip 300 °C."},
 };
 const HEATERS=new Set(["eaph","erh","eagh","eaoh1","eaoh2","eaoh3"]);
 
@@ -412,7 +412,7 @@ part("dcdc","",g=>{ el("text",{x:772,y:72,"text-anchor":"end",class:"t"},g,"DC/D
 part("load","",g=>{ box(g,1085,13,100,98); el("text",{x:1135,y:30,"text-anchor":"middle","font-size":"10","font-weight":"600"},g,"Load bank");
   live.load=[55,75,95].map(y=>el("text",{x:1135,y,"text-anchor":"middle",class:"v"},g,"")); });
 
-document.getElementById("fluidLegend").innerHTML=[["--air","Cathode air"],["--pox","POx air"],["--h2","H₂"],["--n2","N₂"],["--ng","Natural gas"],["--fuel","Fuel / off-gas"],["--flue","Flue gas"],["--elec","Power"],["--heat","Heater on"]]
+document.getElementById("fluidLegend").innerHTML=[["--air","Cathode air"],["--pox","POx air"],["--h2","H₂"],["--n2","N₂"],["--ng","Natural gas"],["--fuel","Fuel / off gas"],["--flue","Flue gas"],["--elec","Power"],["--heat","Heater on"]]
   .map(([c,n])=>`<span><i style="background:var(${c})"></i>${n}</span>`).join("");
 
 // ---------- sensor readings ----------
@@ -494,7 +494,7 @@ function recordAll(){ const st=stage(S), a=new Float32Array(ALLROWS.length); ALL
 // A click on a zone background (or a chip above the list) shows every sensor of that zone, part by part.
 const GROUPS={
   fpm:{chip:"Supply (FPM)",title:"FPM · supply (group)",desc:"All sensors of the supply zone: cathode air, POx air, hydrogen, nitrogen and natural gas lines.",parts:["air","pox","h2","n2","ng"]},
-  pgm:{chip:"Process module (PGM)",title:"PGM · process module (group)",desc:"All sensors of the process module: 3-way valve, recuperators, air heater, fuel path, stack, off-gas heaters, burner and exhaust.",parts:["twv","aph1","aph2","eaph","ejector","reformer","erh","eagh","stack","eaoh3","eaoh1","eaoh2","tox","exhaust"]},
+  pgm:{chip:"Process module (PGM)",title:"PGM · process module (group)",desc:"All sensors of the process module: three way valve, recuperators, air heater, fuel path, stack, off gas heaters, burner and exhaust.",parts:["twv","aph1","aph2","eaph","ejector","reformer","erh","eagh","stack","eaoh3","eaoh1","eaoh2","tox","exhaust"]},
   loads:{chip:"Electrical loads",title:"Electrical loads (group)",desc:"All electrical sensors: current and voltages per string at the DC/DC converters, then the load bank totals.",parts:["dcdc","load"]},
   all:{chip:"All sensors",title:"All sensors in the twin",desc:"Every sensor the twin shows, part by part.",parts:Object.keys(DATA.components).filter(k=>PARTS[k])},
 };
@@ -602,9 +602,9 @@ function plotOne(e,win,i,lo,hi,t0){
   if(c.width!==Math.round(w*dpr)||c.height!==Math.round(h*dpr)){ c.width=Math.round(w*dpr); c.height=Math.round(h*dpr); }
   const g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
   const u=e.r.unit, trip=TRIP[e.r.col], pad=(hi-lo)*0.08, y0=lo>=0? Math.max(0,lo-pad): lo-pad, y1=hi+pad;
-  const L=52, R=10, Tp=8, B=26, pw=w-L-R, ph=h-Tp-B, t1=S.t;
+  const L=64, R=24, Tp=8, B=26, pw=w-L-R, ph=h-Tp-B, t1=S.t;
   const X=t=>L+(t-t0)/PLOT_WIN*pw, Y=v=>Tp+ph-(v-y0)/(y1-y0)*ph;
-  g.font="11px "+css("--f-mono"); g.lineWidth=1;
+  g.font="12px "+css("--f-mono"); g.lineWidth=1;
   { g.strokeStyle=css("--line"); g.fillStyle=css("--muted"); const nk=big?5:3;
     for(let k=0;k<=nk;k++){ const v=y0+(y1-y0)*k/nk, y=Y(v); g.beginPath(); g.moveTo(L,y+.5); g.lineTo(L+pw,y+.5); g.stroke(); g.textAlign="right"; g.fillText(fmt(v,u),L-5,y+3); }
     g.textAlign="center"; for(let k=Math.ceil(t0/240)*240;k<=t1;k+=240){ if(k<0) continue; g.fillText(String(Math.floor(k%1440/60)).padStart(2,"0")+":00",X(k),h-4); }
@@ -864,9 +864,9 @@ function drawBend(ps,tw){
   if(c.width!==w*dpr||c.height!==h*dpr){ c.width=w*dpr; c.height=h*dpr; }
   const g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
   const t0=BENDS.tm[0], t1=BENDS.tm[1], ys=[...(ps?ps.curve:[]),...(tw?tw.y:[])].filter(v=>v!=null&&isFinite(v));
-  const lo=Math.min(-10,...ys), hi=Math.max(10,...ys), L=44,R=10,Tp=8,B=26,pw=w-L-R,ph=h-Tp-B;
+  const lo=Math.min(-10,...ys), hi=Math.max(10,...ys), L=56,R=24,Tp=8,B=26,pw=w-L-R,ph=h-Tp-B;
   const X=t=>L+(t-t0)/(t1-t0)*pw, Y=v=>Tp+ph-(v-lo)/(hi-lo)*ph;
-  g.font="11px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
+  g.font="12px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
   const stp=[5,10,20,50,100,200].find(s=>(hi-lo)/s<=6)||500;
   for(let v=Math.ceil(lo/stp)*stp;v<=hi;v+=stp){ g.beginPath(); g.moveTo(L,Y(v)+.5); g.lineTo(L+pw,Y(v)+.5); g.stroke(); g.textAlign="right"; g.fillText((v>0?"+":"")+v+"°",L-6,Y(v)+4); }
   g.textAlign="center"; for(let t=-45;t<=60;t+=15) g.fillText((t>0?"+":"")+t,X(t),h-8);
@@ -887,8 +887,8 @@ function drawTrend(){
   if(!w) return;
   if(c.width!==w*dpr||c.height!==h*dpr){ c.width=w*dpr; c.height=h*dpr; }
   const g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
-  const L=44,R=10,Tp=8,B=34,pw=w-L-R,ph=h-Tp-B,t1=S.t,t0=t1-1440, X=t=>L+(t-t0)/1440*pw, Y=T=>Tp+ph-(T/900)*ph;
-  g.font="11px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
+  const L=56,R=24,Tp=8,B=34,pw=w-L-R,ph=h-Tp-B,t1=S.t,t0=t1-1440, X=t=>L+(t-t0)/1440*pw, Y=T=>Tp+ph-(T/900)*ph;
+  g.font="12px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
   [0,200,400,600,800].forEach(v=>{ g.beginPath(); g.moveTo(L,Y(v)+.5); g.lineTo(L+pw,Y(v)+.5); g.stroke(); g.textAlign="right"; g.fillText(v+"°",L-6,Y(v)+4); });
   g.textAlign="center"; for(let k=Math.ceil(t0/240)*240;k<=t1;k+=240){ if(k<0) continue; g.fillText(String(Math.floor(k%1440/60)).padStart(2,"0")+":00",X(k),h-6); }
   g.setLineDash([4,4]); g.strokeStyle=css("--n2"); g.beginPath(); g.moveTo(L,Y(210)); g.lineTo(L+pw,Y(210)); g.stroke(); g.setLineDash([]);
@@ -911,8 +911,8 @@ function drawPower(pts,t0,t1){
   if(c.width!==w*dpr||c.height!==h*dpr){ c.width=w*dpr; c.height=h*dpr; }
   const g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
   const ps=pts.filter(p=>p.v).map(p=>[p.t,kW(p.v)]), top=Math.max(5,Math.ceil(Math.max(0,...ps.map(p=>p[1]))/5)*5);
-  const L=44,R=10,Tp=8,B=22,pw=w-L-R,ph=h-Tp-B, X=t=>L+(t-t0)/1440*pw, Y=v=>Tp+ph-(v/top)*ph;
-  g.font="11px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
+  const L=64,R=24,Tp=8,B=22,pw=w-L-R,ph=h-Tp-B, X=t=>L+(t-t0)/1440*pw, Y=v=>Tp+ph-(v/top)*ph;
+  g.font="12px "+css("--f-mono"); g.fillStyle=css("--muted"); g.strokeStyle=css("--line"); g.lineWidth=1;
   [0,top/2,top].forEach(v=>{ g.beginPath(); g.moveTo(L,Y(v)+.5); g.lineTo(L+pw,Y(v)+.5); g.stroke(); g.textAlign="right"; g.fillText(v+" kW",L-6,Y(v)+4); });
   g.textAlign="center"; for(let k=Math.ceil(t0/240)*240;k<=t1;k+=240){ if(k<0) continue; g.fillText(String(Math.floor(k%1440/60)).padStart(2,"0")+":00",X(k),h-6); }
   if(ps.length<2) return;

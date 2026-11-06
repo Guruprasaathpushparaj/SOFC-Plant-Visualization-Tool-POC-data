@@ -7,11 +7,11 @@
 <script>try{if(localStorage.getItem("theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
-<meta name="theme-color" content="#0F121A">
+<meta name="theme-color" content="#000000">
 </head>
 <body>
 
@@ -30,7 +30,7 @@
         <option value="60">1 h per s</option>
       </select>
       <button id="saveBtn" type="button" title="Download every recorded minute (up to the last 48 h) as a CSV file">Save data</button>
-      <button id="themeBtn" type="button" aria-label="Switch light or dark theme" title="Light / dark">◐</button>
+      <button id="themeBtn" type="button" aria-label="Switch light or dark theme" title="Light or dark"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M201.54,54.46A104,104,0,0,0,54.46,201.54,104,104,0,0,0,201.54,54.46ZM40,128a88,88,0,0,1,80-87.63V215.63A88.13,88.13,0,0,1,40,128Zm96,87.63V40.37a88,88,0,0,1,0,175.26Z"/></svg></button>
     </div>
   </header>
 
@@ -42,7 +42,7 @@
   </section>
 
   <section class="panel hi" aria-label="Plant stages">
-    <p class="lbl">Plant stages · no jumps: every button is a real move from the stack temperature the twin has now; heat-up N₂+H₂, hot standby, fuel switch and part load are linked (reached only from the stage before)</p>
+    <p class="lbl">Plant stages · no jumps: every button is a real move from the stack temperature the twin has now; heat up N₂+H₂, hot standby, fuel switch and part load are linked (reached only from the stage before)</p>
     <div class="stagerow">
       <button type="button" class="start" id="startBtn">Start plant</button>
       <span class="sep" aria-hidden="true"></span>
