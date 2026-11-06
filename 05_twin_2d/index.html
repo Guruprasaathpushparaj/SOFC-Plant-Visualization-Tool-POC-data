@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOFC Plant Twin</title>
+<script>try{if(localStorage.getItem("theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#0F121A">
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>SOFC Plant Twin</h1>
+      <p class="sub">Simplified redraw of the plant layout. Click any part to see its sensors. Readings follow the model stack temperature and what the plant showed in the same stage over 39 days.</p>
+    </div>
+    <div class="bar">
+      <span class="clock" id="clock">Day 1 · 00:00</span>
+      <button id="play" type="button">Pause</button>
+      <select id="speed" aria-label="Simulation speed">
+        <option value="5">5 min per s</option>
+        <option value="20" selected>20 min per s</option>
+        <option value="60">1 h per s</option>
+      </select>
+      <button id="saveBtn" type="button" title="Download every recorded minute (up to the last 48 h) as a CSV file">Save data</button>
+      <button id="themeBtn" type="button" aria-label="Switch light or dark theme" title="Light / dark">◐</button>
+    </div>
+  </header>
+
+  <section class="panel status" aria-label="Plant status">
+    <div><p class="lbl">Plant stage</p><span class="pill" id="stage"><i></i><span>–</span></span></div>
+    <div><p class="lbl">Stack temperature</p><span class="big" id="tStack">25</span><span class="unit">°C</span></div>
+    <div><p class="lbl">Heating rate</p><span class="big" id="slope">0</span><span class="unit">°C/h</span><p class="src-tag" id="slopeSrc"></p></div>
+    <div><p class="lbl">Rule checks</p><ul class="checks" id="checks"></ul></div>
+  </section>
+
+  <section class="panel hi" aria-label="Plant stages">
+    <p class="lbl">Plant stages · no jumps: every button is a real move from the stack temperature the twin has now; heat-up N₂+H₂, hot standby, fuel switch and part load are linked (reached only from the stage before)</p>
+    <div class="stagerow">
+      <button type="button" class="start" id="startBtn">Start plant</button>
+      <span class="sep" aria-hidden="true"></span>
+      <div class="stages" id="stages"></div>
+    </div>
+  </section>
+
+  <div class="top">
+    <div class="main">
+    <section class="panel draw" aria-label="Plant schematic">
+      <svg id="pid" viewBox="0 0 1200 680" role="group" aria-label="Plant schematic. Each part is a button that shows its sensor readings.">
+        <rect class="zone" data-group="fpm" x="8" y="128" width="434" height="544" rx="4" fill="var(--zone)"/>
+        <rect class="zone" data-group="pgm" x="450" y="128" width="742" height="544" rx="4" fill="var(--zone2)"/>
+        <rect class="zone" data-group="loads" x="450" y="8" width="742" height="110" rx="4" fill="var(--zone)"/>
+        <text x="20" y="150" class="zl">FPM · supply</text>
+        <text x="462" y="150" class="zl">PGM · process module</text>
+        <text x="462" y="28" class="zl">Electrical loads</text>
+        <text x="20" y="40" class="t" style="font-size:16px">Click a part, a line or a zone to read its sensors</text>
+        <text x="20" y="62" class="m" style="font-size:12px">Simplified redraw · dashed lines move while that fluid flows</text>
+        <text x="20" y="80" class="m" style="font-size:12px">Orange fill = heater on · zone background = all sensors of that group</text>
+        <g id="pipes"></g>
+        <g id="parts"></g>
+      </svg>
+      <div class="fl" id="fluidLegend"></div>
+    </section>
+    <section class="panel ctl" aria-label="Knobs">
+      <div>
+        <p class="lbl">Playbook</p>
+        <div class="scen">
+          <button type="button" data-scen="load">Go to part load</button>
+          <button type="button" data-scen="down">Shut down</button>
+          <button type="button" class="trip" id="tripBtn">Trip / Emergency purge</button>
+          <button type="button" class="estop" id="estopBtn" title="Everything off at once, air included">Emergency stop</button>
+        </div>
+        <p class="scenlbl" id="scenLbl"></p>
+      </div>
+      <p class="lbl" style="margin:0">Knobs</p>
+      <div class="knobs" id="knobs"></div>
+      <div class="knobs">
+        <div class="row"><div class="hd"><span>Heaters (EAPH, ERH, EAGH, EAOH)</span></div>
+          <div class="seg" role="group" aria-label="Heaters"><button type="button" id="hOn">On</button><button type="button" id="hOff">Off</button></div></div>
+        <div class="row"><div class="hd"><span>N₂ + H₂ by 210 °C rule</span></div>
+          <div class="seg" role="group" aria-label="Forming gas rule"><button type="button" id="fgA">Auto</button><button type="button" id="fgM">Manual</button></div></div>
+        <div class="row"><div class="hd"><span>Sensor jerk at stage changes</span></div>
+          <div class="seg" role="group" aria-label="Sensor jerk at stage changes"><button type="button" id="jOn">Plant pace</button><button type="button" id="jOff">One step</button></div></div>
+        <div class="row"><div class="hd"><span>Stack keeper 660 °C (twin only)</span></div>
+          <div class="seg" role="group" aria-label="Stack keeper"><button type="button" id="kpOn">On</button><button type="button" id="kpOff">Off</button></div></div>
+        <div class="row"><div class="hd"><span>Cooling after hot standby</span></div>
+          <div class="seg" role="group" aria-label="Cooling slope after hot standby"><button type="button" id="pcOn">Plant slope</button><button type="button" id="pcOff">Heat balance</button></div></div>
+      </div>
+    </section>
+    </div>
+
+    <div class="side">
+    <section class="panel hi" aria-label="Trend">
+      <p class="lbl">Stack temperature, last 24 h</p>
+      <canvas id="trend" aria-label="Stack temperature, last 24 hours"></canvas>
+      <div class="legend" id="legend"></div>
+    </section>
+    <section class="panel read" aria-live="polite">
+      <p class="lbl">Sensor readings</p>
+      <div class="gchips" id="gChips" role="group" aria-label="Show all sensors of a group"></div>
+      <h2 id="pTitle">Stack</h2>
+      <p class="desc" id="pDesc"></p>
+      <p class="psum" id="pSum"></p>
+      <ul class="rows" id="pRows"></ul>
+      <p class="src-note">Bar: plant range in this stage over 39 days (light band p10–p90, track p2–p98); tick = twin reading. Flows set by a knob read the knob. After a stage change, slow sensors move to the new level at the plant's pace. Plot under a reading: that sensor in the twin over the last 24 h (same time axis as the stack trend, colour strip = stage); only drawn for readings that changed. Tap a plot to enlarge it.</p>
+    </section>
+    </div>
+  </div>
+
+  <section class="panel bendp" aria-label="Last stage change: bend and jerk">
+    <div>
+      <p class="lbl">Last stage change · bend and jerk</p>
+      <h2 id="bTitle">No stage change yet</h2>
+      <p class="desc" id="bNote"></p>
+      <table class="btab" id="bTab"></table>
+      <p class="src-note">Bend = slope after − slope before. Bend time = minutes for the slope to go 10 → 90 % of the way (negative = starts before the stage label changes). Jerk = how sharply the slope turns (°C/h per min²). Plant = median over the clean borders of this type, 39 days.</p>
+    </div>
+    <div>
+      <canvas id="bChart" aria-label="Stack temperature change around the last stage change: plant median vs twin"></canvas>
+      <div class="legend"><span><i style="background:var(--heat)"></i>Plant median (stack)</span><span><i style="background:var(--chart)"></i>Twin (stack)</span></div>
+      <details class="ball"><summary>All border types seen on the plant</summary><table class="btab" id="bAll"></table></details>
+    </div>
+  </section>
+</div>
+
+<script src="data/sensors.js"></script>
+<script src="data/bends.js"></script>
+<script src="app.js"></script>
+<script>if (location.protocol.startsWith('http') && 'serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>

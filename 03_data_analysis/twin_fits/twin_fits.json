@@ -1,0 +1,85 @@
+{
+ "heat": {
+  "values": {
+   "K_UP": 0.5615,
+   "K_DOWN": 0.3162,
+   "Q_HEAT": 7.6203,
+   "LOSS": 0.0121,
+   "Q_NG": 0.3698,
+   "Q_PER_A": 6.6062
+  },
+  "check": {
+   "windows_10min": 3600,
+   "shutdown_windows": 488,
+   "fuel_minutes": 143,
+   "median_miss_C_per_h_by_stage": {
+    "Air-flow cooling": 1.9,
+    "Heat-up N₂+H₂": 3.2,
+    "Heat-up air": 8.0,
+    "Hot standby": 1.8
+   }
+  }
+ },
+ "eaph": {
+  "values": {
+   "ETA_EAPH": 0.9094,
+   "RISE_6000": 267.5117
+  },
+  "check": {
+   "windows_10min": 2773
+  }
+ },
+ "targets": {
+  "values": {
+   "SP_FS": 580.0,
+   "SP_PL": 600.0
+  },
+  "check": {
+   "minutes_FS": 199,
+   "minutes_PL": 262
+  }
+ },
+ "_note": "Fitted from 03_data_analysis data by scripts/twin_fits.py; app.js values typed by hand. 8 replay stretches held out.",
+ "tin": {
+  "values": {
+   "E_REC": 0.91,
+   "E_REC_HI": 0.86
+  },
+  "check": {
+   "weighted_mean_miss_C": 13.4,
+   "held_out_miss_C": 7.6,
+   "app_0.88_0.83_held_out_miss_C": 4.8
+  }
+ },
+ "rec": {
+  "values": {
+   "REC_E6": 0.8515,
+   "REC_E9": 0.872,
+   "REC_G": 0.8515,
+   "REC_TAU": 32.3751,
+   "REC_TG": 31.8149
+  },
+  "check": {
+   "train_miss_C": 5.0,
+   "held_out_miss_C": 12.6
+  }
+ },
+ "hsc": {
+  "values": {
+   "HSC_C6": 0.0605,
+   "HSC_N": 1.6494,
+   "HSC_TAU": 4.2396
+  },
+  "check": {
+   "runs": [
+    "2026-02-04 02:01:00",
+    "2026-02-16 10:37:00",
+    "2026-02-18 17:26:00",
+    "2026-03-04 17:56:00",
+    "2026-03-20 16:24:00"
+   ],
+   "mean_miss_C": 6.1,
+   "leave_one_out_miss_C": 10.8
+  }
+ }
+}

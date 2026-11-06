@@ -1,0 +1,233 @@
+{
+  "TIR_1": [
+    "TIR_1_1_1",
+    "TIR_1_2_1",
+    "TIR_1_2_2",
+    "TIR_1_3",
+    "TIR_1_4_1",
+    "TIR_1_4_2"
+  ],
+  "TIR_2": [
+    "TIR_2_02",
+    "TIR_2_03",
+    "TIR_2_04",
+    "TIR_2_05",
+    "TIR_2_1_1",
+    "TIR_2_1_2"
+  ],
+  "TIR_3": [
+    "TIR_3_01",
+    "TIR_3_02",
+    "TIR_3_04",
+    "TIR_3_05",
+    "TIR_3_06",
+    "TIR_3_18",
+    "TIR_3_19_1",
+    "TIR_3_19_2"
+  ],
+  "TIR_4": [
+    "TIR_4_1",
+    "TIR_4_6_10",
+    "TIR_4_6_11",
+    "TIR_4_6_12",
+    "TIR_4_6_13",
+    "TIR_4_6_14",
+    "TIR_4_6_15",
+    "TIR_4_6_16",
+    "TIR_4_6_17",
+    "TIR_4_6_18",
+    "TIR_4_6_1",
+    "TIR_4_6_20",
+    "TIR_4_6_21",
+    "TIR_4_6_22",
+    "TIR_4_6_23",
+    "TIR_4_6_24",
+    "TIR_4_6_25",
+    "TIR_4_6_26",
+    "TIR_4_6_27",
+    "TIR_4_6_28",
+    "TIR_4_6_29",
+    "TIR_4_6_2",
+    "TIR_4_6_30",
+    "TIR_4_6_31",
+    "TIR_4_6_32",
+    "TIR_4_6_33",
+    "TIR_4_6_34",
+    "TIR_4_6_35",
+    "TIR_4_6_36",
+    "TIR_4_6_3",
+    "TIR_4_6_4",
+    "TIR_4_6_5",
+    "TIR_4_6_6",
+    "TIR_4_6_7",
+    "TIR_4_6_8",
+    "TIR_4_6_9"
+  ],
+  "TIR_5": [
+    "TIR_5_4_1",
+    "TIR_5_4_2",
+    "TIR_5_6_1",
+    "TIR_5_6_2"
+  ],
+  "TIR_6": [
+    "TIR_6_01"
+  ],
+  "TIR_7": [
+    "TIR_7_04",
+    "TIR_7_05",
+    "TIR_7_1_1",
+    "TIR_7_1_2",
+    "TIR_7_2_1",
+    "TIR_7_2_2",
+    "TIR_7_3_1",
+    "TIR_7_3_2"
+  ],
+  "TIRC_2": [
+    "TIRC_2_06"
+  ],
+  "TIRC_3": [
+    "TIRC_3_03",
+    "TIRC_3_07",
+    "TIRC_3_08",
+    "TIRC_3_09",
+    "TIRC_3_10",
+    "TIRC_3_11",
+    "TIRC_3_12",
+    "TIRC_3_13",
+    "TIRC_3_14",
+    "TIRC_3_15",
+    "TIRC_3_16",
+    "TIRC_3_17",
+    "TIRC_3_1_1"
+  ],
+  "TIRC_5": [
+    "TIRC_5_07",
+    "TIRC_5_08",
+    "TIRC_5_09",
+    "TIRC_5_10",
+    "TIRC_5_11",
+    "TIRC_5_12",
+    "TIRC_5_13",
+    "TIRC_5_14",
+    "TIRC_5_15",
+    "TIRC_5_17",
+    "TIRC_5_1_1",
+    "TIRC_5_1_2",
+    "TIRC_5_2_1",
+    "TIRC_5_2_2",
+    "TIRC_5_3_1",
+    "TIRC_5_3_2",
+    "TIRC_5_5_1",
+    "TIRC_5_5_2"
+  ],
+  "TIRC_6": [
+    "TIRC_6_1_1"
+  ],
+  "TIRZ_8": [
+    "TIRZ_8_1_10",
+    "TIRZ_8_1_1",
+    "TIRZ_8_1_3",
+    "TIRZ_8_1_9",
+    "TIRZ_8_2_1",
+    "TIRZ_8_2_2",
+    "TIRZ_8_2_3",
+    "TIRZ_8_2_4",
+    "TIRZ_8_2_5"
+  ],
+  "PIR_1": [
+    "PIR_1_1_1",
+    "PIR_1_1_2",
+    "PIR_1_1_3",
+    "PIR_1_2_1",
+    "PIR_1_2_2",
+    "PIR_1_3_1",
+    "PIR_1_3_2",
+    "PIR_1_4_1",
+    "PIR_1_4_2",
+    "PIR_1_5"
+  ],
+  "PIR_2": [
+    "PIR_2_01",
+    "PIR_2_02"
+  ],
+  "PIR_3": [
+    "PIR_3_01",
+    "PIR_3_02",
+    "PIR_3_03"
+  ],
+  "PIR_5": [
+    "PIR_5_1_1",
+    "PIR_5_1_2",
+    "PIR_5_2_1",
+    "PIR_5_2_2",
+    "PIR_5_3_1",
+    "PIR_5_3_2",
+    "PIR_5_4_1",
+    "PIR_5_4_2"
+  ],
+  "PIR_6": [
+    "PIR_6_01"
+  ],
+  "PIR_7": [
+    "PIR_7_02",
+    "PIR_7_03",
+    "PIR_7_1_1",
+    "PIR_7_1_2"
+  ],
+  "PIRZ_8": [
+    "PIRZ_8_1_2"
+  ],
+  "FIRC": [
+    "ct_FIRC_111_PV_ProcessValue",
+    "ct_FIRC_112_PV_ProcessValue",
+    "ct_FIRC_12_PV_ProcessValue",
+    "ct_FIRC_13_PV_ProcessValue",
+    "ct_FIRC_14_PV_ProcessValue",
+    "ct_FIRC_15_PV_ProcessValue",
+    "PLC_ctrl_ct_FIRC_113_PV_ProcessValue"
+  ],
+  "EIRC_2_V": [
+    "EIRC_2_01_ActV_rMas_MainsVoltage",
+    "EIRC_2_01_ActV_rSlv1_MainsVoltage",
+    "EIRC_2_01_ActV_rSlv2_MainsVoltage"
+  ],
+  "EIRC_2_I": [
+    "EIRC_2_01_ActV_rMas_Current",
+    "EIRC_2_01_ActV_rSlv1_Current",
+    "EIRC_2_01_ActV_rSlv2_Current"
+  ],
+  "EIRC_2_F": [
+    "EIRC_2_01_ActV_rMas_MainsFreq"
+  ],
+  "EIRC_2_P": [
+    "EIRC_2_01_ActV_In_ThreePhasePower"
+  ],
+  "EIRC_4_V": [
+    "PLC_hostSetp_ctrl_ctEIRC41_rVoltMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC42_rVoltMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC43_rVoltMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC44_rVoltMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC45_rVoltMonitor"
+  ],
+  "EIRC_4_I": [
+    "PLC_hostSetp_ctrl_ctEIRC41_rCurrMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC42_rCurrMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC43_rCurrMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC44_rCurrMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC45_rCurrMonitor"
+  ],
+  "EIRC_4_P": [
+    "EIRC_41_Power_kW",
+    "EIRC_42_Power_kW",
+    "EIRC_43_Power_kW",
+    "EIRC_44_Power_kW",
+    "EIRC_45_Power_kW"
+  ],
+  "EIRC_4_Vcell": [
+    "PLC_hostSetp_ctrl_ctEIRC41_rVoltCellMin_ActV",
+    "PLC_hostSetp_ctrl_ctEIRC42_rVoltCellMin_ActV",
+    "PLC_hostSetp_ctrl_ctEIRC43_rVoltCellMin_ActV",
+    "PLC_hostSetp_ctrl_ctEIRC44_rVoltCellMin_ActV",
+    "PLC_hostSetp_ctrl_ctEIRC45_rVoltCellMin_ActV"
+  ]
+}

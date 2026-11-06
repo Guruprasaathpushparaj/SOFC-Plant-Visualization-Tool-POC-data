@@ -1,0 +1,75 @@
+{
+  "TIR_1": [
+    "TIR_1_1_1",
+    "TIR_1_2_1",
+    "TIR_1_3",
+    "TIR_1_4_1"
+  ],
+  "TIR_4": [
+    "TIR_4_6_10",
+    "TIR_4_6_11",
+    "TIR_4_6_12",
+    "TIR_4_6_13",
+    "TIR_4_6_14",
+    "TIR_4_6_15",
+    "TIR_4_6_16",
+    "TIR_4_6_17",
+    "TIR_4_6_18",
+    "TIR_4_6_1",
+    "TIR_4_6_20",
+    "TIR_4_6_21",
+    "TIR_4_6_22",
+    "TIR_4_6_23",
+    "TIR_4_6_24",
+    "TIR_4_6_25",
+    "TIR_4_6_26",
+    "TIR_4_6_27",
+    "TIR_4_6_28",
+    "TIR_4_6_29",
+    "TIR_4_6_2",
+    "TIR_4_6_30",
+    "TIR_4_6_31",
+    "TIR_4_6_32",
+    "TIR_4_6_33",
+    "TIR_4_6_34",
+    "TIR_4_6_35",
+    "TIR_4_6_36",
+    "TIR_4_6_3",
+    "TIR_4_6_4",
+    "TIR_4_6_5",
+    "TIR_4_6_6",
+    "TIR_4_6_7",
+    "TIR_4_6_8",
+    "TIR_4_6_9"
+  ],
+  "TIRC_2": [
+    "TIRC_2_06"
+  ],
+  "PIR_2": [
+    "PIR_2_02"
+  ],
+  "EIRC_2_P": [
+    "EIRC_2_01_ActV_In_ThreePhasePower"
+  ],
+  "EIRC_4_V": [
+    "PLC_hostSetp_ctrl_ctEIRC41_rVoltMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC42_rVoltMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC43_rVoltMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC44_rVoltMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC45_rVoltMonitor"
+  ],
+  "EIRC_4_I": [
+    "PLC_hostSetp_ctrl_ctEIRC41_rCurrMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC42_rCurrMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC43_rCurrMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC44_rCurrMonitor",
+    "PLC_hostSetp_ctrl_ctEIRC45_rCurrMonitor"
+  ],
+  "EIRC_4_P": [
+    "EIRC_41_Power_kW",
+    "EIRC_42_Power_kW",
+    "EIRC_43_Power_kW",
+    "EIRC_44_Power_kW",
+    "EIRC_45_Power_kW"
+  ]
+}

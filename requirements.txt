@@ -1,0 +1,13 @@
+# Python 3.13. Install: python -m pip install -r requirements.txt
+# The 2D twin (05_twin_2d) needs none of this, only Edge or Chrome.
+# Versions = the ones this project was run with (2026-11-05).
+pandas>=3.0.3
+pyarrow>=25.0.1
+numpy>=2.5.1
+scipy>=1.18.0
+matplotlib>=3.11.1
+openpyxl>=3.1.5        # Excel output in 06_deliverables
+scikit-learn>=1.9.0    # sensors_by_stage.ipynb
+streamlit>=1.62.0      # 04_synthetic_data/pattern_app.py
+jupyterlab>=4.6.4      # to open the notebooks
+pytest>=9.1.1          # 03_data_analysis/tests

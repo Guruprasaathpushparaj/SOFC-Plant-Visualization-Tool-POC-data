@@ -1,0 +1,260 @@
+{
+  "03_data_analysis/preprocessing/column_groups.json": {
+    "mtime": 1791549556.3990762,
+    "seen": 1793881005.5608685,
+    "ast_hash": "781b4c537dd1461075cfac655bc18fa4",
+    "semantic_hash": "781b4c537dd1461075cfac655bc18fa4"
+  },
+  "03_data_analysis/preprocessing/stage/column_groups.json": {
+    "mtime": 1791982579.605772,
+    "seen": 1793881005.560878,
+    "ast_hash": "e5c017b99e907cf925ca07e950fa23f6",
+    "semantic_hash": "e5c017b99e907cf925ca07e950fa23f6"
+  },
+  "03_data_analysis/scripts/availability.py": {
+    "mtime": 1793880044.41165,
+    "seen": 1793881005.560882,
+    "ast_hash": "abc642f96cf4b1d18bb4882691020876",
+    "semantic_hash": "abc642f96cf4b1d18bb4882691020876"
+  },
+  "03_data_analysis/scripts/correlation_common.py": {
+    "mtime": 1793880044.4138718,
+    "seen": 1793881005.5608847,
+    "ast_hash": "905fc53397741b4df626f9288f6682e9",
+    "semantic_hash": "905fc53397741b4df626f9288f6682e9"
+  },
+  "03_data_analysis/scripts/downsample.py": {
+    "mtime": 1793880044.4148664,
+    "seen": 1793881005.560887,
+    "ast_hash": "2a2221339a9da903e387c5ccd49518ca",
+    "semantic_hash": "2a2221339a9da903e387c5ccd49518ca"
+  },
+  "03_data_analysis/scripts/efficiency_check.py": {
+    "mtime": 1793880044.4158716,
+    "seen": 1793881005.5608885,
+    "ast_hash": "5d07e0c44f0201ed992d29028a2ddc3e",
+    "semantic_hash": "5d07e0c44f0201ed992d29028a2ddc3e"
+  },
+  "03_data_analysis/scripts/flow_check.py": {
+    "mtime": 1793880044.4178667,
+    "seen": 1793881005.560891,
+    "ast_hash": "d51c76fe90ef6d14fcfb8aeff0b43c48",
+    "semantic_hash": "d51c76fe90ef6d14fcfb8aeff0b43c48"
+  },
+  "03_data_analysis/scripts/heater_temps.py": {
+    "mtime": 1793880044.419873,
+    "seen": 1793881005.5608926,
+    "ast_hash": "06870f0c25883c6a9043fe58aa0d6eec",
+    "semantic_hash": "06870f0c25883c6a9043fe58aa0d6eec"
+  },
+  "03_data_analysis/scripts/industrial_stages.py": {
+    "mtime": 1793880044.419873,
+    "seen": 1793881005.5608943,
+    "ast_hash": "2878c7a0f0b7d91f802f9face0fa5c78",
+    "semantic_hash": "2878c7a0f0b7d91f802f9face0fa5c78"
+  },
+  "03_data_analysis/scripts/ladder_stages.py": {
+    "mtime": 1792158626.0200994,
+    "seen": 1793881005.560896,
+    "ast_hash": "8e383039ddc5e5e2f3c36a34dff21a7c",
+    "semantic_hash": "8e383039ddc5e5e2f3c36a34dff21a7c"
+  },
+  "03_data_analysis/scripts/operating_states.py": {
+    "mtime": 1793880044.419873,
+    "seen": 1793881005.5608978,
+    "ast_hash": "6bb27049860e441381b552a542a5ed8b",
+    "semantic_hash": "6bb27049860e441381b552a542a5ed8b"
+  },
+  "03_data_analysis/scripts/plant_stages.py": {
+    "mtime": 1793880044.419873,
+    "seen": 1793881005.5608997,
+    "ast_hash": "912dd054327a28e700d583f226c42469",
+    "semantic_hash": "912dd054327a28e700d583f226c42469"
+  },
+  "03_data_analysis/scripts/slopes_jerk.py": {
+    "mtime": 1793880044.4324791,
+    "seen": 1793881005.5609014,
+    "ast_hash": "69d2d80cdbd6896f3b83b135e3935119",
+    "semantic_hash": "69d2d80cdbd6896f3b83b135e3935119"
+  },
+  "03_data_analysis/scripts/stage_crosswalk.py": {
+    "mtime": 1793880044.4324791,
+    "seen": 1793881005.5609028,
+    "ast_hash": "a810fe979e37bb249d41ddeb9f66af20",
+    "semantic_hash": "a810fe979e37bb249d41ddeb9f66af20"
+  },
+  "03_data_analysis/scripts/stage_signals.py": {
+    "mtime": 1793880044.4324791,
+    "seen": 1793881005.5609047,
+    "ast_hash": "397401e315f6e67dc1834246e57acf37",
+    "semantic_hash": "397401e315f6e67dc1834246e57acf37"
+  },
+  "03_data_analysis/scripts/stage_split.py": {
+    "mtime": 1793880044.4407537,
+    "seen": 1793881005.560906,
+    "ast_hash": "26ea9f1fb91a5e99db64a33435287669",
+    "semantic_hash": "26ea9f1fb91a5e99db64a33435287669"
+  },
+  "03_data_analysis/scripts/trip_check.py": {
+    "mtime": 1793880044.4417562,
+    "seen": 1793881005.5609076,
+    "ast_hash": "ce55b8a14c457af8cf5b64e278c5a657",
+    "semantic_hash": "ce55b8a14c457af8cf5b64e278c5a657"
+  },
+  "03_data_analysis/sensor_trace/analyse.py": {
+    "mtime": 1793880044.4417562,
+    "seen": 1793881005.560909,
+    "ast_hash": "d8151c7efd7654d5bf7aa9a7187c097e",
+    "semantic_hash": "d8151c7efd7654d5bf7aa9a7187c097e"
+  },
+  "03_data_analysis/sensor_trace/classify.py": {
+    "mtime": 1793880044.4417562,
+    "seen": 1793881005.5609107,
+    "ast_hash": "dc40efb6ec0128716d46ec14ed01206e",
+    "semantic_hash": "dc40efb6ec0128716d46ec14ed01206e"
+  },
+  "03_data_analysis/slopes_jerk/border_type_curves.json": {
+    "mtime": 1793783719.4271777,
+    "seen": 1793881005.5609121,
+    "ast_hash": "9ef551c4bb422c64cc9aeb8877c224c2",
+    "semantic_hash": "9ef551c4bb422c64cc9aeb8877c224c2"
+  },
+  "03_data_analysis/slopes_jerk/run_curves.json": {
+    "mtime": 1793782904.2349463,
+    "seen": 1793881005.5609136,
+    "ast_hash": "fb01d92f6719152e18ac0afbaaeab8c2",
+    "semantic_hash": "fb01d92f6719152e18ac0afbaaeab8c2"
+  },
+  "04_synthetic_data/build_library.py": {
+    "mtime": 1793880044.3654034,
+    "seen": 1793881005.5609152,
+    "ast_hash": "c74aab08735e6c296acc4828ab8a3b84",
+    "semantic_hash": "c74aab08735e6c296acc4828ab8a3b84"
+  },
+  "04_synthetic_data/library/stack_shapes.json": {
+    "mtime": 1792051206.3607283,
+    "seen": 1793881005.5609176,
+    "ast_hash": "d2aa0dcb41044e1b0817e299ac285a05",
+    "semantic_hash": "d2aa0dcb41044e1b0817e299ac285a05"
+  },
+  "04_synthetic_data/pattern_app.py": {
+    "mtime": 1793880044.3654034,
+    "seen": 1793881005.5609188,
+    "ast_hash": "6ec15afe521b429c1305c4e2648e0881",
+    "semantic_hash": "6ec15afe521b429c1305c4e2648e0881"
+  },
+  "04_synthetic_data/pattern_filler.py": {
+    "mtime": 1793880044.3654034,
+    "seen": 1793881005.5609202,
+    "ast_hash": "52d3bf85ba5695c8a6418760cd225f83",
+    "semantic_hash": "52d3bf85ba5695c8a6418760cd225f83"
+  },
+  "04_synthetic_data/pattern_generator.py": {
+    "mtime": 1793880044.381017,
+    "seen": 1793881005.5609217,
+    "ast_hash": "4007778d0b83c16651d37bd0d5f591cb",
+    "semantic_hash": "4007778d0b83c16651d37bd0d5f591cb"
+  },
+  "05_twin_2d/app.js": {
+    "mtime": 1793867048.9431286,
+    "seen": 1793881005.5609233,
+    "ast_hash": "f9930a44be31006024e23655b0c148a8",
+    "semantic_hash": "f9930a44be31006024e23655b0c148a8"
+  },
+  "05_twin_2d/data/bends.js": {
+    "mtime": 1793720955.626651,
+    "seen": 1793881005.5609248,
+    "ast_hash": "de508249f53f5c8a8fd7ffc6fdb2cba0",
+    "semantic_hash": "de508249f53f5c8a8fd7ffc6fdb2cba0"
+  },
+  "05_twin_2d/data/sensors.js": {
+    "mtime": 1793722367.4467807,
+    "seen": 1793881005.5609264,
+    "ast_hash": "3a29ec8f6332af0f9f9dc25af1a39ee4",
+    "semantic_hash": "3a29ec8f6332af0f9f9dc25af1a39ee4"
+  },
+  "05_twin_2d/tools/bends.py": {
+    "mtime": 1793880044.4076493,
+    "seen": 1793881005.5609283,
+    "ast_hash": "bd198ba59828783b0f4f46f9a129a7a7",
+    "semantic_hash": "bd198ba59828783b0f4f46f9a129a7a7"
+  },
+  "05_twin_2d/tools/prep.py": {
+    "mtime": 1793880044.4096525,
+    "seen": 1793881005.56093,
+    "ast_hash": "755c40b00a8339f98d3cab5d4e385492",
+    "semantic_hash": "755c40b00a8339f98d3cab5d4e385492"
+  },
+  "01_docs/README.md": {
+    "mtime": 1793880042.817682,
+    "seen": 1793881005.5609314,
+    "ast_hash": "4354d2a12a33153641dddcd781297106",
+    "semantic_hash": "4354d2a12a33153641dddcd781297106"
+  },
+  "01_docs/component_sensor_map_en.md": {
+    "mtime": 1793880042.8077872,
+    "seen": 1793881005.5609329,
+    "ast_hash": "b8cef1b1165c993696b58bc6c88fa235",
+    "semantic_hash": "b8cef1b1165c993696b58bc6c88fa235"
+  },
+  "01_docs/operational-modes.md": {
+    "mtime": 1793880042.8146799,
+    "seen": 1793881005.5609343,
+    "ast_hash": "601944771b81e8dbadc6c5e1cd7bee75",
+    "semantic_hash": "601944771b81e8dbadc6c5e1cd7bee75"
+  },
+  "01_docs/sofc-operational-stage-literature.md": {
+    "mtime": 1792483863.6467676,
+    "seen": 1793881005.560936,
+    "ast_hash": "d7b70a5199e3400e91700ce337d909cf",
+    "semantic_hash": "d7b70a5199e3400e91700ce337d909cf"
+  },
+  "03_data_analysis/README.md": {
+    "mtime": 1793880043.912293,
+    "seen": 1793881005.5609372,
+    "ast_hash": "721a01904b10e63a51c4e2daf86ff58c",
+    "semantic_hash": "721a01904b10e63a51c4e2daf86ff58c"
+  },
+  "04_synthetic_data/README.md": {
+    "mtime": 1793880044.3834436,
+    "seen": 1793881005.560939,
+    "ast_hash": "d783a891c62e9085a17fe9fb44965be5",
+    "semantic_hash": "d783a891c62e9085a17fe9fb44965be5"
+  },
+  "05_twin_2d/README.md": {
+    "mtime": 1793880044.3928418,
+    "seen": 1793881005.5609407,
+    "ast_hash": "82d4c22ee6c702a270bb86b80a1c870e",
+    "semantic_hash": "82d4c22ee6c702a270bb86b80a1c870e"
+  },
+  "05_twin_2d/index.html": {
+    "mtime": 1793867032.1351898,
+    "seen": 1793881005.5609426,
+    "ast_hash": "87ec381b28a7adc5d3cd84c3f3716270",
+    "semantic_hash": "87ec381b28a7adc5d3cd84c3f3716270"
+  },
+  "README.md": {
+    "mtime": 1793880073.1289968,
+    "seen": 1793881005.560944,
+    "ast_hash": "706973dcaa7941e70bccf0932b603866",
+    "semantic_hash": "706973dcaa7941e70bccf0932b603866"
+  },
+  "01_docs/106 other sensor data_ in relation with the 50 sensors and stages.png": {
+    "mtime": 1793608407.3607366,
+    "seen": 1793881005.5609457,
+    "ast_hash": "fb5810793d67f856ddcc85ff99c136e6",
+    "semantic_hash": "fb5810793d67f856ddcc85ff99c136e6"
+  },
+  "01_docs/Flow_diagram.png": {
+    "mtime": 1791289358.0990498,
+    "seen": 1793881005.5609472,
+    "ast_hash": "ca3b8e1e4ed557af60eb46a3fb3c4df3",
+    "semantic_hash": "ca3b8e1e4ed557af60eb46a3fb3c4df3"
+  },
+  "01_docs/System layout with sensors.png": {
+    "mtime": 1792057391.549085,
+    "seen": 1793881005.5609484,
+    "ast_hash": "888115089c897cba9ec4b414d03a949c",
+    "semantic_hash": "888115089c897cba9ec4b414d03a949c"
+  }
+}

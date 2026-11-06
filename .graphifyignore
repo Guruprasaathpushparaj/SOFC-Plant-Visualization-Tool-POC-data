@@ -1,0 +1,6 @@
+02_data/
+graphify-out/
+__pycache__/
+06_deliverables/
+03_data_analysis/**/*.png
+04_synthetic_data/patterns/

@@ -1,0 +1,22 @@
+{
+  "title": "POC Knowledge Map",
+  "areas": {
+    "05_twin_2d": {"name": "Plant twin", "slot": 1, "anchor": [0, 0], "blurb": "The 2D twin app: the clickable P&ID page, its engine and the data it plays back."},
+    "03_data_analysis": {"name": "Data analysis", "slot": 0, "anchor": [-560, -20], "blurb": "Notebooks and scripts that read the real plant data: stages, trips, heaters, slopes and availability."},
+    "04_synthetic_data": {"name": "Synthetic data", "slot": 4, "anchor": [400, 420], "blurb": "The pattern generator and day filler that build realistic made-up plant days."},
+    "01_docs": {"name": "Docs and drawings", "slot": 2, "anchor": [470, -320], "blurb": "Plant documents, the layout drawing, the sensor heatmap and the papers and patents on stages."}
+  },
+  "tour": [
+    {"title": "This is the whole POC on one page", "text": "{nodes} things from the code, the documents and three drawings, joined by {links} links. The four colours are the four parts of the project: the plant twin, data analysis, synthetic data, and the documents. Inside each part, things that belong together pull into islands; each island is one topic. Big dots have many links."},
+    {"title": "The busiest hub: the 2D plant twin", "text": "The twin is where everything meets. Its notes link the plant drawing, the eight plant stages, the stack heat model and the data files it plays back. If you change one rule in the twin, this is the neighbourhood that feels it.", "nodes": ["SOFC Plant Twin (2D"]},
+    {"title": "The eight plant stages hold the project together", "text": "Heat-up with air, heat-up with forming gas, hot standby, fuel switch, part load, air-flow cooling, shutdown and trip purge. The analysis notebooks, the synthetic-day generator and the twin all lean on this one list.", "nodes": ["The 8 plant stages"]},
+    {"title": "The plant drawing, read as a map", "text": "Each dot here is a part of the real plant from the layout drawing: gas lines, heaters, reformer, burner, stack and inverters. The links follow the pipes, so the air path, the fuel path and the flue-gas path show up as chains.", "topic_of": "SOFC stack block"},
+    {"title": "A link nobody wrote down", "text": "The twin’s chain of linked stages and the synthetic-day generator’s “allowed stage changes” rule were written separately, but they describe the same thing. The extractor guessed this link (dashed line). Worth keeping the two in step.", "nodes": ["Linked stages chain", "Allowed stage changes rule"]},
+    {"title": "Every temperature trip ends in one place", "text": "Exhaust, stack, afterburner and heater over-temperature limits all lead to the safety PLC’s emergency purge. Six of the nine real trips came from the exhaust limit.", "nodes": ["SPLC_EMERGENCYPURGE safety state"]},
+    {"title": "Which sensors can be rebuilt from the core 50?", "text": "This island comes from the heatmap drawing. It links the 106 extra sensors to each stage and says whether they follow the 50 core sensors. Part load is the hard case: most sensors behave on their own there.", "topic_of": "106 Other Sensors: How"},
+    {"title": "What the outside world calls our stages", "text": "Patents and papers (LG, Hanasaki, Toto, Bloom, IEC 62282) use other names for the same stages. Guessed links tie them to our hot standby, start-up and part load. Trip, hot idle and cold start were not found in the literature.", "topic_of": "SOFC Operational-Stage Terminology"},
+    {"title": "Your turn", "text": "Search for any tag or script, click a part or topic on the left, or press “How are two things linked?” to trace a chain between any two dots."}
+  ],
+  "examples": [["TIRZ8.1.10", "trip_events"], ["Hanasaki", "plant_stages.py"], ["106 Other Sensors", "pattern_filler.py"],
+               ["Flow Diagram (SOFC", "app.js"], ["Stack heat balance", "slopes_jerk.py"], ["gas_phase column", "fill()"]]
+}

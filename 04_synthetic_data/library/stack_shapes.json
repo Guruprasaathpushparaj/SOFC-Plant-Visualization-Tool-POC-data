@@ -1,0 +1,23 @@
+{
+  "thermocouples_used": 34,
+  "dropped": [
+    "TIR_4_6_25"
+  ],
+  "minutes": 54951,
+  "variance_first_5": [
+    0.9967,
+    0.0032,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "cumulative_first_5": [
+    0.9967,
+    0.9999,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "shapes_for_95pct": 1,
+  "D7_choice": 3
+}
