@@ -1,6 +1,6 @@
 # SOFC Plant Twin (2D, local)
 
-**Version v36 (2026-11-06)** – DC/DC per string, load bank totals (Σ P, Σ I, V) and load bank power trend. Git tag `twin-v36`.
+**Version 2.0 (2026-11-06, internal build v36)** – DC/DC per string, load bank totals (Σ P, Σ I, V) and load bank power trend. Release tag `v2.0`.
 
 A small local website: redrawn plant schematic, knobs and playbooks, a fitted stack heat model with recuperator and air heater,
 and clickable parts that show their sensor readings.
