@@ -1,5 +1,7 @@
 # SOFC Plant Twin (2D, local)
 
+**Version 2.1 (2026-11-06)** – play back a data file in the twin (top bar **Source → Data file…**: generated `.csv.gz`, Save data CSV or logger day file; seek slider; 6 h/s and 1 day/s speeds); twin dataset maker `04_synthetic_data/twin_dataset.js` + `dataset_app.bat`; v36 colours restored. Release tag `v2.1`.
+
 **Version 2.0 (2026-11-06, internal build v36)** – DC/DC per string, load bank totals (Σ P, Σ I, V) and load bank power trend. Release tag `v2.0`.
 
 A small local website: redrawn plant schematic, knobs and playbooks, a fitted stack heat model with recuperator and air heater,
