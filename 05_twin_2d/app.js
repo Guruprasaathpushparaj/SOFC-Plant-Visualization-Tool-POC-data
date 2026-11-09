@@ -42,17 +42,19 @@ const PURGE_FROM=["Fuel switch","Part load","Rated power"], LOADS=["Part load","
 const SP_HS=500;   // heat-up air-heater target: the stack settles ~506 °C, where the heat up ends and the gas opens
 // Shut down cools at 9000 ln/min and turns the air off at 40 °C (plant full cool-down after trip #8: air 9000, 664 → 41 °C in 18 h).
 const SD_AIR=9000, AIR_OFF_T=40;
-// Rated power (v3.0): 60 kW DC in total (user, 2026-11-06). The plant never went above 16.2 A / 34 kW, so there is no plant
-// data: 40.18 A per string (equal on all strings) gives 60.0 kW on the string V–I lines (VI below, string_vi_fit.csv; El.Load 4.1–4.5
-// rated 42 A / 14 kW each, 01_docs/component_sensor_map_en.md), NG 211 ln/min (60 kW row of
-// 03_data_analysis/rated_power/electrical_60kW.csv, same equal split, fuel use 79 %); POx as part load. Cells then sit at 0.55–0.68 V,
-// below the plant's 0.72 V minimum-cell limit: the twin does not act on it.
-// Air 10000 (plant max), air heater as part load. Rated power holds until a button is pressed (user, 2026-11-06), and the
+// Rated power (v3.3): 30 A per string (user, 2026-11-06; v3.0–3.2 used 40.18 A = 60 kW). The plant never went above
+// 16.2 A / 34 kW, so there is no plant data: 30 A on all strings gives 52.0 kW on the string V–I lines (VI below,
+// string_vi_fit.csv; El.Load 4.1–4.5 rated 42 A / 14 kW each, 01_docs/component_sensor_map_en.md). NG and POx are the
+// sensors' rated values from the part-load extrapolation (data/sensors.js "rated" = sensor_extrapolation.csv use_rated,
+// 52 kW: NG 180 ln/min by Faraday at the fuel-use trend, POx 202 ln/min on its best-fitting curve). Cells then average
+// 0.73 V (weakest string 0.67 V), around the plant's 0.72 V minimum-cell limit: the twin does not act on it.
+// Air 10000 (plant max; the extrapolation asks more, past the blower), air heater as part load. Rated power holds until a button is pressed (user, 2026-11-06), and the
 // twin changes nothing by temperature there: no stack keeper, no automatic 720 °C trip. The heat balance runs as fitted, so
 // the stack goes where the physics takes it.
 // The stage reads Rated power above the plant's highest part-load current (16.2 A).
 const I_RATED_MIN=17;
-FLOWS["Rated power"]={...FLOWS["Part load"],air:AIR_MAX,14:211,I:40.18};
+const RATED_V=col=>Object.values(DATA.components).flat().find(r=>r.col===col)?.rated?.v;
+FLOWS["Rated power"]={...FLOWS["Part load"],air:AIR_MAX,12:RATED_V("ct_FIRC_12_PV_ProcessValue"),14:RATED_V("ct_FIRC_14_PV_ProcessValue"),I:30};
 const S={t:0,T:T_AMB,Tin:T_AMB,dT:0,slope:0,air:0,pox:0,n2:0,h2:0,ng:0,I:0,heaters:false,target:500,fgAuto:true,trip:0,mark:0,keeper:false,kept:false,plantCool:true,coolAt:null,lastSt:"Shutdown",hist:[]};
 const ngOn=s=>s.ng>NG_ON, fgOn=s=>s.n2>N2_ON&&s.h2>H2_ON, heatOn=s=>s.heaters&&s.trip<=0, loadOn=s=>ngOn(s)&&s.I>=I_POWER;
 // EAPH inlet = air leaving the recuperators (fitted 2026-11-04 on the 39 days, 8 replay stretches held out:
@@ -218,7 +220,7 @@ function toStandby(s){
 // Part load / rated power settings (n = stage key); only from the buttons (stage bar or Go to …).
 function toLoad(s,n){ const f=F(n); Object.assign(s,{air:f.air,ng:f[14],pox:f[12],I:f.I,heaters:true,target:SP_PL,kept:false}); }
 const loadMsg=n=>`${nm(n)}: air ${F(n).air|0}, NG ${F(n)[14]|0}, POx ${F(n)[12]|0} ln/min, ${F(n).I} A per string, air heater ${SP_PL} °C.`
-  +(n==="Rated power"?" Holds until a button is pressed (then hot standby); nothing changes by temperature (no keeper, no automatic trip). No plant data at this power: readings are part load look-ups (string voltage from the current).":"");
+  +(n==="Rated power"?" Holds until a button is pressed (then hot standby); nothing changes by temperature (no keeper, no automatic trip). No plant data at this power (52 kW): readings are rated values extrapolated from part load (best-fitting curve per sensor), string voltage from the current, stack from the heat balance.":"");
 let play=null, playStep=0, playMsg="";
 function startPlay(n){ play=PLAYS[n]; playStep=0; runPlay(); }
 function runPlay(){ if(!play) return; while(playStep<play.length && play[playStep].when(S)){ play[playStep].act(S); playMsg=play[playStep].say; playStep++; } if(playStep>=play.length) play=null; }
@@ -433,15 +435,19 @@ for(let i=1;i<=5;i++) KNOB[`PLC_hostSetp_ctrl_ctEIRC4${i}_rCurrMonitor`]=s=>load
 const TRIP={"TIRZ_8_1_1":1050,"TIRZ_8_1_3":720,"TIRZ_8_1_9":930,"TIRZ_8_1_10":300,"TIRZ_8_2_1":950,"TIRZ_8_2_2":950,"TIRZ_8_2_3":950,"TIRZ_8_2_4":950,"TIRZ_8_2_5":860};
 // "Near trip": a reading within NEAR K of its trip (or above it) → bold in the list, its block on the drawing blinks.
 const NEAR=40, nearTrip=(col,v)=>TRIP[col]!=null&&v!=null&&v>TRIP[col]-NEAR;
-// Rated power has no plant data: every sensor uses its part-load line, except the string voltages, which follow the current
-// (V = V0 + b·I per string, fitted on the plant part-load minutes: 03_data_analysis/rated_power/string_vi_fit.csv → 51 kW at 29.2 A).
-// shortcut: part-load look-ups for all other sensors at rated power; replace with rated-power fits if the plant ever runs there.
+// Rated power has no plant data (v3.2): every look-up sensor shows its rated value from the part-load extrapolation
+// (r.rated at 30 A = 52 kW, best-fitting curve per sensor: 03_data_analysis/rated_power_extrapolation.ipynb §4.7). The string
+// voltages follow the current (V = V0 + b·I per string, string_vi_fit.csv: 52.0 kW at 30 A). Knob, model and CALC sensors stay
+// twin-made, and the stack safety TC keeps following the twin stack (heat balance), not the extrapolated 764 °C.
+// The plant band shown under each reading stays the part-load one, so the rated value is seen against what the plant did.
+// shortcut: one fixed value per sensor (rated power is always 30 A); interpolate use_<p>kW by power if rated power ever varies.
 Object.values(DATA.components).flat().forEach(r=>{ if(r.fits["Part load"]) r.fits["Rated power"]=r.fits["Part load"]; });
 const VI={}; [[486.66,-4.662],[492.27,-4.866],[482.52,-5.476],[477.36,-3.809],[501.16,-4.746]].forEach(([v0,b],k)=>VI[STR[k][1]]=I=>v0+b*I);
 function reading(r,st){
   if(st==="Rated power" && VI[r.col]) return {v:VI[r.col](S.I),f:r.fits[st]};
   const f=r.fits[st];
   if(KNOB[r.col]) return {v:KNOB[r.col](S),f,knob:true};
+  if(st==="Rated power" && r.rated && r.col!==STACK_SAFETY) return {v:r.rated.v,f,rated:true};
   if(!f) return {v:null,f:null};
   const [a,b,p2,,,,p98]=f, hi=r.col===STACK_SAFETY?Infinity:p98;   // the safety TC follows the twin stack past the plant's hottest reading
   return {v:Math.min(hi,Math.max(p2,a+b*S.T)),f};
@@ -556,12 +562,13 @@ function buildReadings(){
 function renderReadings(){
   const st=stage(S);
   for(const e of rowEls){ const r=e.r;
-    const {v,f,knob,ease}=shown(r,st), trip=TRIP[r.col];
+    const {v,f,knob,ease,rated}=shown(r,st), trip=TRIP[r.col];
     let bar="", note="";
     if(f){ const [,,p2,p10,,p90,p98,n]=f, lo=Math.min(p2,v??p2), hi=Math.max(p98,v??p98), span=(hi-lo)||1, X=x=>((x-lo)/span*100).toFixed(1)+"%";
       bar=`<div class="band" style="left:${X(p10)};width:calc(${X(p90)} - ${X(p10)})"></div>${v!=null?`<div class="dot" style="left:calc(${X(v)} - 1px)"></div>`:""}`;
-      note=`${nm(st)}: plant p10–p90 ${fmt(p10,r.unit)}–${fmt(p90,r.unit)} ${r.unit}, ${n} min`; }
+      note=`${st==="Rated power"?"No plant data at rated power; part load":nm(st)}: plant p10–p90 ${fmt(p10,r.unit)}–${fmt(p90,r.unit)} ${r.unit}, ${n} min`; }
     else note=`No plant data for this sensor in ${nm(st)}.`;
+    if(rated && !FEED.row) note=`Rated power value (30 A, 52 kW) from the part-load extrapolation (${r.rated.model}) · `+note;
     if(FEED.row) note="Data file · "+note;
     else if(CALC[r.col]) note="Twin model value · "+note;
     else if(knob && r.col!=="T_stack_C") note="Set by knob · "+note;

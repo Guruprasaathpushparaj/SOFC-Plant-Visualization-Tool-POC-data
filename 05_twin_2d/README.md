@@ -1,5 +1,15 @@
 # SOFC Plant Twin (2D, local)
 
+**Version 3.3 (2026-11-06)** – rated power is now **30 A per string** (52.0 kW on the string V–I lines; was 40.18 A = 60 kW).
+Rated readings, natural gas (180 ln/min) and POx (202 ln/min) come from the extrapolation's rated point (`use_rated` at
+52 kW in `03_data_analysis/rated_power/sensor_extrapolation.csv`, refreshed with `python tools/prep.py --rated-only`).
+
+**Version 3.2 (2026-11-06)** – rated power readings from the part-load extrapolation: at rated power every look-up sensor
+shows its 60 kW value from the best-fitting curve per sensor (`03_data_analysis/rated_power_extrapolation.ipynb` §4.7, stored as
+`"rated"` in `data/sensors.js` by `python tools/prep.py --rated-only`), with the part-load plant band kept underneath. Natural gas
+210 ln/min and POx 166 ln/min at rated power come from the same table; air stays 10000 (plant max). The stack temperature and
+the stack safety TC stay on the twin heat balance.
+
 **Version 3.1 (2026-11-06)** – near-trip alarm: when any of the 9 trip-limited temperatures (TIRZ 8.1.x / 8.2.x) is within
 40 K of its trip or above it, its reading is shown bold red in the sensor list and its block on the drawing blinks red
 (steady red tint with reduced motion). Display only: the twin still changes nothing by temperature.

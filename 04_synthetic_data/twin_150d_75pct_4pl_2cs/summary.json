@@ -1,0 +1,25 @@
+{
+ "period": "2027-01-01 00:00 to 2027-05-31 00:00",
+ "days": 150,
+ "minutes": 216000,
+ "availability_target_pct": 75,
+ "availability_pct": 75,
+ "order": "SU HS PL HS CS HS PL HS PL HS CS HS PL HS SD",
+ "minutes_per_stage": {
+  "Heat-up air": 819,
+  "Heat-up N₂+H₂": 1383,
+  "Fuel switch": 46987,
+  "Part load": 115013,
+  "Air-flow cooling": 6549,
+  "Shutdown": 45249
+ },
+ "part_loads": 4,
+ "hot_standbys": 7,
+ "cold_shutdowns": 2,
+ "shutdowns": 3,
+ "trips": 0,
+ "first_stage": "Heat-up air",
+ "last_stage": "Shutdown",
+ "startup_min": 735,
+ "folder": "twin_150d_75pct_4pl_2cs"
+}

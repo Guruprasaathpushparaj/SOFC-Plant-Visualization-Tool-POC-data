@@ -9,7 +9,7 @@ let job=null, lastPing=Date.now();
 
 function args(q){
   const a=["--days",q.get("days"),"--availability",q.get("availability"),"--part-loads",q.get("pl"),"--hot-standbys",q.get("hs"),
-    "--cold-shutdowns",q.get("cs"),"--start",q.get("start")];
+    "--cold-shutdowns",q.get("cs"),"--rated-powers",q.get("rp"),"--rated-hours",q.get("rph"),"--start",q.get("start")];
   return a.some(v=>v==null||v==="")? null: a;
 }
 function check(a){

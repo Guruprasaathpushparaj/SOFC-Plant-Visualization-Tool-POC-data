@@ -24,7 +24,7 @@ Saved datasets (with `preview.json`) are listed and can be reopened.
 (without it the app falls back to system fonts and shows no icons).
 
 **Command line (same generator):**
-`node twin_dataset.js --days 181 --availability 95 --part-loads 5 --cold-shutdowns 1 [--hot-standbys 7] [--start 2027-01-01] [--out folder] [--check]`
+`node twin_dataset.js --days 181 --availability 95 --part-loads 5 --cold-shutdowns 1 [--hot-standbys 7] [--rated-powers 0] [--rated-hours 4] [--start 2027-01-01] [--out folder] [--check]`
 → `twin_<days>d_<availability>pct_<P>pl_<C>cs/` (`sofc_twin_dataset.csv.gz`: one row per minute, the twin's "Save data" columns + `timestamp`;
 `events.csv`; `summary.json`; `preview.json` for the app). About 40 s per 6 months.
 
