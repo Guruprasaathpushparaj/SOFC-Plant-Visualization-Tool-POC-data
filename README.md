@@ -106,7 +106,7 @@ The 2D twin needs no Python, only Edge or Chrome. The twin dataset maker (`04_sy
 | Way | What to do |
 |---|---|
 | App window (easiest) | Double-click `05_twin_2d/app.bat`. It opens in its own Edge or Chrome window, no server needed |
-| Desktop icon | Double-click `05_twin_2d/install_shortcut.bat` once. A "SOFC Plant Twin" icon appears on the desktop |
+| Desktop icon | Double-click `05_twin_2d/install_shortcut.bat` once. A "SOFC Plant Descriptive Twin" icon appears on the desktop |
 | Browser | Double-click `05_twin_2d/start.bat` (needs Python). It serves the page at http://localhost:8765 and opens it. Close the black window to stop it |
 | Plain file | Double-click `05_twin_2d/index.html` |
 

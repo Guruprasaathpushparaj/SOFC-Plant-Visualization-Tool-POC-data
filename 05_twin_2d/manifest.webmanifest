@@ -1,6 +1,6 @@
 {
-  "name": "SOFC Plant Twin",
-  "short_name": "SOFC Twin",
+  "name": "SOFC Plant Descriptive Twin",
+  "short_name": "Descriptive Twin",
   "start_url": "index.html",
   "scope": "./",
   "display": "standalone",

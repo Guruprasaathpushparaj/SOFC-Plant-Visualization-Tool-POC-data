@@ -1,4 +1,4 @@
-# SOFC Plant Twin (2D, local)
+# SOFC Plant Descriptive Twin (2D, local)
 
 **Version 3.3 (2026-11-06)** – rated power is now **30 A per string** (52.0 kW on the string V–I lines; was 40.18 A = 60 kW).
 Rated readings, natural gas (180 ln/min) and POx (202 ln/min) come from the extrapolation's rated point (`use_rated` at
@@ -43,7 +43,7 @@ and clickable parts that show their sensor readings.
 ## Open it
 
 - **As an app (2026-11-05):** double-click `app.bat` – opens the twin in its own Edge (or Chrome) window, no browser bar,
-  no server. Run `install_shortcut.bat` once for a "SOFC Plant Twin" desktop icon (delete the icon to undo).
+  no server. Run `install_shortcut.bat` once for a "SOFC Plant Descriptive Twin" desktop icon (delete the icon to undo).
 - **Installed app:** run `start.bat`, then in Edge/Chrome click the install icon in the address bar (or menu → Apps →
   Install this site as an app). It gets a Start-menu entry and keeps working offline after the first open, also when
   `start.bat` is not running (`sw.js` caches the files; it fetches fresh copies whenever the server is on).
