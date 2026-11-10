@@ -1,14 +1,24 @@
-"""Per-stage sensor fits for the 2D twin: reading = a + b * T_stack, clipped to the stage's p2..p98.
-Plus, per slow sensor (temperatures, heater currents/power, 3-way valve) and plant border type, how the plant
-moves from the old-stage line to the new-stage line: [delay, duration] (min) of a minimum-jerk S-curve
-fitted to its 10 -> 90 % crossing ("ease"). The twin blends the two stage readings over that time.
-Plus, per sensor, its rated-power (30 A per string = 52 kW) value "rated": {v, model} from the part-load extrapolation
-(03_data_analysis/rated_power/sensor_extrapolation.csv use_rated + model: best plausible curve per sensor,
-string V/I solved, gas by Faraday; run 03_data_analysis/scripts/rated_power_extrapolation.py first).
+"""Per-stage sensor fits for the 2D twin: reading = a + b * T_stack, clipped to the \
+stage's p2..p98.
+Plus, per slow sensor (temperatures, heater currents/power, 3-way valve) and plant \
+border type, how the plant
+moves from the old-stage line to the new-stage line: [delay, duration] (min) of a \
+minimum-jerk S-curve
+fitted to its 10 -> 90 % crossing ("ease"). The twin blends the two stage readings \
+over that time.
+Plus, per sensor, its rated-power (30 A per string = 52 kW) value "rated": {v, model} \
+from the part-load extrapolation
+(03_data_analysis/rated_power/sensor_extrapolation.csv use_rated + model: best \
+plausible curve per sensor,
+string V/I solved, gas by Faraday; run \
+03_data_analysis/scripts/rated_power_extrapolation.py first).
 Writes 05_twin_2d/data/sensors.js (loaded by index.html).
 Run from anywhere: python 05_twin_2d/tools/prep.py
-           python 05_twin_2d/tools/prep.py --rated-only   (only refresh "rated" in the existing sensors.js; the full run
-           also rebuilds every stage fit from the current plant_stages file, which shifts the tuned twin)"""
+           python 05_twin_2d/tools/prep.py --rated-only   (only refresh "rated" in the \
+existing sensors.js; the full run
+           also rebuilds every stage fit from the current plant_stages file, which \
+shifts the tuned twin)"""
+
 import json
 import sys
 from pathlib import Path
@@ -30,14 +40,21 @@ def add_rated(out):
         for row in rows:
             row.pop("rated", None)
             if row["col"] in rated.index:
-                row["rated"] = {"v": round(float(rated.at[row["col"], "use_rated"]), 3), "model": rated.at[row["col"], "model"]}
+                row["rated"] = {
+                    "v": round(float(rated.at[row["col"], "use_rated"]), 3),
+                    "model": rated.at[row["col"], "model"],
+                }
 
 
 if "--rated-only" in sys.argv:
-    out = json.loads(OUT.read_text(encoding="utf-8")[len(HEAD):].rstrip().rstrip(";"))
+    out = json.loads(OUT.read_text(encoding="utf-8")[len(HEAD) :].rstrip().rstrip(";"))
     add_rated(out)
     OUT.write_text(HEAD + json.dumps(out, ensure_ascii=False) + ";\n", encoding="utf-8")
-    print("rated values:", sum("rated" in r for v in out["components"].values() for r in v), "sensors")
+    print(
+        "rated values:",
+        sum("rated" in r for v in out["components"].values() for r in v),
+        "sensors",
+    )
     sys.exit()
 
 F = "ct_FIRC_{}_PV_ProcessValue"
@@ -45,65 +62,158 @@ CUR = "PLC_hostSetp_ctrl_ctEIRC4{}_rCurrMonitor"
 VOLT = "PLC_hostSetp_ctrl_ctEIRC4{}_rVoltMonitor"
 # component -> [(tag shown, data column, description, unit)]
 COMP = {
-    "air": [("FIRC 1.1.1", F.format(111), "Cathode air stream 1", "ln/min"), ("FIRC 1.1.2", F.format(112), "Cathode air stream 2", "ln/min"),
-            ("PIR 1.1.1", "PIR_1_1_1", "Air stream 1 supply", "bar"), ("PIR 1.1.3", "PIR_1_1_3", "Air stream 2 supply", "bar"),
-            ("TIR 1.1.1", "TIR_1_1_1", "Air after MFCs", "°C"), ("PIR 1.1.2", "PIR_1_1_2", "Air after MFCs", "bar")],
-    "twv": [("FIRC 1.1.3", F.format(113), "3-way valve (temperature-driven)", "m³/h"), ("TIR 2.04", "TIR_2_04", "TWV → APH inlet", "°C")],
-    "pox": [("FIRC 1.2", F.format(12), "POx air", "ln/min"), ("PIR 1.2.1", "PIR_1_2_1", "POx air supply", "bar"),
-            ("TIR 1.2.1", "TIR_1_2_1", "POx air (FPM)", "°C"), ("TIR 1.2.2", "TIR_1_2_2", "POx air FPM → PGM", "°C"),
-            ("PIR 1.2.2", "PIR_1_2_2", "POx air after MFC", "bar"), ("TIR 3.04", "TIR_3_04", "POx air PGM inlet", "°C"),
-            ("TIR 3.05", "TIR_3_05", "Reformer inlet POx air", "°C")],
-    "n2": [("FIRC 1.3", F.format(13), "Nitrogen", "ln/min"), ("PIR 1.3.1", "PIR_1_3_1", "N₂ supply", "bar"),
-           ("TIR 1.3", "TIR_1_3", "Purge gas", "°C"), ("PIR 1.3.2", "PIR_1_3_2", "Purge gas", "bar")],
-    "h2": [("FIRC 1.5", F.format(15), "Hydrogen", "ln/min"), ("PIR 1.5", "PIR_1_5", "H₂ supply", "bar")],
-    "ng": [("FIRC 1.4", F.format(14), "Natural gas", "ln/min"), ("PIR 1.4.1", "PIR_1_4_1", "After booster", "bar"),
-           ("TIR 1.4.1", "TIR_1_4_1", "Fuel (FPM)", "°C"), ("PIR 1.4.2", "PIR_1_4_2", "Fuel after MFC", "bar"),
-           ("TIR 1.4.2", "TIR_1_4_2", "Fuel FPM → PGM", "°C"), ("TIR 3.01", "TIR_3_01", "Fuel PGM inlet", "°C")],
-    "aph1": [("TIR 2.1.1", "TIR_2_1_1", "APH1 inlet air", "°C"), ("TIR 2.02", "TIR_2_02", "APH1+2 outlet air", "°C"),
-             ("TIR 7.2.1", "TIR_7_2_1", "Flue gas in (TOX outlet mixed 1)", "°C"), ("PIR 7.1.1", "PIR_7_1_1", "APH inlet exhaust 1", "bar"),
-             ("TIR 7.3.1", "TIR_7_3_1", "Flue gas out 1", "°C")],
-    "aph2": [("TIR 2.1.2", "TIR_2_1_2", "APH2 inlet air", "°C"), ("TIR 2.03", "TIR_2_03", "APH outlet riser → EAPH", "°C"),
-             ("TIR 7.2.2", "TIR_7_2_2", "Flue gas in (TOX outlet mixed 2)", "°C"), ("PIR 7.1.2", "PIR_7_1_2", "APH inlet exhaust 2", "bar"),
-             ("TIR 7.3.2", "TIR_7_3_2", "Flue gas out 2", "°C")],
-    "eaph": [("TIR 2.05", "TIR_2_05", "EAPH inlet", "°C"), ("PIR 2.01", "PIR_2_01", "EAPH inlet", "bar"),
-             ("EAPH power", "EIRC_2_01_ActV_In_ThreePhasePower", "Heater power (3-phase)", "kW"),
-             ("TIRZ 8.1.1", "TIRZ_8_1_1", "EAPH safety (trip 1050)", "°C"),
-             ("TIRC 2.06", "TIRC_2_06", "EAPH outlet = stack air in", "°C"), ("PIR 2.02", "PIR_2_02", "Stack module air inlet", "bar")],
-    "ejector": [("TIR 3.02", "TIR_3_02", "Ejector main stream", "°C"), ("PIR 3.01", "PIR_3_01", "Ejector main stream", "bar"),
-                ("TIR 6.01", "TIR_6_01", "Recycle gas inlet", "°C"), ("PIR 6.01", "PIR_6_01", "Recycle gas inlet", "bar"),
-                ("TIRC 3.03", "TIRC_3_03", "Ejector outlet", "°C"), ("PIR 3.02", "PIR_3_02", "Ejector outlet", "bar")],
-    "reformer": [("TIR 3.06", "TIR_3_06", "Reformer inlet mixed", "°C"), ("TIRC 3.07", "TIRC_3_07", "Catalyst inlet", "°C"),
-                 ("TIRC 3.15", "TIRC_3_15", "Catalyst outlet", "°C"), ("TIRC 3.17", "TIRC_3_17", "Reformer outlet", "°C")],
-    "erh": [("TIRC 5.17", "TIRC_5_17", "ERH control", "°C"), ("TIRZ 8.2.5", "TIRZ_8_2_5", "ERH safety (trip 860)", "°C"),
-            ("IIR 5.1.3", "pi_IIR_5_1_3_ActVal", "ERH current", "A")],
-    "eagh": [("TIRC 3.1.1", "TIRC_3_1_1", "EAGH control", "°C"), ("TIRZ 8.2.1", "TIRZ_8_2_1", "EAGH safety (trip 950)", "°C"),
-             ("IIR 3.1.1", "pi_IIR_3_1_1_ActVal", "EAGH current", "A"), ("TIR 3.18", "TIR_3_18", "Stack module anode inlet", "°C"),
-             ("PIR 3.03", "PIR_3_03", "Stack module anode inlet", "bar")],
-    "stack": [("TIR 4.6.x", "T_stack_C", "Stack median of 36 TCs (model)", "°C"), ("TIRZ 8.1.3", "TIRZ_8_1_3", "Stack safety (trip 720)", "°C"),
-              ("TIR 3.19.1", "TIR_3_19_1", "Manifold 1 inlet", "°C"), ("TIR 3.19.2", "TIR_3_19_2", "Manifold 2 inlet", "°C"),
-              ("TIRC 5.1.1", "TIRC_5_1_1", "Cathode outlet 1", "°C"), ("TIRC 5.1.2", "TIRC_5_1_2", "Cathode outlet 2", "°C"),
-              ("PIR 5.1.1", "PIR_5_1_1", "Cathode outlet 1", "bar"), ("TIRC 5.2.1", "TIRC_5_2_1", "Anode outlet 1", "°C"),
-              ("TIRC 5.2.2", "TIRC_5_2_2", "Anode outlet 2", "°C"), ("PIR 5.2.1", "PIR_5_2_1", "Anode outlet 1", "bar")],
+    "air": [
+        ("FIRC 1.1.1", F.format(111), "Cathode air stream 1", "ln/min"),
+        ("FIRC 1.1.2", F.format(112), "Cathode air stream 2", "ln/min"),
+        ("PIR 1.1.1", "PIR_1_1_1", "Air stream 1 supply", "bar"),
+        ("PIR 1.1.3", "PIR_1_1_3", "Air stream 2 supply", "bar"),
+        ("TIR 1.1.1", "TIR_1_1_1", "Air after MFCs", "°C"),
+        ("PIR 1.1.2", "PIR_1_1_2", "Air after MFCs", "bar"),
+    ],
+    "twv": [
+        ("FIRC 1.1.3", F.format(113), "3-way valve (temperature-driven)", "m³/h"),
+        ("TIR 2.04", "TIR_2_04", "TWV → APH inlet", "°C"),
+    ],
+    "pox": [
+        ("FIRC 1.2", F.format(12), "POx air", "ln/min"),
+        ("PIR 1.2.1", "PIR_1_2_1", "POx air supply", "bar"),
+        ("TIR 1.2.1", "TIR_1_2_1", "POx air (FPM)", "°C"),
+        ("TIR 1.2.2", "TIR_1_2_2", "POx air FPM → PGM", "°C"),
+        ("PIR 1.2.2", "PIR_1_2_2", "POx air after MFC", "bar"),
+        ("TIR 3.04", "TIR_3_04", "POx air PGM inlet", "°C"),
+        ("TIR 3.05", "TIR_3_05", "Reformer inlet POx air", "°C"),
+    ],
+    "n2": [
+        ("FIRC 1.3", F.format(13), "Nitrogen", "ln/min"),
+        ("PIR 1.3.1", "PIR_1_3_1", "N₂ supply", "bar"),
+        ("TIR 1.3", "TIR_1_3", "Purge gas", "°C"),
+        ("PIR 1.3.2", "PIR_1_3_2", "Purge gas", "bar"),
+    ],
+    "h2": [
+        ("FIRC 1.5", F.format(15), "Hydrogen", "ln/min"),
+        ("PIR 1.5", "PIR_1_5", "H₂ supply", "bar"),
+    ],
+    "ng": [
+        ("FIRC 1.4", F.format(14), "Natural gas", "ln/min"),
+        ("PIR 1.4.1", "PIR_1_4_1", "After booster", "bar"),
+        ("TIR 1.4.1", "TIR_1_4_1", "Fuel (FPM)", "°C"),
+        ("PIR 1.4.2", "PIR_1_4_2", "Fuel after MFC", "bar"),
+        ("TIR 1.4.2", "TIR_1_4_2", "Fuel FPM → PGM", "°C"),
+        ("TIR 3.01", "TIR_3_01", "Fuel PGM inlet", "°C"),
+    ],
+    "aph1": [
+        ("TIR 2.1.1", "TIR_2_1_1", "APH1 inlet air", "°C"),
+        ("TIR 2.02", "TIR_2_02", "APH1+2 outlet air", "°C"),
+        ("TIR 7.2.1", "TIR_7_2_1", "Flue gas in (TOX outlet mixed 1)", "°C"),
+        ("PIR 7.1.1", "PIR_7_1_1", "APH inlet exhaust 1", "bar"),
+        ("TIR 7.3.1", "TIR_7_3_1", "Flue gas out 1", "°C"),
+    ],
+    "aph2": [
+        ("TIR 2.1.2", "TIR_2_1_2", "APH2 inlet air", "°C"),
+        ("TIR 2.03", "TIR_2_03", "APH outlet riser → EAPH", "°C"),
+        ("TIR 7.2.2", "TIR_7_2_2", "Flue gas in (TOX outlet mixed 2)", "°C"),
+        ("PIR 7.1.2", "PIR_7_1_2", "APH inlet exhaust 2", "bar"),
+        ("TIR 7.3.2", "TIR_7_3_2", "Flue gas out 2", "°C"),
+    ],
+    "eaph": [
+        ("TIR 2.05", "TIR_2_05", "EAPH inlet", "°C"),
+        ("PIR 2.01", "PIR_2_01", "EAPH inlet", "bar"),
+        (
+            "EAPH power",
+            "EIRC_2_01_ActV_In_ThreePhasePower",
+            "Heater power (3-phase)",
+            "kW",
+        ),
+        ("TIRZ 8.1.1", "TIRZ_8_1_1", "EAPH safety (trip 1050)", "°C"),
+        ("TIRC 2.06", "TIRC_2_06", "EAPH outlet = stack air in", "°C"),
+        ("PIR 2.02", "PIR_2_02", "Stack module air inlet", "bar"),
+    ],
+    "ejector": [
+        ("TIR 3.02", "TIR_3_02", "Ejector main stream", "°C"),
+        ("PIR 3.01", "PIR_3_01", "Ejector main stream", "bar"),
+        ("TIR 6.01", "TIR_6_01", "Recycle gas inlet", "°C"),
+        ("PIR 6.01", "PIR_6_01", "Recycle gas inlet", "bar"),
+        ("TIRC 3.03", "TIRC_3_03", "Ejector outlet", "°C"),
+        ("PIR 3.02", "PIR_3_02", "Ejector outlet", "bar"),
+    ],
+    "reformer": [
+        ("TIR 3.06", "TIR_3_06", "Reformer inlet mixed", "°C"),
+        ("TIRC 3.07", "TIRC_3_07", "Catalyst inlet", "°C"),
+        ("TIRC 3.15", "TIRC_3_15", "Catalyst outlet", "°C"),
+        ("TIRC 3.17", "TIRC_3_17", "Reformer outlet", "°C"),
+    ],
+    "erh": [
+        ("TIRC 5.17", "TIRC_5_17", "ERH control", "°C"),
+        ("TIRZ 8.2.5", "TIRZ_8_2_5", "ERH safety (trip 860)", "°C"),
+        ("IIR 5.1.3", "pi_IIR_5_1_3_ActVal", "ERH current", "A"),
+    ],
+    "eagh": [
+        ("TIRC 3.1.1", "TIRC_3_1_1", "EAGH control", "°C"),
+        ("TIRZ 8.2.1", "TIRZ_8_2_1", "EAGH safety (trip 950)", "°C"),
+        ("IIR 3.1.1", "pi_IIR_3_1_1_ActVal", "EAGH current", "A"),
+        ("TIR 3.18", "TIR_3_18", "Stack module anode inlet", "°C"),
+        ("PIR 3.03", "PIR_3_03", "Stack module anode inlet", "bar"),
+    ],
+    "stack": [
+        ("TIR 4.6.x", "T_stack_C", "Stack median of 36 TCs (model)", "°C"),
+        ("TIRZ 8.1.3", "TIRZ_8_1_3", "Stack safety (trip 720)", "°C"),
+        ("TIR 3.19.1", "TIR_3_19_1", "Manifold 1 inlet", "°C"),
+        ("TIR 3.19.2", "TIR_3_19_2", "Manifold 2 inlet", "°C"),
+        ("TIRC 5.1.1", "TIRC_5_1_1", "Cathode outlet 1", "°C"),
+        ("TIRC 5.1.2", "TIRC_5_1_2", "Cathode outlet 2", "°C"),
+        ("PIR 5.1.1", "PIR_5_1_1", "Cathode outlet 1", "bar"),
+        ("TIRC 5.2.1", "TIRC_5_2_1", "Anode outlet 1", "°C"),
+        ("TIRC 5.2.2", "TIRC_5_2_2", "Anode outlet 2", "°C"),
+        ("PIR 5.2.1", "PIR_5_2_1", "Anode outlet 1", "bar"),
+    ],
     "load": [(f"String {s}", None, None, None) for s in []],
-    "eaoh3": [("TIRC 6.1.1", "TIRC_6_1_1", "EAOH3 control", "°C"), ("TIRZ 8.2.4", "TIRZ_8_2_4", "EAOH3 safety (trip 950)", "°C"),
-              ("IIR 6.1.1", "pi_IIR_6_1_1_ActVal", "EAOH3 current", "A")],
-    "eaoh1": [("TIRC 5.3.1", "TIRC_5_3_1", "EAOH1 control", "°C"), ("TIRZ 8.2.2", "TIRZ_8_2_2", "EAOH1 safety (trip 950)", "°C"),
-              ("IIR 5.1.1", "pi_IIR_5_1_1_ActVal", "EAOH1 current", "A"), ("TIRC 5.5.1", "TIRC_5_5_1", "TOX inlet anode 1", "°C"),
-              ("PIR 5.4.1", "PIR_5_4_1", "TOX inlet anode 1", "bar")],
-    "eaoh2": [("TIRC 5.3.2", "TIRC_5_3_2", "EAOH2 control", "°C"), ("TIRZ 8.2.3", "TIRZ_8_2_3", "EAOH2 safety (trip 950)", "°C"),
-              ("IIR 5.1.2", "pi_IIR_5_1_2_ActVal", "EAOH2 current", "A"), ("TIRC 5.5.2", "TIRC_5_5_2", "TOX inlet anode 2", "°C"),
-              ("PIR 5.4.2", "PIR_5_4_2", "TOX inlet anode 2", "bar")],
-    "tox": [("TIRC 5.09", "TIRC_5_09", "Burner (TOX) representative", "°C"), ("TIRZ 8.1.9", "TIRZ_8_1_9", "Burner safety (trip 930)", "°C"),
-            ("TIR 5.4.1", "TIR_5_4_1", "TOX inlet cathode 1", "°C"), ("PIR 5.3.1", "PIR_5_3_1", "TOX inlet cathode 1", "bar"),
-            ("TIR 5.6.1", "TIR_5_6_1", "Cathode bypass 1", "°C"), ("TIR 7.1.1", "TIR_7_1_1", "TOX outlet 1", "°C"),
-            ("TIR 7.1.2", "TIR_7_1_2", "TOX outlet 2", "°C")],
-    "exhaust": [("TIR 7.04", "TIR_7_04", "APH exhaust outlet", "°C"), ("PIR 7.02", "PIR_7_02", "APH exhaust outlet", "bar"),
-                ("TIR 7.05", "TIR_7_05", "Exhaust (roof)", "°C"), ("PIR 7.03", "PIR_7_03", "Exhaust", "bar"),
-                ("TIRZ 8.1.10", "TIRZ_8_1_10", "Exhaust safety (trip 300)", "°C")],
+    "eaoh3": [
+        ("TIRC 6.1.1", "TIRC_6_1_1", "EAOH3 control", "°C"),
+        ("TIRZ 8.2.4", "TIRZ_8_2_4", "EAOH3 safety (trip 950)", "°C"),
+        ("IIR 6.1.1", "pi_IIR_6_1_1_ActVal", "EAOH3 current", "A"),
+    ],
+    "eaoh1": [
+        ("TIRC 5.3.1", "TIRC_5_3_1", "EAOH1 control", "°C"),
+        ("TIRZ 8.2.2", "TIRZ_8_2_2", "EAOH1 safety (trip 950)", "°C"),
+        ("IIR 5.1.1", "pi_IIR_5_1_1_ActVal", "EAOH1 current", "A"),
+        ("TIRC 5.5.1", "TIRC_5_5_1", "TOX inlet anode 1", "°C"),
+        ("PIR 5.4.1", "PIR_5_4_1", "TOX inlet anode 1", "bar"),
+    ],
+    "eaoh2": [
+        ("TIRC 5.3.2", "TIRC_5_3_2", "EAOH2 control", "°C"),
+        ("TIRZ 8.2.3", "TIRZ_8_2_3", "EAOH2 safety (trip 950)", "°C"),
+        ("IIR 5.1.2", "pi_IIR_5_1_2_ActVal", "EAOH2 current", "A"),
+        ("TIRC 5.5.2", "TIRC_5_5_2", "TOX inlet anode 2", "°C"),
+        ("PIR 5.4.2", "PIR_5_4_2", "TOX inlet anode 2", "bar"),
+    ],
+    "tox": [
+        ("TIRC 5.09", "TIRC_5_09", "Burner (TOX) representative", "°C"),
+        ("TIRZ 8.1.9", "TIRZ_8_1_9", "Burner safety (trip 930)", "°C"),
+        ("TIR 5.4.1", "TIR_5_4_1", "TOX inlet cathode 1", "°C"),
+        ("PIR 5.3.1", "PIR_5_3_1", "TOX inlet cathode 1", "bar"),
+        ("TIR 5.6.1", "TIR_5_6_1", "Cathode bypass 1", "°C"),
+        ("TIR 7.1.1", "TIR_7_1_1", "TOX outlet 1", "°C"),
+        ("TIR 7.1.2", "TIR_7_1_2", "TOX outlet 2", "°C"),
+    ],
+    "exhaust": [
+        ("TIR 7.04", "TIR_7_04", "APH exhaust outlet", "°C"),
+        ("PIR 7.02", "PIR_7_02", "APH exhaust outlet", "bar"),
+        ("TIR 7.05", "TIR_7_05", "Exhaust (roof)", "°C"),
+        ("PIR 7.03", "PIR_7_03", "Exhaust", "bar"),
+        ("TIRZ 8.1.10", "TIRZ_8_1_10", "Exhaust safety (trip 300)", "°C"),
+    ],
 }
-COMP["load"] = ([(f"EIRC 4.{s}.2", CUR.format(s), f"String {s} current", "A") for s in range(1, 6)]
-                + [(f"EIRC 4.{s}.1", VOLT.format(s), f"String {s} load voltage", "V") for s in range(1, 6)]
-                + [(f"Σ stacks M{s}", f"TotalVoltage_M{s}", f"String {s} stack-sum voltage", "V") for s in range(1, 6)])
+COMP["load"] = (
+    [(f"EIRC 4.{s}.2", CUR.format(s), f"String {s} current", "A") for s in range(1, 6)]
+    + [
+        (f"EIRC 4.{s}.1", VOLT.format(s), f"String {s} load voltage", "V")
+        for s in range(1, 6)
+    ]
+    + [
+        (f"Σ stacks M{s}", f"TotalVoltage_M{s}", f"String {s} stack-sum voltage", "V")
+        for s in range(1, 6)
+    ]
+)
 
 cols = sorted({c for v in COMP.values() for _, c, _, _ in v if c and c != "T_stack_C"})
 st = pd.read_parquet(STAGE)[["T_stack_C", "plant_stage"]]
@@ -114,12 +224,25 @@ for p in sorted(SRC.glob("*_10s.parquet")):
     have = [c for c in cols if c in d.columns]
     frames.append(d[have].apply(pd.to_numeric, errors="coerce").resample("1min").mean())
 raw = pd.concat(frames)
-raw["EIRC_2_01_ActV_In_ThreePhasePower"] = raw.get("EIRC_2_01_ActV_In_ThreePhasePower") / 1000
+raw["EIRC_2_01_ActV_In_ThreePhasePower"] = (
+    raw.get("EIRC_2_01_ActV_In_ThreePhasePower") / 1000
+)
 df = st.join(raw, how="inner")
 df = df[df.plant_stage != "No data"]
 
-BAR = {"PIR_1_1_1", "PIR_1_1_3", "PIR_1_2_1", "PIR_1_3_1", "PIR_1_5", "PIR_1_4_1", "PIR_1_4_2", "PIR_3_01"}
-for items in COMP.values():   # supply lines read in bar, the low-pressure lines (ICA 0–0.4 bar) in mbar
+BAR = {
+    "PIR_1_1_1",
+    "PIR_1_1_3",
+    "PIR_1_2_1",
+    "PIR_1_3_1",
+    "PIR_1_5",
+    "PIR_1_4_1",
+    "PIR_1_4_2",
+    "PIR_3_01",
+}
+for items in (
+    COMP.values()
+):  # supply lines read in bar, the low-pressure lines (ICA 0–0.4 bar) in mbar
     for i, (tag, col, desc, unit) in enumerate(items):
         if unit == "bar" and col not in BAR:
             items[i] = (tag, col, desc, "bar?" if col == "PIR_1_3_2" else "mbar")
@@ -131,10 +254,24 @@ def clean(s, unit):
         return s.where((s > -0.5) & (s < 1300))
     return s.where(s.abs() < 1e6)
 
+
 # ---- stage-border easing (same clean-border rule as tools/bends.py) ----
-PRE, POST, CLEAN, MIN_N = 45, 60, 10, 3   # curve window (min), min stage length each side, min clean borders per type
-SLOW = {"°C", "A", "kW", "m³/h"}          # flows and pressures follow the valves within a minute: no easing
-MJ10, MJ90 = 0.2466, 0.7534               # minimum-jerk curve 10 % / 90 % points (fraction of its duration)
+PRE, POST, CLEAN, MIN_N = (
+    45,
+    60,
+    10,
+    3,
+)  # curve window (min), min stage length each side, min clean borders per type
+SLOW = {
+    "°C",
+    "A",
+    "kW",
+    "m³/h",
+}  # flows and pressures follow the valves within a minute: no easing
+MJ10, MJ90 = (
+    0.2466,
+    0.7534,
+)  # minimum-jerk curve 10 % / 90 % points (fraction of its duration)
 tm = np.arange(-PRE, POST + 1)
 i0 = PRE
 u = df[~df.index.duplicated()]
@@ -148,16 +285,17 @@ for t in sb.index[chg]:
     if i < PRE or i + POST >= len(full):
         continue
     a, b = sb.iloc[i - 1], sb.iloc[i]
-    if (sb.iloc[i - CLEAN:i] != a).any() or (sb.iloc[i:i + CLEAN] != b).any():
+    if (sb.iloc[i - CLEAN : i] != a).any() or (sb.iloc[i : i + CLEAN] != b).any():
         continue
-    if xb.T_stack_C.iloc[i - PRE:i + POST + 1].isna().sum() > 5:
+    if xb.T_stack_C.iloc[i - PRE : i + POST + 1].isna().sum() > 5:
         continue
     border.setdefault((a, b), []).append(i)
 border = {k: v for k, v in border.items() if len(v) >= MIN_N}
 
 
 def crossing(y, span):
-    """old line on -30..-1, new line on +30..+60; first 10 % and 90 % crossing of y between them (-20..+45 min)"""
+    """old line on -30..-1, new line on +30..+60; first 10 % and 90 % crossing of y \
+between them (-20..+45 min)"""
     ys = pd.Series(y).rolling(5, center=True, min_periods=3).mean().values
     o, n = (tm >= -30) & (tm < 0), (tm >= 30) & (tm <= 60)
     if np.isnan(ys[o]).sum() > 5 or np.isnan(ys[n]).sum() > 5:
@@ -167,7 +305,7 @@ def crossing(y, span):
     zone = np.where((tm >= -20) & (tm <= 45))[0]
     gap = ln - lo
     if np.abs(gap[zone]).min() < max(3 * np.nanstd(ys[o] - lo[o]), 0.02 * span):
-        return None   # no clear move between the two lines
+        return None  # no clear move between the two lines
     p = (ys - lo) / gap
     a = next((k for k in zone if p[k] >= 0.1), None)
     if a is None:
@@ -176,7 +314,7 @@ def crossing(y, span):
     return float(tm[a]), float(tm[b])
 
 
-cross = {}   # col -> {(from, to): (t10, t90)}
+cross = {}  # col -> {(from, to): (t10, t90)}
 for items in COMP.values():
     for tag, col, desc, unit in items:
         if col not in xb.columns or unit not in SLOW or col.endswith("rCurrMonitor"):
@@ -184,7 +322,7 @@ for items in COMP.values():
         y_all = clean(xb[col], unit)
         span = np.nanpercentile(y_all, 98) - np.nanpercentile(y_all, 2)
         for key, idx in border.items():
-            W = np.array([y_all.values[i - PRE:i + POST + 1] for i in idx], float)
+            W = np.array([y_all.values[i - PRE : i + POST + 1] for i in idx], float)
             W = W[(np.isnan(W).sum(1) < 10) & ~np.isnan(W[:, i0])]
             r = crossing(np.nanmedian(W - W[:, [i0]], axis=0), span) if len(W) else None
             if r:
@@ -193,11 +331,15 @@ by_border = {key: [c[key] for c in cross.values() if key in c] for key in border
 
 
 def ease(col, key):
-    """own crossing, else the median crossing of the slow sensors at this border; none (step) where fewer than
-    MIN_N sensors move clearly (air off, standby -> cooling: held-out test said the step fits better there)"""
+    """own crossing, else the median crossing of the slow sensors at this border; none \
+(step) where fewer than
+    MIN_N sensors move clearly (air off, standby -> cooling: held-out test said the \
+step fits better there)"""
     if len(by_border[key]) < MIN_N:
         return None
-    r = cross.get(col, {}).get(key) or tuple(np.median(np.array(by_border[key]), axis=0))
+    r = cross.get(col, {}).get(key) or tuple(
+        np.median(np.array(by_border[key]), axis=0)
+    )
     d = max(1.0, (r[1] - r[0]) / (MJ90 - MJ10))
     return [round(max(0.0, r[0] - MJ10 * d), 1), round(d, 1)]
 
@@ -220,10 +362,16 @@ for comp, items in COMP.items():
             a, b = float(np.median(y)), 0.0
             if col != "T_stack_C" and x.std() > 5:
                 bb, aa = np.polyfit(x, y, 1)
-                r2 = 1 - ((y - (aa + bb * x)) ** 2).sum() / max(((y - y.mean()) ** 2).sum(), 1e-9)
+                r2 = 1 - ((y - (aa + bb * x)) ** 2).sum() / max(
+                    ((y - y.mean()) ** 2).sum(), 1e-9
+                )
                 if r2 >= 0.25:
                     a, b = float(aa), float(bb)
-            fits[stg] = [round(a, 4), round(b, 5)] + [round(float(v), 3) for v in q] + [int(m.sum())]
+            fits[stg] = (
+                [round(a, 4), round(b, 5)]
+                + [round(float(v), 3) for v in q]
+                + [int(m.sum())]
+            )
         row = {"tag": tag, "col": col, "desc": desc, "unit": unit, "fits": fits}
         if unit in SLOW and not col.endswith("rCurrMonitor") and col != "T_stack_C":
             e = {f"{a}>{b}": ease(col, (a, b)) for a, b in border}
@@ -236,13 +384,27 @@ for k in ("12", "13", "14", "15"):
     flow[k] = df[F.format(k)]
 flow["I"] = df[[CUR.format(s) for s in range(1, 6)]].clip(lower=0).mean(axis=1)
 for stg, g in df.groupby("plant_stage"):
-    out["flows"][stg] = {k: round(float(np.nanmedian(v.loc[g.index])), 1) for k, v in flow.items()}
+    out["flows"][stg] = {
+        k: round(float(np.nanmedian(v.loc[g.index])), 1) for k, v in flow.items()
+    }
 add_rated(out)
 OUT.write_text(HEAD + json.dumps(out, ensure_ascii=False) + ";\n", encoding="utf-8")
 print(json.dumps(out["flows"], ensure_ascii=False, indent=0))
-print("sensors:", sum(len(v) for v in out["components"].values()), "kB:", OUT.stat().st_size // 1024)
+print(
+    "sensors:",
+    sum(len(v) for v in out["components"].values()),
+    "kB:",
+    OUT.stat().st_size // 1024,
+)
 print("eased border types (>= %d clean borders):" % MIN_N)
 for (a, b), idx in border.items():
-    d = [r["ease"][f"{a}>{b}"][1] for v in out["components"].values() for r in v if f"{a}>{b}" in r.get("ease", {})]
-    print(f"  {a} -> {b}: {len(idx)} borders, {len(by_border[(a, b)])} own crossings, "
-          f"{len(d)} sensors eased, duration median {np.median(d) if d else 0:.0f} min")
+    d = [
+        r["ease"][f"{a}>{b}"][1]
+        for v in out["components"].values()
+        for r in v
+        if f"{a}>{b}" in r.get("ease", {})
+    ]
+    print(
+        f"  {a} -> {b}: {len(idx)} borders, {len(by_border[(a, b)])} own crossings, "
+        f"{len(d)} sensors eased, duration median {np.median(d) if d else 0:.0f} min"
+    )

@@ -10,6 +10,7 @@ Writes to 03_data_analysis/operating_states/:
     <day>_segments.csv      one row per contiguous (stage, operation) block
     <day>_states.png        timeline plot
 """
+
 import sys
 from functools import lru_cache
 from pathlib import Path
@@ -22,22 +23,28 @@ SRC = ROOT / "02_data" / "downsampled"
 OUT = ROOT / "03_data_analysis" / "operating_states"
 
 # --- thresholds (operational-modes.md §1, §4) ---
-I_LOAD = 1.0            # A per string: below = no load
-I_RATED = 28.5          # A per string: ≈ 30 A nominal (95 %)
-DTDT_HEAT = 10.0        # °C/h: heat-up / cool-down threshold
-DTDT_STABLE = 5.0       # °C/h: stable threshold for Hot standby
-T_HOT = 450.0           # °C: Hot standby lower bound
-T_STANDBY = 550.0       # °C: below = intermediate hold (part of Start-up), §4.3
-DIDT_RAMP = 0.05        # A/min: load ramp threshold, §4.4
-EAPH_ON_W = 200.0       # W: EAPH heater considered on (off-state noise < 50 W)
-AIR_ON = 1.0            # PIR_2_02 stack inlet pressure: air flow on
-MIN_SEG_MIN = 15        # merge blocks shorter than this into neighbours
-MIN_LOAD_MIN = 3        # min: current must last this long to count as load
-MAX_PAUSE_MIN = 180     # min: heater pause inside a start-up, not a shut-down
-MIN_HOLD_MIN = 360      # min: steady 450–550 °C hold this long = Hot standby, not Start-up
-MAX_GAP_DAYS = 7        # days: a Shut-down tail is followed across missing day files (cooling τ ≈ 89 h)
-DT_AMBIENT = 30.0       # K: stack within this of ambient, plant off = shut down (near ambient)
-T_AMB_DEFAULT = 16.0    # °C: ambient when the proxy probes have no reading (median of the data)
+I_LOAD = 1.0  # A per string: below = no load
+I_RATED = 28.5  # A per string: ≈ 30 A nominal (95 %)
+DTDT_HEAT = 10.0  # °C/h: heat-up / cool-down threshold
+DTDT_STABLE = 5.0  # °C/h: stable threshold for Hot standby
+T_HOT = 450.0  # °C: Hot standby lower bound
+T_STANDBY = 550.0  # °C: below = intermediate hold (part of Start-up), §4.3
+DIDT_RAMP = 0.05  # A/min: load ramp threshold, §4.4
+EAPH_ON_W = 200.0  # W: EAPH heater considered on (off-state noise < 50 W)
+AIR_ON = 1.0  # PIR_2_02 stack inlet pressure: air flow on
+MIN_SEG_MIN = 15  # merge blocks shorter than this into neighbours
+MIN_LOAD_MIN = 3  # min: current must last this long to count as load
+MAX_PAUSE_MIN = 180  # min: heater pause inside a start-up, not a shut-down
+MIN_HOLD_MIN = 360  # min: steady 450–550 °C hold this long = Hot standby, not Start-up
+MAX_GAP_DAYS = (
+    7  # days: a Shut-down tail is followed across missing day files (cooling τ ≈ 89 h)
+)
+DT_AMBIENT = (
+    30.0  # K: stack within this of ambient, plant off = shut down (near ambient)
+)
+T_AMB_DEFAULT = (
+    16.0  # °C: ambient when the proxy probes have no reading (median of the data)
+)
 # No true ambient sensor: the fuel-module supply-line probes sit on cold pipes and
 # stay near room temperature whatever the stack does (cold_idle_analysis.ipynb §1).
 AMB_COLS = ["TIR_1_1_1", "TIR_1_2_1", "TIR_1_3", "TIR_1_4_1"]
@@ -61,18 +68,31 @@ PAUSED = "Heat-up interrupted (plant off)"
 # sub-phases and fixes; the six stages and the stage map stay). Mass-flow
 # controllers: FIRC_13 N2 and FIRC_15 H2 (forming gas, 1200 + 60 ln/min),
 # FIRC_14 natural gas (FIRC_12 is POx air, not gas), FIRC_111/112 cathode air blowers.
-N2_ON = 100.0           # ln/min FIRC_13
-H2_ON = 5.0             # ln/min FIRC_15
-NG_ON = 20.0            # ln/min FIRC_14
-AIR_FLOW_ON = 100.0     # ln/min FIRC_111 + FIRC_112
-GAS_GAP_MIN = 10        # min: supply gap this short inside one gas state is bridged
-GAS_BLIP_MIN = 3        # min: any gas state shorter than this takes its neighbours' state
-PH_OFF, PH_AIR, PH_FORMING, PH_N2, PH_NG = \
-    "Plant off", "Air only", "Forming gas (N2 + H2)", "N2 purge", "Natural gas"
+N2_ON = 100.0  # ln/min FIRC_13
+H2_ON = 5.0  # ln/min FIRC_15
+NG_ON = 20.0  # ln/min FIRC_14
+AIR_FLOW_ON = 100.0  # ln/min FIRC_111 + FIRC_112
+GAS_GAP_MIN = 10  # min: supply gap this short inside one gas state is bridged
+GAS_BLIP_MIN = 3  # min: any gas state shorter than this takes its neighbours' state
+PH_OFF, PH_AIR, PH_FORMING, PH_N2, PH_NG = (
+    "Plant off",
+    "Air only",
+    "Forming gas (N2 + H2)",
+    "N2 purge",
+    "Natural gas",
+)
 PHASES = [PH_OFF, PH_AIR, PH_FORMING, PH_N2, PH_NG]
 FUEL_SWITCH = "Fuel switch-over (NG on, no load)"
 FALSE_START = "Heater on without air (false start)"
-STAGES = ["Idle", "Start-up", "Hot standby", ADJUST, "Part load", "Rated power", "Shut-down"]
+STAGES = [
+    "Idle",
+    "Start-up",
+    "Hot standby",
+    ADJUST,
+    "Part load",
+    "Rated power",
+    "Shut-down",
+]
 
 
 def num(d, cols):
@@ -80,11 +100,14 @@ def num(d, cols):
 
 
 def stale(out, *sources):
-    """True when saved file `out` is missing or older than any source (a file, or the files in a folder)."""
+    """True when saved file `out` is missing or older than any source (a file, or the \
+files in a folder)."""
     if not out.exists():
         return True
     t = out.stat().st_mtime
-    files = (f for s in map(Path, sources) for f in (s.iterdir() if s.is_dir() else [s]))
+    files = (
+        f for s in map(Path, sources) for f in (s.iterdir() if s.is_dir() else [s])
+    )
     return any(f.is_file() and f.stat().st_mtime > t for f in files)
 
 
@@ -101,39 +124,59 @@ def load_signals(day):
     dev = (t.sub(t.median(axis=1), axis=0)).abs().median()
     bad = dev[(dev > 75) | t.isna().all()].index.tolist()
     if bad:
-        print(f"Excluded stack thermocouples: {sorted(bad + [c for c in st if c not in t.columns])}")
+        print(
+            "Excluded stack thermocouples: "
+            f"{sorted(bad + [c for c in st if c not in t.columns])}"
+        )
     t = t.drop(columns=bad)
 
     # String current and voltage from the PLC monitor columns: present on every
     # day and unaffected by the mid-day column shift that corrupts the
     # EIRC_4X_* columns (e.g. 2026-03-20 from ~11:00, OpMode = 150).
-    cur = num(d, [f"PLC_hostSetp_ctrl_ctEIRC4{i}_rCurrMonitor" for i in range(1, 6)]).clip(lower=0)
-    v = num(d, [f"PLC_hostSetp_ctrl_ctEIRC4{i}_rVoltMonitor" for i in range(1, 6)]).clip(lower=0)
+    cur = num(
+        d, [f"PLC_hostSetp_ctrl_ctEIRC4{i}_rCurrMonitor" for i in range(1, 6)]
+    ).clip(lower=0)
+    v = num(
+        d, [f"PLC_hostSetp_ctrl_ctEIRC4{i}_rVoltMonitor" for i in range(1, 6)]
+    ).clip(lower=0)
     p_stack = pd.Series((v.values * cur.values).sum(axis=1) / 1000.0, index=d.index)
 
-    s = pd.DataFrame({
-        "T_stack_C": t.median(axis=1),
-        "T_stack_min_C": t.min(axis=1),
-        "T_stack_max_C": t.max(axis=1),
-        "I_string_A": cur.sum(axis=1) / 5,
-        "P_stack_kW": p_stack,
-        "P_EAPH_kW": num(d, ["EIRC_2_01_ActV_In_ThreePhasePower"]).iloc[:, 0] / 1000,
-        "T_cathode_in_C": num(d, ["TIRC_2_06"]).iloc[:, 0],
-        "P_air_in": num(d, ["PIR_2_02"]).iloc[:, 0],
-        "T_amb_C": num(d, AMB_COLS).where(lambda a: (a != -1) & (a < 60)).median(axis=1),
-        "F_N2": num(d, ["ct_FIRC_13_PV_ProcessValue"]).iloc[:, 0],
-        "F_H2": num(d, ["ct_FIRC_15_PV_ProcessValue"]).iloc[:, 0],
-        "F_NG": num(d, ["ct_FIRC_14_PV_ProcessValue"]).iloc[:, 0],
-        "F_air": num(d, ["ct_FIRC_111_PV_ProcessValue", "ct_FIRC_112_PV_ProcessValue"]).sum(axis=1, min_count=1),
-    })
+    s = pd.DataFrame(
+        {
+            "T_stack_C": t.median(axis=1),
+            "T_stack_min_C": t.min(axis=1),
+            "T_stack_max_C": t.max(axis=1),
+            "I_string_A": cur.sum(axis=1) / 5,
+            "P_stack_kW": p_stack,
+            "P_EAPH_kW": num(d, ["EIRC_2_01_ActV_In_ThreePhasePower"]).iloc[:, 0]
+            / 1000,
+            "T_cathode_in_C": num(d, ["TIRC_2_06"]).iloc[:, 0],
+            "P_air_in": num(d, ["PIR_2_02"]).iloc[:, 0],
+            "T_amb_C": num(d, AMB_COLS)
+            .where(lambda a: (a != -1) & (a < 60))
+            .median(axis=1),
+            "F_N2": num(d, ["ct_FIRC_13_PV_ProcessValue"]).iloc[:, 0],
+            "F_H2": num(d, ["ct_FIRC_15_PV_ProcessValue"]).iloc[:, 0],
+            "F_NG": num(d, ["ct_FIRC_14_PV_ProcessValue"]).iloc[:, 0],
+            "F_air": num(
+                d, ["ct_FIRC_111_PV_ProcessValue", "ct_FIRC_112_PV_ProcessValue"]
+            ).sum(axis=1, min_count=1),
+        }
+    )
     s = s.resample("1min").mean()
-    s["T_amb_C"] = s["T_amb_C"].rolling(60, center=True, min_periods=1).median().fillna(T_AMB_DEFAULT)
+    s["T_amb_C"] = (
+        s["T_amb_C"]
+        .rolling(60, center=True, min_periods=1)
+        .median()
+        .fillna(T_AMB_DEFAULT)
+    )
     # 1-hour centred difference for reported rates (§4.1); a 20-min centred
     # difference for classification so stage boundaries are not smeared.
     T = s["T_stack_C"]
-    s["dTdt_C_per_h"] = (T.shift(-30) - T.shift(30))
+    s["dTdt_C_per_h"] = T.shift(-30) - T.shift(30)
     s["dTdt_20min_C_per_h"] = ((T.shift(-10) - T.shift(10)) * 3).fillna(
-        T.diff(5).rolling(5, center=True, min_periods=1).mean() * 12)
+        T.diff(5).rolling(5, center=True, min_periods=1).mean() * 12
+    )
     s["dIdt_A_per_min"] = (s["I_string_A"].shift(-2) - s["I_string_A"].shift(2)) / 4
     # Load = current above I_LOAD for at least MIN_LOAD_MIN consecutive minutes;
     # shorter blips (e.g. 1 min at 1.15 A on 2026-03-04) are not a load stage.
@@ -144,8 +187,11 @@ def load_signals(day):
 
 
 def steady_hold(s):
-    return ~s["load_on"] & s["T_stack_C"].between(T_HOT, T_STANDBY, inclusive="neither") \
+    return (
+        ~s["load_on"]
+        & s["T_stack_C"].between(T_HOT, T_STANDBY, inclusive="neither")
         & (s["dTdt_20min_C_per_h"].abs() < DTDT_STABLE)
+    )
 
 
 def long_hold(day, s):
@@ -157,6 +203,7 @@ def long_hold(day, s):
     """
     import contextlib
     import io
+
     parts = [s]
     for off in (-1, 1):
         d = (pd.Timestamp(day) + pd.Timedelta(days=off)).strftime("%Y%m%d")
@@ -168,9 +215,15 @@ def long_hold(day, s):
     # minutes known to break the hold (logger gaps and their blank slope edges do not)
     breaks = ~h & a[["T_stack_C", "dTdt_20min_C_per_h"]].notna().all(axis=1)
     run = (h != h.shift()).cumsum()
-    runs = pd.DataFrame({"hold": h.groupby(run).first(), "breaks": breaks.groupby(run).sum()})
-    gap = ~runs["hold"] & (runs["breaks"] < MIN_SEG_MIN) \
-        & runs["hold"].shift(1, fill_value=False) & runs["hold"].shift(-1, fill_value=False)
+    runs = pd.DataFrame(
+        {"hold": h.groupby(run).first(), "breaks": breaks.groupby(run).sum()}
+    )
+    gap = (
+        ~runs["hold"]
+        & (runs["breaks"] < MIN_SEG_MIN)
+        & runs["hold"].shift(1, fill_value=False)
+        & runs["hold"].shift(-1, fill_value=False)
+    )
     h = h | run.map(gap)
     run = (h != h.shift()).cumsum()
     long = h & (run.map(run.value_counts()) >= MIN_HOLD_MIN)
@@ -178,7 +231,7 @@ def long_hold(day, s):
 
 
 def classify_row(r):
-    T, dT, I, dI = r.T_stack_C, r.dTdt_20min_C_per_h, r.I_string_A, r.dIdt_A_per_min
+    T, dT, I_str, dI = r.T_stack_C, r.dTdt_20min_C_per_h, r.I_string_A, r.dIdt_A_per_min
     air_on = r.P_air_in > AIR_ON
     # The heater only heats the stack with air flowing through it; heater power
     # with the blowers off is not a heat-up (2026-02-06, ~0.4 kW all afternoon).
@@ -187,7 +240,7 @@ def classify_row(r):
     if pd.isna(T):
         return "No data", "Logger gap"
     if r.load_on:
-        stage = "Rated power" if I >= I_RATED else "Part load"
+        stage = "Rated power" if I_str >= I_RATED else "Part load"
         if dI > DIDT_RAMP:
             op = "Load ramp-up"
         elif dI < -DIDT_RAMP:
@@ -215,17 +268,24 @@ def classify_row(r):
             return "Start-up", "Final heat-up to Hot standby"
         return "Start-up", "Heat-up (EAPH on)" if eaph_on else "Heat-up (EAPH off)"
     if dT < -DTDT_HEAT:
-        return "Shut-down", "Cool-down (air flow on)" if air_on else "Cool-down (natural)"
+        return (
+            "Shut-down",
+            "Cool-down (air flow on)" if air_on else "Cool-down (natural)",
+        )
     if T >= T_STANDBY and abs(dT) < DTDT_STABLE:
         return "Hot standby", "Temperature hold"
     if T > T_HOT:  # drifting 5–10 °C/h: not constant, so not Hot standby
-        return ("Shut-down", "Slow cool-down") if dT < 0 else ("Start-up", "Slow heat-up")
+        return (
+            ("Shut-down", "Slow cool-down") if dT < 0 else ("Start-up", "Slow heat-up")
+        )
     # Plant off (no current, heater off, air off, slow drift). Near ambient the
     # plant is shut down; a warm stack is Idle, or the natural-cooling tail of a
     # Shut-down (re-labelled by apply_context when a Shut-down comes before it).
     if T <= r.T_amb_C + DT_AMBIENT:
         return "Shut-down", AT_AMBIENT
-    return "Idle", ("Natural cooling (heater off, no air)" if dT < -0.5 else "Stable / settling")
+    return "Idle", (
+        "Natural cooling (heater off, no air)" if dT < -0.5 else "Stable / settling"
+    )
 
 
 def gas_phase(s):
@@ -238,14 +298,28 @@ def gas_phase(s):
     """
     air = (s["F_air"] > AIR_FLOW_ON) | (s["P_air_in"] > AIR_ON)
     n2, h2, ng = s["F_N2"] > N2_ON, s["F_H2"] > H2_ON, s["F_NG"] > NG_ON
-    ph = pd.Series(np.select([ng | s["load_on"], n2 & h2, n2, air], [PH_NG, PH_FORMING, PH_N2, PH_AIR], PH_OFF),
-                   index=s.index)
-    for limit, gap_states in ((GAS_GAP_MIN, (PH_OFF, PH_AIR, PH_N2)), (GAS_BLIP_MIN - 1, tuple(PHASES))):
+    ph = pd.Series(
+        np.select(
+            [ng | s["load_on"], n2 & h2, n2, air],
+            [PH_NG, PH_FORMING, PH_N2, PH_AIR],
+            PH_OFF,
+        ),
+        index=s.index,
+    )
+    for limit, gap_states in (
+        (GAS_GAP_MIN, (PH_OFF, PH_AIR, PH_N2)),
+        (GAS_BLIP_MIN - 1, tuple(PHASES)),
+    ):
         for _ in range(3):
             run = (ph != ph.shift()).cumsum()
             r = ph.groupby(run).agg(state="first", n="size")
             prv, nxt = r["state"].shift(), r["state"].shift(-1)
-            fill = (r["n"] <= limit) & r["state"].isin(gap_states) & (prv == nxt) & prv.notna()
+            fill = (
+                (r["n"] <= limit)
+                & r["state"].isin(gap_states)
+                & (prv == nxt)
+                & prv.notna()
+            )
             if limit == GAS_GAP_MIN:
                 fill &= prv.isin([PH_FORMING, PH_NG])
             if not fill.any():
@@ -267,20 +341,35 @@ def fuel_rules(s):
     for k in run[ng].unique():
         idx = s.index[run == k]
         nxt = s.index[s.index > idx[-1]]
-        if len(nxt) and s.at[nxt[0], "load_on"] and s.loc[idx, "stage"].isin(["Hot standby", ADJUST]).all():
+        if (
+            len(nxt)
+            and s.at[nxt[0], "load_on"]
+            and s.loc[idx, "stage"].isin(["Hot standby", ADJUST]).all()
+        ):
             s.loc[idx, ["stage", "operation"]] = ["Hot standby", PRE_LOAD]
     sw = ng & s["stage"].isin(["Hot standby", ADJUST]) & (s["operation"] != PRE_LOAD)
     s.loc[sw, "operation"] = FUEL_SWITCH
     # a sliver shorter than GAS_BLIP_MIN left between two operations of the same
     # no-load stage takes the operation of its longer same-stage neighbour
     b = blocks(s)
-    seg = s.groupby(b).agg(stage=("stage", "first"), op=("operation", "first"), n=("stage", "size"))
+    seg = s.groupby(b).agg(
+        stage=("stage", "first"), op=("operation", "first"), n=("stage", "size")
+    )
     ids = list(seg.index)
     for i, k in enumerate(ids):
-        if seg.at[k, "n"] >= GAS_BLIP_MIN or seg.at[k, "stage"] not in ("Hot standby", ADJUST):
+        if seg.at[k, "n"] >= GAS_BLIP_MIN or seg.at[k, "stage"] not in (
+            "Hot standby",
+            ADJUST,
+        ):
             continue
-        nb = [j for j in (ids[i - 1] if i else None, ids[i + 1] if i + 1 < len(ids) else None)
-              if j is not None and seg.at[j, "stage"] == seg.at[k, "stage"]]
+        nb = [
+            j
+            for j in (
+                ids[i - 1] if i else None,
+                ids[i + 1] if i + 1 < len(ids) else None,
+            )
+            if j is not None and seg.at[j, "stage"] == seg.at[k, "stage"]
+        ]
         if nb:
             j = max(nb, key=lambda j: seg.at[j, "n"])
             s.loc[b == k, "operation"] = seg.at[j, "op"]
@@ -291,7 +380,7 @@ def ng_tail(s, idx):
     """Trailing natural-gas minutes of a block (empty when it ends without NG)."""
     ng = (s.loc[idx, "phase"] == PH_NG).to_numpy()
     n = len(ng) - (np.flatnonzero(~ng)[-1] + 1) if (~ng).any() else len(ng)
-    return idx[len(idx) - n:]
+    return idx[len(idx) - n :]
 
 
 def plant_off_cold(stage, op):
@@ -348,22 +437,40 @@ def apply_context(s, prev_stage=None):
     for k in b.unique():
         idx = s.index[b == k]
         st, op = s.loc[idx[0], ["stage", "operation"]]
-        T0, T1 = s.loc[idx, "T_stack_C"].dropna().iloc[[0, -1]] if s.loc[idx, "T_stack_C"].notna().any() else (0, 0)
-        if st == "Start-up" and prv_st == "Shut-down" and prv_op != AT_AMBIENT and T1 < T0 + 5:
-            s.loc[idx, ["stage", "operation"]] = ["Shut-down", "Controlled cool-down (heater trim)"]
+        T0, T1 = (
+            s.loc[idx, "T_stack_C"].dropna().iloc[[0, -1]]
+            if s.loc[idx, "T_stack_C"].notna().any()
+            else (0, 0)
+        )
+        if (
+            st == "Start-up"
+            and prv_st == "Shut-down"
+            and prv_op != AT_AMBIENT
+            and T1 < T0 + 5
+        ):
+            s.loc[idx, ["stage", "operation"]] = [
+                "Shut-down",
+                "Controlled cool-down (heater trim)",
+            ]
             st, op = "Shut-down", "Controlled cool-down (heater trim)"
         if st != "No data":
             prv_st, prv_op = st, op
     b = blocks(s)
-    seg = s.groupby(b).agg(stage=("stage", "first"), op=("operation", "first"),
-                           start=("stage", lambda x: x.index[0]))
+    seg = s.groupby(b).agg(
+        stage=("stage", "first"),
+        op=("operation", "first"),
+        start=("stage", lambda x: x.index[0]),
+    )
     seg_ids = list(seg.index)
     reached_hot = False
     for i, k in enumerate(seg_ids):
         st = seg.at[k, "stage"]
         # A ~510 °C low-temperature hold is below the operating window: the
         # heat-up that follows it is still a Start-up, not a re-heat.
-        if st in ("Hot standby", "Part load", "Rated power") and seg.at[k, "op"] != LOW_HOLD:
+        if (
+            st in ("Hot standby", "Part load", "Rated power")
+            and seg.at[k, "op"] != LOW_HOLD
+        ):
             reached_hot = True
         nxt = seg.at[seg_ids[i + 1], "stage"] if i + 1 < len(seg_ids) else None
         # Warming after the stack has already been hot (between load periods) is
@@ -372,24 +479,53 @@ def apply_context(s, prev_stage=None):
             s.loc[b == k, "operation"] = REHEAT
         # Temperature rising with the heater off right after a cool-down is not a
         # start-up (no EAPH); seen on 2026-03-30, a leakage symptom per §6.6.
-        elif st == "Start-up" and seg.at[k, "op"] == "Heat-up (EAPH off)" and i > 0 \
-                and seg.at[seg_ids[i - 1], "stage"] == "Shut-down" and seg.at[seg_ids[i - 1], "op"] != AT_AMBIENT:
-            s.loc[b == k, ["stage", "operation"]] = ["Shut-down", "Temperature rise, heater off"]
+        elif (
+            st == "Start-up"
+            and seg.at[k, "op"] == "Heat-up (EAPH off)"
+            and i > 0
+            and seg.at[seg_ids[i - 1], "stage"] == "Shut-down"
+            and seg.at[seg_ids[i - 1], "op"] != AT_AMBIENT
+        ):
+            s.loc[b == k, ["stage", "operation"]] = [
+                "Shut-down",
+                "Temperature rise, heater off",
+            ]
             st = "Shut-down"
         # Cooling with air on, right before an EAPH heat-up and with no load or
         # Hot standby since the plant was last off = start-up purge, not shut-down.
         prv = seg.at[seg_ids[i - 1], "stage"] if i > 0 else None
-        prv_off = prv in (None, "No data") or plant_off_cold(prv, seg.at[seg_ids[i - 1], "op"])
-        if st == "Shut-down" and not reached_hot and nxt == "Start-up" and prv_off \
-                and seg.at[k, "op"].startswith("Cool-down") and seg.at[k, "op"] != COOL_BACK:
-            s.loc[b == k, ["stage", "operation"]] = ["Start-up", "Air flow start (purge, heater off)"]
+        prv_off = prv in (None, "No data") or plant_off_cold(
+            prv, seg.at[seg_ids[i - 1], "op"]
+        )
+        if (
+            st == "Shut-down"
+            and not reached_hot
+            and nxt == "Start-up"
+            and prv_off
+            and seg.at[k, "op"].startswith("Cool-down")
+            and seg.at[k, "op"] != COOL_BACK
+        ):
+            s.loc[b == k, ["stage", "operation"]] = [
+                "Start-up",
+                "Air flow start (purge, heater off)",
+            ]
         # Load dropping to zero right before cool-down = Shut-down step 1 (§3.3)
-        if st in ("Part load", "Rated power") and seg.at[k, "op"] == "Load ramp-down" \
-                and nxt == "Shut-down":
-            s.loc[b == k, ["stage", "operation"]] = ["Shut-down", "Load ramp-down to zero"]
+        if (
+            st in ("Part load", "Rated power")
+            and seg.at[k, "op"] == "Load ramp-down"
+            and nxt == "Shut-down"
+        ):
+            s.loc[b == k, ["stage", "operation"]] = [
+                "Shut-down",
+                "Load ramp-down to zero",
+            ]
         # Heat-up that stops below Hot standby = aborted start-up
-        if st == "Idle" and i > 0 and seg.at[seg_ids[i - 1], "stage"] == "Start-up" \
-                and not reached_hot:
+        if (
+            st == "Idle"
+            and i > 0
+            and seg.at[seg_ids[i - 1], "stage"] == "Start-up"
+            and not reached_hot
+        ):
             s.loc[b == k, "operation"] = "Heat-up stopped - settling / natural cooling"
         # a cool-back to Hot standby leaves the stack hot
         if st == "Idle" or (st == "Shut-down" and seg.at[k, "op"] != COOL_BACK):
@@ -405,34 +541,55 @@ def apply_context(s, prev_stage=None):
     eps = list(ep.unique())
     for i in range(1, len(eps) - 1):
         idx = s.index[ep == eps[i]]
-        if st.loc[idx[0]] != "Shut-down" or (s.loc[idx, "operation"] == COOL_BACK).any() \
-                or (s.loc[ep == eps[i - 1], "operation"] == REHEAT).any():
+        if (
+            st.loc[idx[0]] != "Shut-down"
+            or (s.loc[idx, "operation"] == COOL_BACK).any()
+            or (s.loc[ep == eps[i - 1], "operation"] == REHEAT).any()
+        ):
             continue
         prv = st[ep == eps[i - 1]].iloc[0]
         nxt = st[ep == eps[i + 1]].iloc[0]
         heater_on = (s.loc[idx, "P_EAPH_kW"] * 1000 > EAPH_ON_W).mean() > 0.5
         if prv == "Start-up" and nxt in ("Start-up", "Hot standby"):
             if heater_on:
-                s.loc[idx, ["stage", "operation"]] = ["Start-up", "Temperature dip during heat-up (heater on)"]
+                s.loc[idx, ["stage", "operation"]] = [
+                    "Start-up",
+                    "Temperature dip during heat-up (heater on)",
+                ]
             elif len(idx) <= MAX_PAUSE_MIN:
-                s.loc[idx, ["stage", "operation"]] = ["Start-up", "Heat-up paused (heater off)"]
+                s.loc[idx, ["stage", "operation"]] = [
+                    "Start-up",
+                    "Heat-up paused (heater off)",
+                ]
 
     # A short excursion between two low-temperature holds (e.g. 2026-02-02
     # 13:46, dip to 492 °C and back with the heater on): the fall is Shut-down,
     # the climb back Start-up, as Hot standby is a constant temperature only.
     b = blocks(s)
-    seg = s.groupby(b).agg(stage=("stage", "first"), op=("operation", "first"),
-                           T_max=("T_stack_C", "max"), load=("load_on", "any"), n=("stage", "size"))
+    seg = s.groupby(b).agg(
+        stage=("stage", "first"),
+        op=("operation", "first"),
+        T_max=("T_stack_C", "max"),
+        load=("load_on", "any"),
+        n=("stage", "size"),
+    )
     ids = list(seg.index)
     holds = [i for i, k in enumerate(ids) if seg.at[k, "op"] == LOW_HOLD]
     for a, z in zip(holds, holds[1:]):
-        mid = ids[a + 1:z]
-        if mid and not seg.loc[mid, "load"].any() and seg.loc[mid, "T_max"].max() < T_STANDBY \
-                and seg.loc[mid, "n"].sum() <= MAX_PAUSE_MIN:
+        mid = ids[a + 1 : z]
+        if (
+            mid
+            and not seg.loc[mid, "load"].any()
+            and seg.loc[mid, "T_max"].max() < T_STANDBY
+            and seg.loc[mid, "n"].sum() <= MAX_PAUSE_MIN
+        ):
             for k in mid:
                 warming = s.loc[b == k, "dTdt_20min_C_per_h"].mean() > 0
-                s.loc[b == k, ["stage", "operation"]] = \
-                    ["Start-up", "Re-heat to hold"] if warming else ["Shut-down", "Temperature dip during hold"]
+                s.loc[b == k, ["stage", "operation"]] = (
+                    ["Start-up", "Re-heat to hold"]
+                    if warming
+                    else ["Shut-down", "Temperature dip during hold"]
+                )
 
     # The climb from a low-temperature hold to the operating window (e.g.
     # 2026-03-03 511 → 576 °C) is a Start-up re-heat, and a cool-down from Hot
@@ -457,8 +614,11 @@ def apply_context(s, prev_stage=None):
     for i in range(1, len(eps) - 1):
         idx = s.index[(ep == eps[i]) & (s["stage"] != "No data")]
         nxt = s.index[ep == eps[i + 1]][0]
-        if st.loc[idx[0]] == "Shut-down" and st[ep == eps[i - 1]].iloc[0] == "Hot standby" \
-                and s.at[nxt, "operation"] == LOW_HOLD:
+        if (
+            st.loc[idx[0]] == "Shut-down"
+            and st[ep == eps[i - 1]].iloc[0] == "Hot standby"
+            and s.at[nxt, "operation"] == LOW_HOLD
+        ):
             s.loc[idx, "operation"] = COOL_BACK
 
     # A warm, plant-off stack right after a Shut-down is its natural-cooling tail
@@ -473,7 +633,10 @@ def apply_context(s, prev_stage=None):
         if pd.isna(cur):
             continue
         if cur == "Idle" and prv == "Shut-down":
-            s.loc[(ep == e) & (s["stage"] == "Idle"), ["stage", "operation"]] = ["Shut-down", TAIL]
+            s.loc[(ep == e) & (s["stage"] == "Idle"), ["stage", "operation"]] = [
+                "Shut-down",
+                TAIL,
+            ]
             cur = "Shut-down"
         prv = cur
     return s
@@ -485,12 +648,15 @@ def restarts_next_day(day):
     stopped overnight, e.g. 2026-03-17 → 18)."""
     import contextlib
     import io
+
     nxt = (pd.Timestamp(day) + pd.Timedelta(days=1)).strftime("%Y%m%d")
     if not (SRC / f"{nxt}_10s.parquet").exists():
         return False
     with contextlib.redirect_stdout(io.StringIO()):
         a = load_signals(nxt)
-    active = a["load_on"] | (a["P_EAPH_kW"] * 1000 > EAPH_ON_W) | (a["P_air_in"] > AIR_ON)
+    active = (
+        a["load_on"] | (a["P_EAPH_kW"] * 1000 > EAPH_ON_W) | (a["P_air_in"] > AIR_ON)
+    )
     if not active.any():
         return False
     first = active.idxmax()
@@ -519,7 +685,9 @@ def thermal_adjustment(s, day, prev_stage=None):
     def labelled_blocks():
         b = blocks(s)
         v = s["stage"] != "No data"
-        seg = s[v].groupby(b[v]).agg(stage=("stage", "first"), op=("operation", "first"))
+        seg = (
+            s[v].groupby(b[v]).agg(stage=("stage", "first"), op=("operation", "first"))
+        )
         return b, seg, list(seg.index)
 
     b, seg, ids = labelled_blocks()
@@ -529,18 +697,30 @@ def thermal_adjustment(s, day, prev_stage=None):
         if st == ADJUST and op in COOL_BACK_OPS and nxt_stage == "Shut-down":
             idx = s.index[b == k]
             air = (s.loc[idx, "P_air_in"] > AIR_ON).mean() > 0.5
-            s.loc[idx, ["stage", "operation"]] = ["Shut-down", "Cool-down (air flow on)" if air else "Cool-down (natural)"]
+            s.loc[idx, ["stage", "operation"]] = [
+                "Shut-down",
+                "Cool-down (air flow on)" if air else "Cool-down (natural)",
+            ]
             st = "Shut-down"
-        elif st == "Shut-down" and op == "Load ramp-down to zero" and nxt_stage == ADJUST:
+        elif (
+            st == "Shut-down" and op == "Load ramp-down to zero" and nxt_stage == ADJUST
+        ):
             idx = s.index[b == k]
-            load = "Rated power" if s.loc[idx, "I_string_A"].max() >= I_RATED else "Part load"
+            load = (
+                "Rated power"
+                if s.loc[idx, "I_string_A"].max() >= I_RATED
+                else "Part load"
+            )
             s.loc[idx, ["stage", "operation"]] = [load, "Load ramp-down"]
             st = load
         nxt_stage = st
 
     b, seg, ids = labelled_blocks()
     for i, k in enumerate(ids[:-1]):
-        if seg.at[k, "stage"] == ADJUST and seg.at[ids[i + 1], "stage"] in ("Part load", "Rated power"):
+        if seg.at[k, "stage"] == ADJUST and seg.at[ids[i + 1], "stage"] in (
+            "Part load",
+            "Rated power",
+        ):
             idx = s.index[b == k]
             # pre-load = natural gas on until load starts; without a fuel
             # switch-over in the data, the last MIN_SEG_MIN minutes
@@ -556,10 +736,16 @@ def thermal_adjustment(s, day, prev_stage=None):
         if st[ep == e].iloc[0] != "Idle":
             continue
         prv = st[ep == eps[i - 1]].iloc[0] if i > 0 else prev_stage
-        nxt = st[ep == eps[i + 1]].iloc[0] if i + 1 < len(eps) else \
-            ("Start-up" if restarts_next_day(day) else None)
+        nxt = (
+            st[ep == eps[i + 1]].iloc[0]
+            if i + 1 < len(eps)
+            else ("Start-up" if restarts_next_day(day) else None)
+        )
         if prv == "Start-up" and nxt == "Start-up":
-            s.loc[(ep == e) & (s["stage"] == "Idle"), ["stage", "operation"]] = ["Start-up", PAUSED]
+            s.loc[(ep == e) & (s["stage"] == "Idle"), ["stage", "operation"]] = [
+                "Start-up",
+                PAUSED,
+            ]
     return s
 
 
@@ -572,8 +758,12 @@ def sub_stage(stage, op):
     forced or natural cooling, stack still warm) or At ambient (plant off,
     within DT_AMBIENT of ambient, waiting for the next Start-up). Empty for
     other stages."""
-    return pd.Series(np.where(stage != "Shut-down", "",
-                              np.where(op == AT_AMBIENT, SD_AMBIENT, SD_COOLING)), index=stage.index)
+    return pd.Series(
+        np.where(
+            stage != "Shut-down", "", np.where(op == AT_AMBIENT, SD_AMBIENT, SD_COOLING)
+        ),
+        index=stage.index,
+    )
 
 
 def prev_day(day):
@@ -587,11 +777,13 @@ def prev_day(day):
 
 @lru_cache(maxsize=None)
 def last_stage(day):
-    """Stage at the end of a day file (None without a file), for rules that cross midnight."""
+    """Stage at the end of a day file (None without a file), for rules that cross \
+midnight."""
     if day is None:
         return None
     import contextlib
     import io
+
     with contextlib.redirect_stdout(io.StringIO()):
         st = segment(day)[0]["stage"]
     st = st[st != "No data"]
@@ -617,33 +809,55 @@ def segment(day):
         nxt = s.index[s.index > idx[-1]]
         if len(on) and len(nxt) and on[-1] < idx[-1]:
             tail = idx[idx > on[-1]]
-            s.loc[tail, ["stage", "operation"]] = s.loc[nxt[0], ["stage", "operation"]].values
+            s.loc[tail, ["stage", "operation"]] = s.loc[
+                nxt[0], ["stage", "operation"]
+            ].values
     s = thermal_adjustment(s, day, last_stage(prev_day(day)))
     s = fuel_rules(s)
     s["sub_stage"] = sub_stage(s["stage"], s["operation"])
     # Heater power with the blowers off while the plant is otherwise off
     # (2026-02-06): named, so it is not mistaken for a start-up.
-    off = (s["P_EAPH_kW"] * 1000 > EAPH_ON_W) & (s["phase"] == PH_OFF) & ~s["load_on"] \
+    off = (
+        (s["P_EAPH_kW"] * 1000 > EAPH_ON_W)
+        & (s["phase"] == PH_OFF)
+        & ~s["load_on"]
         & (s["stage"].isin(["Idle"]) | s["operation"].isin([AT_AMBIENT, TAIL]))
-    gap = s["T_stack_C"].isna() & (s["stage"] != "No data") & off.shift().fillna(False).astype(bool)
+    )
+    gap = (
+        s["T_stack_C"].isna()
+        & (s["stage"] != "No data")
+        & off.shift().fillna(False).astype(bool)
+    )
     off = off | gap  # a lone logger-gap minute does not end it
     run = (off != off.shift()).cumsum()
     s.loc[off & (run.map(run.value_counts()) >= MIN_SEG_MIN), "operation"] = FALSE_START
 
     b = blocks(s)
-    seg = s.groupby(b).agg(
-        stage=("stage", "first"), sub_stage=("sub_stage", "first"), operation=("operation", "first"),
-        phases=("phase", lambda x: " > ".join(v for v in dict.fromkeys(x) if v)),
-        start=("T_stack_C", lambda x: x.index[0]),
-        end=("T_stack_C", lambda x: x.index[-1] + pd.Timedelta("1min")),
-        T_start_C=("T_stack_C", "first"), T_end_C=("T_stack_C", "last"),
-        T_min_C=("T_stack_C", "min"), T_max_C=("T_stack_C", "max"),
-        dTdt_mean_C_per_h=("dTdt_C_per_h", "mean"),
-        I_max_A=("I_string_A", "max"), P_stack_max_kW=("P_stack_kW", "max"),
-        P_EAPH_mean_kW=("P_EAPH_kW", "mean"), P_EAPH_max_kW=("P_EAPH_kW", "max"),
-    ).reset_index(drop=True)
+    seg = (
+        s.groupby(b)
+        .agg(
+            stage=("stage", "first"),
+            sub_stage=("sub_stage", "first"),
+            operation=("operation", "first"),
+            phases=("phase", lambda x: " > ".join(v for v in dict.fromkeys(x) if v)),
+            start=("T_stack_C", lambda x: x.index[0]),
+            end=("T_stack_C", lambda x: x.index[-1] + pd.Timedelta("1min")),
+            T_start_C=("T_stack_C", "first"),
+            T_end_C=("T_stack_C", "last"),
+            T_min_C=("T_stack_C", "min"),
+            T_max_C=("T_stack_C", "max"),
+            dTdt_mean_C_per_h=("dTdt_C_per_h", "mean"),
+            I_max_A=("I_string_A", "max"),
+            P_stack_max_kW=("P_stack_kW", "max"),
+            P_EAPH_mean_kW=("P_EAPH_kW", "mean"),
+            P_EAPH_max_kW=("P_EAPH_kW", "max"),
+        )
+        .reset_index(drop=True)
+    )
     seg[seg.select_dtypes("number").columns] = seg.select_dtypes("number").round(2)
-    seg.insert(4, "duration_min", ((seg.end - seg.start).dt.total_seconds() / 60).astype(int))
+    seg.insert(
+        4, "duration_min", ((seg.end - seg.start).dt.total_seconds() / 60).astype(int)
+    )
     return s, seg
 
 
@@ -671,14 +885,29 @@ def segment_all(days=None):
 
 
 # One clearly different hue per stage (Okabe-Ito, colour-blind safe): warming = orange,
-# hot = vermilion, cooling = sky blue, load = green/blue. Signal lines in plot() stay neutral
+# hot = vermilion, cooling = sky blue, load = green/blue. Signal lines in plot() stay
+# neutral
 # so they are never mistaken for a stage.
-STAGE_COLORS = {"Idle": "#999999", "Start-up": "#E69F00", "Hot standby": "#D55E00", ADJUST: "#CC79A7",
-                "Part load": "#009E73", "Rated power": "#0072B2", "Shut-down": "#56B4E9"}
+STAGE_COLORS = {
+    "Idle": "#999999",
+    "Start-up": "#E69F00",
+    "Hot standby": "#D55E00",
+    ADJUST: "#CC79A7",
+    "Part load": "#009E73",
+    "Rated power": "#0072B2",
+    "Shut-down": "#56B4E9",
+}
 STAGE_TINT = 0.22  # background shading behind the signal panels
-# Flow lines (dark) and gas-phase band (light version of the same hue), kept apart from the stage hues.
+# Flow lines (dark) and gas-phase band (light version of the same hue), kept apart from
+# the stage hues.
 GAS_COLORS = {"N2": "#1F3A93", "H2": "#C0392B", "NG": "#542788", "air": "#333333"}
-PHASE_COLORS = {PH_OFF: "#FFFFFF", PH_AIR: "#D9D9D9", PH_FORMING: "#F2B8B0", PH_N2: "#A9B8E0", PH_NG: "#B2A1CF"}
+PHASE_COLORS = {
+    PH_OFF: "#FFFFFF",
+    PH_AIR: "#D9D9D9",
+    PH_FORMING: "#F2B8B0",
+    PH_N2: "#A9B8E0",
+    PH_NG: "#B2A1CF",
+}
 
 
 def plot_flows(s, ax_fuel, ax_air, legend=True):
@@ -688,14 +917,37 @@ def plot_flows(s, ax_fuel, ax_air, legend=True):
     ax_fuel.plot(s.index, s.F_NG, color=c["NG"], lw=1.1, label="Natural gas  FIRC_14")
     ax_fuel.set_ylabel("ln/min")
     h2 = ax_fuel.twinx()
-    h2.plot(s.index, s.F_H2, color=c["H2"], lw=1.1, ls="--", label="H2  FIRC_15 (right axis)")
-    h2.set_ylabel("H2 ln/min", color=c["H2"]); h2.set_ylim(0, max(100, s.F_H2.max() * 1.6))  # H2 sits lower than N2, not on top of it
+    h2.plot(
+        s.index,
+        s.F_H2,
+        color=c["H2"],
+        lw=1.1,
+        ls="--",
+        label="H2  FIRC_15 (right axis)",
+    )
+    h2.set_ylabel("H2 ln/min", color=c["H2"])
+    h2.set_ylim(
+        0, max(100, s.F_H2.max() * 1.6)
+    )  # H2 sits lower than N2, not on top of it
     ax_fuel.set_ylim(0, max(1400, s[["F_N2", "F_NG"]].max().max() * 1.15))
-    ax_air.plot(s.index, s.F_air, color=c["air"], lw=1.1, label="Cathode air  FIRC_111 + FIRC_112")
-    ax_air.set_ylabel("ln/min"); ax_air.set_ylim(bottom=0)
+    ax_air.plot(
+        s.index,
+        s.F_air,
+        color=c["air"],
+        lw=1.1,
+        label="Cathode air  FIRC_111 + FIRC_112",
+    )
+    ax_air.set_ylabel("ln/min")
+    ax_air.set_ylim(bottom=0)
     if legend:
         lines = ax_fuel.get_lines() + h2.get_lines()
-        ax_fuel.legend(lines, [l.get_label() for l in lines], loc="upper left", fontsize=8, ncol=3)
+        ax_fuel.legend(
+            lines,
+            [line.get_label() for line in lines],
+            loc="upper left",
+            fontsize=8,
+            ncol=3,
+        )
         ax_air.legend(loc="upper left", fontsize=8)
     return h2
 
@@ -707,57 +959,133 @@ def phase_band(s, ax):
     step = pd.Timedelta("1min")
     for _, g in ph.groupby(run):
         if g.iloc[0]:
-            ax.axvspan(g.index[0], g.index[-1] + step, color=PHASE_COLORS[g.iloc[0]], lw=0)
+            ax.axvspan(
+                g.index[0], g.index[-1] + step, color=PHASE_COLORS[g.iloc[0]], lw=0
+            )
     ax.set_yticks([])
 
 
 def plot(day, s, seg, path=None):
-    """Timeline figure. With a path it is saved and closed; without, it is returned (notebooks)."""
+    """Timeline figure. With a path it is saved and closed; without, it is returned \
+(notebooks)."""
     import matplotlib.pyplot as plt
+
     colors = STAGE_COLORS
-    fig, ax = plt.subplots(6, 1, figsize=(13, 12), sharex=True,
-                           gridspec_kw={"height_ratios": [3, 2, 1.8, 1.3, 0.5, 0.5]})
-    ax[0].plot(s.index, s.T_stack_C, color="k", lw=1.2, label="Stack T (median of valid TIR_4_6_* TCs)")
-    ax[0].plot(s.index, s.T_cathode_in_C, color="#555555", lw=0.9, ls="--", label="Cathode inlet TIRC2.06")
-    ax[0].set_ylabel("°C"); ax[0].legend(loc="upper left", fontsize=8)
+    fig, ax = plt.subplots(
+        6,
+        1,
+        figsize=(13, 12),
+        sharex=True,
+        gridspec_kw={"height_ratios": [3, 2, 1.8, 1.3, 0.5, 0.5]},
+    )
+    ax[0].plot(
+        s.index,
+        s.T_stack_C,
+        color="k",
+        lw=1.2,
+        label="Stack T (median of valid TIR_4_6_* TCs)",
+    )
+    ax[0].plot(
+        s.index,
+        s.T_cathode_in_C,
+        color="#555555",
+        lw=0.9,
+        ls="--",
+        label="Cathode inlet TIRC2.06",
+    )
+    ax[0].set_ylabel("°C")
+    ax[0].legend(loc="upper left", fontsize=8)
     ax[1].plot(s.index, s.P_EAPH_kW, color="k", lw=1.1, label="EAPH heater power (kW)")
-    ax[1].plot(s.index, s.P_stack_kW.fillna(0), color="#555555", lw=1, ls="--", label="Stack DC power (kW)")
+    ax[1].plot(
+        s.index,
+        s.P_stack_kW.fillna(0),
+        color="#555555",
+        lw=1,
+        ls="--",
+        label="Stack DC power (kW)",
+    )
     ax1b = ax[1].twinx()
-    ax1b.plot(s.index, s.I_string_A, color="#888888", lw=0.8, ls=":", label="I per string (A)")
+    ax1b.plot(
+        s.index, s.I_string_A, color="#888888", lw=0.8, ls=":", label="I per string (A)"
+    )
     ax1b.set_ylabel("A")
-    ax[1].set_ylabel("kW"); ax[1].legend(loc="upper left", fontsize=8)
+    ax[1].set_ylabel("kW")
+    ax[1].legend(loc="upper left", fontsize=8)
     plot_flows(s, ax[2], ax[3])
     for _, r in seg.iterrows():
         ax[4].axvspan(r.start, r.end, color=colors.get(r.stage, "#ccc"))
         for a in ax[:4]:
-            a.axvspan(r.start, r.end, color=colors.get(r.stage, "#ccc"), alpha=STAGE_TINT, lw=0)
-    ax[4].set_yticks([]); ax[4].set_ylabel("stage", rotation=0, ha="right", va="center", fontsize=9)
-    phase_band(s, ax[5]); ax[5].set_ylabel("gas", rotation=0, ha="right", va="center", fontsize=9)
+            a.axvspan(
+                r.start,
+                r.end,
+                color=colors.get(r.stage, "#ccc"),
+                alpha=STAGE_TINT,
+                lw=0,
+            )
+    ax[4].set_yticks([])
+    ax[4].set_ylabel("stage", rotation=0, ha="right", va="center", fontsize=9)
+    phase_band(s, ax[5])
+    ax[5].set_ylabel("gas", rotation=0, ha="right", va="center", fontsize=9)
     handles = [plt.Rectangle((0, 0), 1, 1, color=c) for c in colors.values()]
     handles.append(plt.Rectangle((0, 0), 1, 1, fc="white", ec="#999"))
-    leg = ax[5].legend(handles, [*colors.keys(), "No data"], ncol=8, fontsize=8, loc="upper center",
-                       bbox_to_anchor=(.5, -0.7), title="Stage", title_fontsize=8)
+    leg = ax[5].legend(
+        handles,
+        [*colors.keys(), "No data"],
+        ncol=8,
+        fontsize=8,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.7),
+        title="Stage",
+        title_fontsize=8,
+    )
     ax[5].add_artist(leg)
-    ax[5].legend([plt.Rectangle((0, 0), 1, 1, fc=c, ec="#999") for c in PHASE_COLORS.values()], PHASE_COLORS.keys(),
-                 ncol=5, fontsize=8, loc="upper center", bbox_to_anchor=(.5, -2.0),
-                 title="Gas / air supply (column phase)", title_fontsize=8)
+    ax[5].legend(
+        [plt.Rectangle((0, 0), 1, 1, fc=c, ec="#999") for c in PHASE_COLORS.values()],
+        PHASE_COLORS.keys(),
+        ncol=5,
+        fontsize=8,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -2.0),
+        title="Gas / air supply (column phase)",
+        title_fontsize=8,
+    )
     fig.suptitle(f"{day} — operating stages and gas / air supply")
     fig.tight_layout()
     if path is None:
         return fig
-    fig.savefig(path, dpi=130); plt.close(fig)
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
 
 
 if __name__ == "__main__":
     import matplotlib
+
     matplotlib.use("Agg")
-    day = sys.argv[1] if len(sys.argv) > 1 else sorted(SRC.glob("*_10s.parquet"))[0].name[:8]
+    day = (
+        sys.argv[1]
+        if len(sys.argv) > 1
+        else sorted(SRC.glob("*_10s.parquet"))[0].name[:8]
+    )
     OUT.mkdir(parents=True, exist_ok=True)
     s, seg = segment(day)
     s.to_csv(OUT / f"{day}_states_1min.csv", float_format="%.3f")
     seg.to_csv(OUT / f"{day}_segments.csv", index=False)
     plot(day, s, seg, OUT / f"{day}_states.png")
     pd.set_option("display.width", 250)
-    print(seg[["stage", "operation", "start", "end", "duration_min", "T_start_C",
-               "T_end_C", "dTdt_mean_C_per_h", "I_max_A", "P_EAPH_max_kW"]].to_string())
+    print(
+        seg[
+            [
+                "stage",
+                "operation",
+                "start",
+                "end",
+                "duration_min",
+                "T_start_C",
+                "T_end_C",
+                "dTdt_mean_C_per_h",
+                "I_max_A",
+                "P_EAPH_max_kW",
+            ]
+        ].to_string()
+    )
     print("\nMinutes per stage:\n", s.stage.value_counts().to_string())

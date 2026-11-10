@@ -19,6 +19,7 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,27 +39,32 @@ def load_day(args):
     table = pv.read_csv(
         path,
         parse_options=pv.ParseOptions(delimiter="\t"),
-        convert_options=pv.ConvertOptions(decimal_point=",",
-                                           column_types={"Date Time": "string"}),
+        convert_options=pv.ConvertOptions(
+            decimal_point=",", column_types={"Date Time": "string"}
+        ),
     )
     df = table.to_pandas()
     df.index = pd.to_datetime(df.pop("Date Time"), format="%d.%m.%Y %H:%M:%S")
     df = df.apply(pd.to_numeric, errors="coerce").astype("float64")
     df = df.resample(resample).mean()
-    print(f"  {path.name}: {len(table):,} rows -> {len(df):,} ({time.time() - t0:.1f}s)",
-          flush=True)
+    print(
+        f"  {path.name}: {len(table):,} rows -> {len(df):,} ({time.time() - t0:.1f}s)",
+        flush=True,
+    )
     return df
 
 
 def top_pairs(pear, spear):
     iu = np.triu_indices(len(pear), k=1)
     cols = pear.columns
-    pairs = pd.DataFrame({
-        "col_a": cols[iu[0]],
-        "col_b": cols[iu[1]],
-        "pearson": pear.values[iu],
-        "spearman": spear.values[iu],
-    })
+    pairs = pd.DataFrame(
+        {
+            "col_a": cols[iu[0]],
+            "col_b": cols[iu[1]],
+            "pearson": pear.values[iu],
+            "spearman": spear.values[iu],
+        }
+    )
     pairs["spearman_minus_pearson"] = pairs["spearman"] - pairs["pearson"]
     pairs["max_abs"] = pairs[["pearson", "spearman"]].abs().max(axis=1)
     return pairs.sort_values("max_abs", ascending=False).reset_index(drop=True)
@@ -92,8 +98,12 @@ def main():
     ap.add_argument("--file", default="20251030.txt", help="single day file in common/")
     ap.add_argument("--all", action="store_true", help="use every file in common/")
     ap.add_argument("--resample", default="10s")
-    ap.add_argument("--min-coverage", type=float, default=0.5,
-                    help="drop columns with less than this fraction of non-null values")
+    ap.add_argument(
+        "--min-coverage",
+        type=float,
+        default=0.5,
+        help="drop columns with less than this fraction of non-null values",
+    )
     ap.add_argument("--workers", type=int, default=6)
     a = ap.parse_args()
 
@@ -109,16 +119,22 @@ def main():
     coverage = df.notna().mean()
     std = df.std()
     dropped = pd.DataFrame({"coverage": coverage, "std": std})
-    dropped["reason"] = np.where(coverage < a.min_coverage, "low coverage",
-                                 np.where(~(std > 0), "constant", ""))
+    dropped["reason"] = np.where(
+        coverage < a.min_coverage, "low coverage", np.where(~(std > 0), "constant", "")
+    )
     dropped = dropped[dropped["reason"] != ""]
     df = df.drop(columns=dropped.index)
-    print(f"Dropped {len(dropped)} columns (constant / low coverage); {df.shape[1]} remain")
+    print(
+        f"Dropped {len(dropped)} columns (constant / low coverage); "
+        f"{df.shape[1]} remain"
+    )
 
     df64 = df
     t0 = time.time()
     pear = df64.corr(method="pearson", min_periods=100)
-    spear = df64.rank().corr(method="pearson", min_periods=100)  # Spearman = Pearson on ranks
+    spear = df64.rank().corr(
+        method="pearson", min_periods=100
+    )  # Spearman = Pearson on ranks
     print(f"Correlations computed ({time.time() - t0:.1f}s)")
 
     # near-constant columns (float noise only) pass the std check but give all-NaN rows
@@ -126,11 +142,18 @@ def main():
     if len(empty):
         pear = pear.drop(index=empty, columns=empty)
         spear = spear.drop(index=empty, columns=empty)
-        extra = pd.DataFrame({"coverage": coverage[empty], "std": std[empty],
-                              "reason": "no valid correlation"})
+        extra = pd.DataFrame(
+            {
+                "coverage": coverage[empty],
+                "std": std[empty],
+                "reason": "no valid correlation",
+            }
+        )
         dropped = pd.concat([dropped, extra])
-        print(f"Dropped {len(empty)} more columns with no valid correlation; "
-              f"{len(pear)} remain")
+        print(
+            f"Dropped {len(empty)} more columns with no valid correlation; "
+            f"{len(pear)} remain"
+        )
 
     pear.to_csv(OUT / "pearson.csv", float_format="%.4f")
     spear.to_csv(OUT / "spearman.csv", float_format="%.4f")
@@ -144,16 +167,25 @@ def main():
         dropped.to_excel(xw, sheet_name="dropped_columns")
 
     order = cluster_order(spear)
-    heatmap(pear, order, f"Pearson correlation ({a.resample} means, {len(df):,} rows)",
-            OUT / "heatmap_pearson.png")
-    heatmap(spear, order, f"Spearman correlation ({a.resample} means, {len(df):,} rows)",
-            OUT / "heatmap_spearman.png")
+    heatmap(
+        pear,
+        order,
+        f"Pearson correlation ({a.resample} means, {len(df):,} rows)",
+        OUT / "heatmap_pearson.png",
+    )
+    heatmap(
+        spear,
+        order,
+        f"Spearman correlation ({a.resample} means, {len(df):,} rows)",
+        OUT / "heatmap_spearman.png",
+    )
 
     print(f"\nOutputs written to {OUT}")
     print("\nTop 15 pairs by |r|:")
     print(pairs.head(15).to_string(index=False, float_format="%.3f"))
-    big_gap = pairs.reindex(pairs["spearman_minus_pearson"].abs()
-                            .sort_values(ascending=False).index).head(10)
+    big_gap = pairs.reindex(
+        pairs["spearman_minus_pearson"].abs().sort_values(ascending=False).index
+    ).head(10)
     print("\nLargest Spearman vs Pearson gaps (non-linear / outlier-driven):")
     print(big_gap.to_string(index=False, float_format="%.3f"))
 

@@ -1,0 +1,10 @@
+# Coding standard: PEP 8, enforced by ruff (Python scripts + notebooks).
+#   ruff format .        fix layout
+#   ruff check --fix .   lint (pycodestyle, pyflakes, import order)
+# JavaScript (04 dataset app, 05 twin): prettier + eslint, see eslint.config.mjs.
+[tool.ruff]
+line-length = 88
+extend-exclude = ["02_data", "06_deliverables", "graphify-out", ".ua", "data_analysis"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I"]

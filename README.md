@@ -136,3 +136,12 @@ jupyter lab
 Run the notebooks from inside `03_data_analysis/` because they import from `scripts/`.
 
 **Tests**: `python -m pytest 03_data_analysis/tests`
+
+## Coding standard
+
+- **Python** (scripts and notebooks): PEP 8, checked by ruff with the settings in `pyproject.toml` (line length 88).
+  `ruff format .` then `ruff check .` must report nothing.
+- **JavaScript** (`05_twin_2d/app.js`, `sw.js`, `tools/*.js`, `04_synthetic_data/*.js`): Prettier layout plus ESLint core
+  rules in `eslint.config.mjs`. Nothing to install, Node fetches them:
+  `npx --yes prettier@3.9.10 --write <files>` and `npx --yes eslint@10.14.0 05_twin_2d 04_synthetic_data`.
+  The generated files `05_twin_2d/data/*.js` are left as they are.

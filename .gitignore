@@ -8,3 +8,8 @@ __pycache__/
 *.pyc
 .pytest_cache/
 *.csv.gz
+
+# Understand Anything scratch (the graph itself is committed)
+.ua/.trash-*/
+.ua/intermediate/
+.ruff_cache/
