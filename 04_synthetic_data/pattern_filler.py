@@ -41,7 +41,7 @@ minute by minute from 02_data/preprocessed/ (1-min means):
    asked for a length no real episode has from that temperature).
 
 Usage:
-    python "04_synthetic_data/pattern_filler.py" --pattern "04_synthetic_data/patterns/pattern_7.csv" --plot
+    python "04_synthetic_data/pattern_filler.py" --pattern "04_synthetic_data/datasets/200h_af32pct_4hua_4hun_5hs_3fs_3pl_7afc_7sd_seed7/pattern_7.csv" --plot
     python "04_synthetic_data/pattern_filler.py" --hours 200 \
         --count "Shut-down=3, Start-up=3, Hot standby=5, Part load=3" --seed 7 --plot
 
@@ -49,11 +49,12 @@ Sensors: the 175 preprocessed ones plus RAW_EXTRA from the 1 s raw files
 (02_data/parquet), i.e. the present FIRC 1,1,3 tag ct_FIRC_113_PV_ProcessValue
 (renamed in the PLC, real values from 2026-03-17; blank before).
 
-Writes patterns/synthetic_<name>.parquet (1-min rows: block, stage, sub_stage,
+Writes datasets/<day_name>/synthetic_<name>.parquet (folder named by day_name(): hours, availability, stage counts, seed;
+the plan's seed_<name>/ folder is renamed to it) (1-min rows: block, stage, sub_stage,
 plant_stage, operation, phase, source_episode, source_time, T_stack_C and all sensors),
 Planning uses the old 7 stages on purpose (2026-11-05 decision); plant_stage is the
 decided 8-stage label, taken from the real minute each row was copied from.
-patterns/synthetic_<name>_blocks.csv (which real episodes filled which block,
+<same folder>/synthetic_<name>_blocks.csv (which real episodes filled which block,
 planned vs. copied supply phases and the share of minutes where they agree)
 and, with --plot, a PNG of the main signals.
 """
@@ -78,6 +79,30 @@ RAW = ROOT / "02_data" / "parquet"   # 1 s raw logger files
 RAW_EXTRA = ["ct_FIRC_113_PV_ProcessValue"]   # not in the preprocessed set (tag renamed 2026-03-17)
 LIB = HERE / "library"
 CACHE = LIB / "sensors_1min.parquet"   # all preprocessed sensors on the 1-min grid + labels
+
+AVAILABLE = {"Part load", "Hot standby", "Fuel switch"}   # as 03_data_analysis/scripts/availability.py
+CODES = [("Heat-up air", "hua"), ("Heat-up N₂+H₂", "hun"), ("Hot standby", "hs"), ("Fuel switch", "fs"),
+         ("Part load", "pl"), ("Air-flow cooling", "afc"), ("Shutdown", "sd"), ("Trip: purge", "trip")]
+
+
+def day_name(syn, seed):
+    """Folder name of a filled day: hours, availability, episodes per plant stage, seed,
+    e.g. 200h_af32pct_4hua_4hun_5hs_3fs_3pl_7afc_7sd_seed7 ('No data' minutes left out, as availability.py)."""
+    st = syn["plant_stage"][syn["plant_stage"] != "No data"]
+    n = st[st.ne(st.shift())].value_counts()
+    runs = "_".join(f"{n[k]}{c}" for k, c in CODES if n.get(k, 0))
+    return f"{round(len(syn) / 60)}h_af{round(100 * st.isin(AVAILABLE).mean())}pct_{runs}_seed{seed}"
+
+
+def day_folder(syn, seed, plan_dir=None):
+    """datasets/<day_name>/; the plan's folder (default datasets/seed_<seed>/) is renamed to it, so plan and data stay together."""
+    out = pg.OUT / day_name(syn, seed)
+    plan_dir = Path(plan_dir) if plan_dir else pg.day_dir(seed)
+    if plan_dir.resolve() != out.resolve() and plan_dir.parent.resolve() == pg.OUT.resolve() and plan_dir.exists() and not out.exists():
+        plan_dir.rename(out)
+    out.mkdir(parents=True, exist_ok=True)
+    return out
+
 
 HOLD = {"Hot standby", "Idle"}
 CHAIN = {"Shut-down"}
@@ -504,7 +529,7 @@ def main():
         sys.exit("give --pattern FILE or --hours and --count")
 
     syn, used = fill(pat, seed, Library(real_minutes(a.rebuild_cache)))
-    out = Path(a.out) if a.out else pg.OUT / f"synthetic_{name}.parquet"
+    out = Path(a.out) if a.out else day_folder(syn, name, Path(a.pattern).parent if a.pattern else None) / f"synthetic_{name}.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)
     syn.to_parquet(out)
     used.to_csv(out.with_name(out.stem + "_blocks.csv"), index=False)

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SOFC Twin Dataset v2.5</title>
+<title>SOFC Twin Dataset v2.6</title>
 <meta name="description" content="Make minute by minute SOFC plant datasets from the 2D twin for a chosen duration, availability and stage counts.">
 <meta name="theme-color" content="#121519">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23181818'/%3E%3Crect x='7' y='18' width='4' height='7' rx='1' fill='%23E8B04A'/%3E%3Crect x='14' y='9' width='4' height='16' rx='1' fill='%232E8B57'/%3E%3Crect x='21' y='13' width='4' height='12' rx='1' fill='%23B4472B'/%3E%3C/svg%3E">
@@ -156,7 +156,7 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:
 <header class="bar">
   <div class="brand">
     <div class="mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="1" y="10" width="4" height="7" rx="1" fill="#E8B04A"/><rect x="7" y="2" width="4" height="15" rx="1" fill="#2E8B57"/><rect x="13" y="6" width="4" height="11" rx="1" fill="#B4472B"/></svg></div>
-    <div><p class="title-2">SOFC twin dataset v2.5</p><p class="caption-5">Minute by minute plant data from the 2D twin</p></div>
+    <div><p class="title-2">SOFC twin dataset v2.6</p><p class="caption-5">Minute by minute plant data from the 2D twin</p></div>
   </div>
   <button class="icon" id="theme" type="button" aria-label="Switch between light and dark" title="Light or dark"><i class="ph ph-circle-half" aria-hidden="true"></i></button>
 </header>
@@ -307,7 +307,7 @@ function render(c){
   const order=Object.keys(COLOR).filter(k=>mins[k]);
   const avOk=Math.abs(s.availability_pct-s.availability_target_pct)<0.005;
   $("view").innerHTML=`
-  <div class="head rise"><div><p class="caption-3">Dataset</p><h1 class="heading-6">${esc(c.name)}</h1><p class="caption-5">${esc(s.period)} · ${fmt(tot)} minutes · one row per minute, 114 sensors</p></div>
+  <div class="head rise"><div><p class="caption-3">Dataset</p><h1 class="heading-6">${esc(c.name)}</h1><p class="caption-5">${esc(s.period)} · ${fmt(tot)} minutes · one row per minute, ${s.sensors??114} sensors</p></div>
     <div class="dl">${[["sofc_twin_dataset.csv.gz","Data (csv.gz)","ph-download-simple"],["events.csv","Stage changes","ph-list-bullets"],["summary.json","Summary","ph-file-text"]]
       .map(([f,l,i])=>`<a class="btn" href="/download?name=${encodeURIComponent(c.name)}&file=${f}" download><i class="ph ${i}" aria-hidden="true"></i>${l}</a>`).join("")}</div></div>
   <div class="tiles rise">
@@ -316,6 +316,7 @@ function render(c){
     ${s.rated_powers?`<div class="tile"><span class="caption-3">Rated powers</span><span class="v">${s.rated_powers}</span><span class="caption-5">${s.rated_hours} h each, stack up to ${Math.round(s.rated_stack_max_C)} °C</span></div>`:""}
     <div class="tile"><span class="caption-3">Hot standbys</span><span class="v">${s.hot_standbys}</span><span class="caption-5">${(((mins["Hot standby"]||0))/1440).toFixed(1)} days in total</span></div>
     <div class="tile"><span class="caption-3">Cold shutdowns</span><span class="v">${s.cold_shutdowns}</span><span class="caption-5">plus the final shutdown</span></div>
+    ${s.eta_part_load_pct!=null?`<div class="tile"><span class="caption-3">Efficiency</span><span class="v">${s.eta_part_load_pct}<small>%</small></span><span class="caption-5">Median in part load${s.eta_rated_pct!=null?`, ${s.eta_rated_pct} % at rated power`:""} (gross DC)</span></div>`:""}
     <div class="tile"><span class="caption-3">Trips</span><span class="v">${s.trips}</span><span class="caption-5">Start up ${fmt(s.startup_min)} min</span></div>
   </div>
   <section class="card rise" aria-label="Stage and stack temperature over time">

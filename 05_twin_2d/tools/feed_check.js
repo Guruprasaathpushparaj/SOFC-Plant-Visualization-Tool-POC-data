@@ -1,4 +1,4 @@
-// Self-check of the app's data viewer (app.js "data viewer"), run headless in Node like 04_synthetic_data/twin_6month.js.
+// Self-check of the app's data viewer (app.js "data viewer"), run headless in Node like 04_synthetic_data/twin_dataset.js.
 // 1 Data file: the generated 6-month .csv.gz → one row per minute, stage minutes = summary.json.
 // 2 Data file: one plant logger day file (1 Hz, tab, decimal comma) → ≤ 1440 rows, stack T from the TCs, stages by the twin rules.
 // Run: node 05_twin_2d/tools/feed_check.js [logger day file, default 02_data/common/20260330.txt]
@@ -20,7 +20,7 @@ const count=rows=>rows.reduce((m,r)=>(m[r.st]=(m[r.st]||0)+1,m),{});
 
 (async()=>{
   // 1 generated 6-month data
-  const gen=path.join(ROOT,"04_synthetic_data/twin_6month/sofc_twin_6month.csv.gz"), sum=JSON.parse(fs.readFileSync(path.join(path.dirname(gen),"summary.json")));
+  const gen=path.join(ROOT,"04_synthetic_data/datasets/twin_181d_85pct_4pl_1cs_4rp4h/sofc_twin_dataset.csv.gz"), sum=JSON.parse(fs.readFileSync(path.join(path.dirname(gen),"summary.json")));
   const g=await fileRows(gen);
   assert(g.length===sum.minutes,`6-month file: ${g.length} rows = ${sum.minutes} minutes`);
   const key=o=>JSON.stringify(Object.entries(o).sort());
@@ -35,6 +35,10 @@ const count=rows=>rows.reduce((m,r)=>(m[r.st]=(m[r.st]||0)+1,m),{});
   assert(r.length>1300 && r.length<=1440,`logger file ${path.basename(day)}: ${r.length} minute rows`);
   assert(Math.min(...Ts)>0 && Math.max(...Ts)<900,`logger file: stack T (median TC) ${Math.min(...Ts).toFixed(0)}–${Math.max(...Ts).toFixed(0)} °C`);
   console.log("    stages:",JSON.stringify(count(r)));
+  const E=["eta_module_pct",...[1,2,3,4,5].map(k=>`eta_string${k}_pct`)].map(c=>IDX.get(c)), pl=r.filter(x=>x.st==="Part load"&&x.v[E[0]]===x.v[E[0]]);
+  const em=pl.map(x=>x.v[E[0]]).sort((p,q)=>p-q), mean5=x=>E.slice(1).reduce((s,i)=>s+x.v[i],0)/5;
+  assert(!pl.length||(em[0]>=0&&em.at(-1)<60&&pl.every(x=>Math.abs(mean5(x)-x.v[E[0]])<0.01)),
+    `logger file: efficiency in part load ${pl.length?em[0].toFixed(1)+"–"+em.at(-1).toFixed(1)+" %, median "+em[em.length>>1].toFixed(1):"(no part load)"}; string mean = module`);
   leaveFeed();
 
   console.log("all checks passed");

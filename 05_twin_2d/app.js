@@ -407,10 +407,10 @@ part("stack","",g=>{ el("rect",{class:"sh",x:770,y:150,width:300,height:110,rx:6
 // DC/DC converters: one box per string (4.1–4.5) with current, voltage and P = V × I.
 part("dcdc","",g=>{ el("text",{x:772,y:72,"text-anchor":"end",class:"t"},g,"DC/DC"); el("text",{x:772,y:86,"text-anchor":"end",class:"m"},g,"per string"); live.dcdc=[];
   for(let i=0;i<5;i++){ const x=780.5+i*57, cx=x+26.5; box(g,x,40,53,71); el("text",{x:cx,y:53,"text-anchor":"middle","font-size":"10","font-weight":"600"},g,`4.${i+1}`);
-    live.dcdc.push([66,80,94].map(y=>el("text",{x:cx,y,"text-anchor":"middle",class:"v","font-size":"9.5"},g,""))); } });
+    live.dcdc.push([64,76,88,100].map(y=>el("text",{x:cx,y,"text-anchor":"middle",class:"v","font-size":"9.5"},g,""))); } });
 // Load bank: the combined output on the bus (calculated sensors Σ P, Σ I, V).
 part("load","",g=>{ box(g,1085,13,100,98); el("text",{x:1135,y:30,"text-anchor":"middle","font-size":"10","font-weight":"600"},g,"Load bank");
-  live.load=[55,75,95].map(y=>el("text",{x:1135,y,"text-anchor":"middle",class:"v"},g,"")); });
+  live.load=[48,66,84,102].map(y=>el("text",{x:1135,y,"text-anchor":"middle",class:"v"},g,"")); });
 
 document.getElementById("fluidLegend").innerHTML=[["--air","Cathode air"],["--pox","POx air"],["--h2","H₂"],["--n2","N₂"],["--ng","Natural gas"],["--fuel","Fuel / off gas"],["--flue","Flue gas"],["--elec","Power"],["--heat","Heater on"]]
   .map(([c,n])=>`<span><i style="background:var(${c})"></i>${n}</span>`).join("");
@@ -420,16 +420,24 @@ const KNOB={"ct_FIRC_111_PV_ProcessValue":s=>s.air/2,"ct_FIRC_112_PV_ProcessValu
   "ct_FIRC_13_PV_ProcessValue":s=>s.n2,"ct_FIRC_14_PV_ProcessValue":s=>s.ng,"ct_FIRC_15_PV_ProcessValue":s=>s.h2,"T_stack_C":s=>s.T};
 // EAPH box: model values (A outlet = air-in, D inlet = recuperator air, B power from the air heat), not the per-stage table
 const STR=[1,2,3,4,5].map(n=>[`PLC_hostSetp_ctrl_ctEIRC4${n}_rCurrMonitor`,`PLC_hostSetp_ctrl_ctEIRC4${n}_rVoltMonitor`]);
+// Gross DC efficiency (03_data_analysis/scripts/efficiency_check.py): DC power ÷ gas energy. FIRC 1,4 is logged as pure CH4
+// (PLC_pv_rM_CH4 = 0.042943 kg/h per ln/min), LHV 50 MJ/kg. No gas while heating up → no value.
+// shortcut: one gas meter only, so a string gets 1/5 of the gas (as the PLC rFU_Worst tags): ranks strings, not a measured split.
+const FUEL_KW=0.042943/3600*50000, eta=(P,ng,share=1)=>ng>1? P/(ng*FUEL_KW/share)*100: null;
 const sumI=()=>STR.reduce((a,[i])=>a+(val(i)??0),0), sumP=()=>STR.reduce((a,[i,u])=>a+(val(i)??0)*(val(u)??0),0);
 const CALC={"TIRC_2_06":s=>s.Tin,"TIR_2_05":eaphIn,"EIRC_2_01_ActV_In_ThreePhasePower":eaphPower,
   P_total_kW:()=>sumP()/1000, I_total_A:sumI,
   // shortcut: no bus voltage is logged, so V is the current-weighted string voltage (keeps Σ P = V × Σ I); use the real bus voltage if one is found
-  V_total_V:()=>{ const I=sumI(); return I>0? sumP()/I: STR.reduce((a,[,u])=>a+(val(u)??0),0)/5; }};
+  V_total_V:()=>{ const I=sumI(); return I>0? sumP()/I: STR.reduce((a,[,u])=>a+(val(u)??0),0)/5; },
+  eta_module_pct:()=>eta(sumP()/1000,val("ct_FIRC_14_PV_ProcessValue"))};
+STR.forEach(([i,u],k)=>CALC[`eta_string${k+1}_pct`]=()=>eta((val(i)??0)*(val(u)??0)/1000,val("ct_FIRC_14_PV_ProcessValue"),5));
 // Per-string rows (plant tags) → DC/DC part; the load bank keeps only the three twin-made totals (no plant tag, no plant range).
-DATA.components.dcdc=DATA.components.load;
+DATA.components.dcdc=[...DATA.components.load,...[1,2,3,4,5].map(k=>({tag:`η 4.${k}`,col:`eta_string${k}_pct`,
+  desc:`String 4.${k} gross DC efficiency (V × I ÷ ⅕ of the gas energy; equal gas split assumed, one gas meter)`,unit:"%",fits:{}}))];
 DATA.components.load=[{tag:"Σ P",col:"P_total_kW",desc:"Load bank total power (Σ V × I, 5 strings)",unit:"kW",fits:{}},
   {tag:"Σ I",col:"I_total_A",desc:"Load bank total current (sum of the 5 string currents)",unit:"A",fits:{}},
-  {tag:"V",col:"V_total_V",desc:"Load bank voltage (Σ P ÷ Σ I; mean string voltage at 0 A)",unit:"V",fits:{}}];
+  {tag:"V",col:"V_total_V",desc:"Load bank voltage (Σ P ÷ Σ I; mean string voltage at 0 A)",unit:"V",fits:{}},
+  {tag:"η",col:"eta_module_pct",desc:"Module gross DC efficiency (Σ P ÷ gas energy, FIRC 1.4 as CH4, LHV 50 MJ/kg; blower and heaters not subtracted)",unit:"%",fits:{}}];
 Object.assign(KNOB,CALC);
 for(let i=1;i<=5;i++) KNOB[`PLC_hostSetp_ctrl_ctEIRC4${i}_rCurrMonitor`]=s=>loadOn(s)?s.I:0;
 const TRIP={"TIRZ_8_1_1":1050,"TIRZ_8_1_3":720,"TIRZ_8_1_9":930,"TIRZ_8_1_10":300,"TIRZ_8_2_1":950,"TIRZ_8_2_2":950,"TIRZ_8_2_3":950,"TIRZ_8_2_4":950,"TIRZ_8_2_5":860};
@@ -828,10 +836,11 @@ function render(){
   const v=(c)=>{const x=val(c); return x==null?"–":Math.round(x);};
   live.eaph.textContent=`${v("TIRC_2_06")} °C`; live.erh.textContent=`${v("TIRC_5_17")} °C`; live.eagh.textContent=`${v("TIRC_3_1_1")} °C`;
   live.tox.textContent=`${v("TIRC_5_09")} °C`; live.eaoh.textContent=`${v("TIRC_6_1_1")} °C`;
-  live.dcdc.forEach(([tI,tV,tP],k)=>{ const I=val(STR[k][0])??0, V=val(STR[k][1])??0;
-    tI.textContent=`${I.toFixed(1)} A`; tV.textContent=`${Math.round(V)} V`; tP.textContent=`${(V*I/1000).toFixed(2)} kW`; });
-  const [lP,lV,lI]=live.load;
-  lP.textContent=`${(val("P_total_kW")??0).toFixed(1)} kW`; lV.textContent=`${Math.round(val("V_total_V")??0)} V`; lI.textContent=`${(val("I_total_A")??0).toFixed(1)} A`;
+  const pct=c=>{ const x=val(c); return x==null?"η –":`η ${x.toFixed(1)} %`; };
+  live.dcdc.forEach(([tI,tV,tP,tE],k)=>{ const I=val(STR[k][0])??0, V=val(STR[k][1])??0;
+    tI.textContent=`${I.toFixed(1)} A`; tV.textContent=`${Math.round(V)} V`; tP.textContent=`${(V*I/1000).toFixed(2)} kW`; tE.textContent=pct(`eta_string${k+1}_pct`); });
+  const [lP,lV,lI,lE]=live.load;
+  lP.textContent=`${(val("P_total_kW")??0).toFixed(1)} kW`; lV.textContent=`${Math.round(val("V_total_V")??0)} V`; lI.textContent=`${(val("I_total_A")??0).toFixed(1)} A`; lE.textContent=pct("eta_module_pct");
   KN.forEach(([k,,,,,,u])=>{ const i=$("k_"+k); i.value=S[k]; $("v_"+k).textContent=`${k==="I"?S[k].toFixed(1):Math.round(S[k])} ${u}`; });
   const rOk=canRestart(S), sOk=canStart(S)||rOk, sb=$("startBtn");
   sb.setAttribute("aria-disabled",sOk?"false":"true");
@@ -949,12 +958,13 @@ $("play").onclick=()=>{ running=!running; $("play").textContent=running?"Pause":
 
 // ---------- data viewer: a data file (2026-11-06) ----------
 // Source "Data file": one CSV (or .csv.gz) with the twin's column names, e.g. this app's Save data file or
-// 04_synthetic_data/twin_6month/sofc_twin_6month.csv.gz, or a plant logger day file (YYYYMMDD.txt: tab, decimal comma, 1 Hz).
+// 04_synthetic_data/datasets/twin_181d_85pct_4pl_1cs_4rp4h/sofc_twin_dataset.csv.gz, or a plant logger day file (YYYYMMDD.txt: tab, decimal comma, 1 Hz).
 // One row per minute (first sample of each minute). The rows take the place of the simulated minutes, so the drawing,
 // readings, plots, trends and Save data all show them; knobs, playbook and stage bar are locked meanwhile.
 const KEEP_MIN=2880, DEC=new TextDecoder();
 const COL=n=>IDX.get(n), FLOW=n=>COL(`ct_FIRC_${n}_PV_ProcessValue`), Z=x=>x===x?x:0;
-const I_STACK=COL("T_stack_C"), I_EAPH=COL("EIRC_2_01_ActV_In_ThreePhasePower"), I_TIN=COL("TIRC_2_06"), TOT=["P_total_kW","I_total_A","V_total_V"].map(COL);
+const I_STACK=COL("T_stack_C"), I_EAPH=COL("EIRC_2_01_ActV_In_ThreePhasePower"), I_TIN=COL("TIRC_2_06"), TOT=["P_total_kW","I_total_A","V_total_V"].map(COL),
+  ETA=["eta_module_pct",...[1,2,3,4,5].map(k=>`eta_string${k}_pct`)].map(COL);
 const HEAT_I=["pi_IIR_5_1_3_ActVal","pi_IIR_3_1_1_ActVal"].map(COL);
 // a row in the twin's state fields, so stage(), the flow lines and the knob read-outs work unchanged
 function rowState(v){
@@ -995,6 +1005,8 @@ function rowParser(){
       if(n) v[I_STACK]=n%2? T[n>>1]: (T[n/2-1]+T[n/2])/2; }
     if(v[TOT[0]]!==v[TOT[0]]){ const p=PW_IDX.reduce((s,[i,u])=>s+Z(v[i])*Z(v[u]),0), I=PW_IDX.reduce((s,[i])=>s+Z(v[i]),0);
       v[TOT[0]]=p/1000; v[TOT[1]]=I; v[TOT[2]]=I>0? p/I: PW_IDX.reduce((s,[,u])=>s+Z(v[u]),0)/5; }
+    if(v[ETA[0]]!==v[ETA[0]]){ const ng=v[FLOW(14)];
+      v[ETA[0]]=eta(Z(v[TOT[0]]),ng)??NaN; PW_IDX.forEach(([i,u],k)=>v[ETA[k+1]]=eta(Z(v[i])*Z(v[u])/1000,ng,5)??NaN); }
     const T=v[I_STACK]; back.push(T); if(back.length>11) back.shift();
     const dT=back.length>1&&T===T&&back[0]===back[0]? (T-back[0])*60/(back.length-1): 0;   // °C/h over the last 10 rows
     // stage: the file's plant_stage, else the twin's own stage rules on the row (no trip purge: trips are not in the row)

@@ -44,7 +44,7 @@ Options:
     --bounds "Part load=0.2-1.5"  override the min-max length (hours) of a stage
     --seed N                      same seed -> same pattern
     --start-time "2026-01-01 00:00"
-    --out FILE.csv                default library/../patterns/pattern_<seed>.csv
+    --out FILE.csv                default datasets/seed_<seed>/pattern_<seed>.csv
     --plot                        also save a timeline PNG next to the CSV
 
 Writes one row per stage block: seq, step, stage, sub_stage, start, end, duration_h,
@@ -73,7 +73,12 @@ from operating_states import (AIR_FLOW_ON, DT_AMBIENT, GAS_BLIP_MIN, PH_FORMING,
 LIB = HERE / "library" / "episodes.csv"
 TRACES = HERE / "library" / "traces_1min.parquet"
 SENSORS = HERE / "library" / "sensors_1min.parquet"   # pattern_filler.real_minutes() cache
-OUT = HERE / "patterns"
+OUT = HERE / "datasets"
+
+
+def day_dir(seed):
+    """plan folder of a made-up day; pattern_filler.day_folder renames it by availability + stage counts once filled"""
+    return OUT / f"seed_{seed}"
 SD = "Shut-down"
 SD_COOL, SD_AMB = "Shut-down (Cooling)", "Shut-down (At ambient)"
 SUB = {SD_COOL: SD_COOLING, SD_AMB: SD_AMBIENT}       # step -> sub_stage label
@@ -709,7 +714,7 @@ def main():
     except ValueError as err:
         sys.exit(str(err))
 
-    out = Path(a.out) if a.out else OUT / f"pattern_{seed}.csv"
+    out = Path(a.out) if a.out else day_dir(seed) / f"pattern_{seed}.csv"
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out, index=False)
     ph = phase_table(df)

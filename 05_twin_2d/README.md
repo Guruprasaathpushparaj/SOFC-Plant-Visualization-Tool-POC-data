@@ -1,5 +1,12 @@
 # SOFC Plant Descriptive Twin (2D, local)
 
+**Version 3.5 (2026-11-09)** – efficiency readings (twin calculated sensors, also in Save data and generated datasets):
+**η** on the load bank = Σ P ÷ gas energy (FIRC 1.4 as pure CH4, 0.042943 kg/h per ln/min, LHV 50 MJ/kg; gross DC, blower
+and heaters not subtracted), **η 4.1–4.5** on each DC/DC box = string V × I ÷ ⅕ of the gas energy. There is one gas meter, so
+each string is given an equal fifth of the gas (as the PLC `rFU_Worst` tags): the string values rank the strings, they are not
+a measured split. No gas (heat up, cooling, shutdown) → no value. Same formula as `03_data_analysis/scripts/efficiency_check.py`;
+plant 2026-03-25 part load 3.5–35.4 % (median 25.7 %), twin part load ≈18 %, rated power (52 kW, NG 180 ln/min) ≈48 %.
+
 **Version 3.3 (2026-11-06)** – rated power is now **30 A per string** (52.0 kW on the string V–I lines; was 40.18 A = 60 kW).
 Rated readings, natural gas (180 ln/min) and POx (202 ln/min) come from the extrapolation's rated point (`use_rated` at
 52 kW in `03_data_analysis/rated_power/sensor_extrapolation.csv`, refreshed with `python tools/prep.py --rated-only`).
@@ -67,7 +74,7 @@ and clickable parts that show their sensor readings.
 
 - **Twin**: the simulation (default).
 - **Data file…**: open a CSV or `.csv.gz` with one row per minute and the twin's column names, e.g.
-  `04_synthetic_data/twin_6month/sofc_twin_6month.csv.gz` (6 months), a **Save data** file, or a plant logger
+  `04_synthetic_data/datasets/twin_181d_85pct_4pl_1cs_4rp4h/sofc_twin_dataset.csv.gz` (6 months), a **Save data** file, or a plant logger
   day file (`02_data/common/YYYYMMDD.txt`). Play / speed (up to 1 day per s) run through it, the slider next to the
   clock jumps anywhere. Stage = the file's `plant_stage` column, else the twin's stage rules on that row.
 Knobs, playbook and stage bar are locked while a file is shown; **Twin** brings the simulation back

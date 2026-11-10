@@ -1,0 +1,61 @@
+FAIL 19 05_twin_2d\index.html:46 dash "–" in copy | fix: A comma, a colon, a full stop or parentheses; never a dash
+FAIL 34 05_twin_2d\style.css:1 no overflow-x: clip on html and body | fix: overflow-x: clip on both html and body
+FAIL 39a 05_twin_2d\style.css:112 disabled via opacity alone on input[type=range]:disabled | fix: Three disabled channels: fill, ink and cursor, plus the disabled attribute
+FAIL 48 05_twin_2d\style.css:33 colour literal #fff outside tokens (color on button.start) | fix: Lift the value into the token block
+FAIL 48 05_twin_2d\style.css:35 colour literal #fff outside tokens (color on button.estop) | fix: Lift the value into the token block
+FAIL 48 05_twin_2d\style.css:37 colour literal #fff outside tokens (color on #play) | fix: Lift the value into the token block
+FAIL 48 05_twin_2d\style.css:116 colour literal rgb(0 0 0 / .25) outside tokens (box-shadow on .seg button[aria-pressed="tru…) | fix: Lift the value into the token block
+FAIL 48 05_twin_2d\style.css:141 colour literal #fff outside tokens (color on .stages button[aria-current="…) | fix: Lift the value into the token block
+FAIL 48 05_twin_2d\style.css:142 colour literal #fff outside tokens (color on .stages button[aria-current="…) | fix: Lift the value into the token block
+FAIL 48 05_twin_2d\style.css:179 colour literal #fff outside tokens (color on .gchips button[aria-pressed="…) | fix: Lift the value into the token block
+FAIL 67 05_twin_2d\style.css:49 .lbl: uppercase tracked 0.06em at 11px in a label role | fix: Labels, captions, table heads, nav links and meta are the body face (or the theme's label face), a step smaller, sentence case, untracked
+FAIL 67 05_twin_2d\style.css:67 svg .zl: uppercase tracked 0.06em at 12px in a label role | fix: Labels, captions, table heads, nav links and meta are the body face (or the theme's label face), a step smaller, sentence case, untracked
+FAIL 67 05_twin_2d\style.css:162 .btab th: uppercase tracked 0.04em at 11px in a label role | fix: Labels, captions, table heads, nav links and meta are the body face (or the theme's label face), a step smaller, sentence case, untracked
+REFLEX 24b 05_twin_2d\style.css:20 padding-block: 6px 24px (off the 4px scale) on .wrap | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:20 padding-left: max(6px,env(safe-area-inset… (off the 4px scale) on .wrap | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:20 padding-right: max(6px,env(safe-area-inset… (off the 4px scale) on .wrap | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:20 gap: 6px (off the 4px scale) on .wrap | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:21 padding: 8px 14px (off the 4px scale) on header | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:25 gap: 6px (off the 4px scale) on .bar | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:26 padding: 5px 10px (off the 4px scale) on .clock | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:27 padding: 6px 12px (off the 4px scale) on button,select | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:41 padding: 12px 14px (off the 4px scale) on .panel | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:49 margin: 0 0 6px (off the 4px scale) on .lbl | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:57 gap: 3px (off the 4px scale) on .checks | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:59 margin-top: 6px (off the 4px scale) on .checks li b | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:62 gap: 6px (off the 4px scale) on .top | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:88 margin: 2px 0 10px (off the 4px scale) on .read .desc | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:89 margin: 0 -14px (off the 4px scale) on .rows | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:90 gap: 2px 10px (off the 4px scale) on .rows li | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:90 padding: 7px 14px (off the 4px scale) on .rows li | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:95 margin-left: 3px (off the 4px scale) on .rows .val small | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:96 margin-top: 5px (off the 4px scale) on .rng | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:101 margin-top: 10px (off the 4px scale) on .src-note | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:109 margin-right: 6px (off the 4px scale) on .row .hd i | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:114 padding: 4px 6px (off the 4px scale) on .seg button | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:117 gap: 6px (off the 4px scale) on .scen | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:118 margin: 6px 0 0 (off the 4px scale) on .scenlbl | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:120 gap: 6px 14px (off the 4px scale) on .legend | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:121 gap: 6px (off the 4px scale) on .legend span | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:125 gap: 4px 14px (off the 4px scale) on .fl | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:126 gap: 6px (off the 4px scale) on .fl span | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:129 padding: 6px 16px (off the 4px scale) on .stagerow>.start | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:133 gap: 6px 4px (off the 4px scale) on .stages | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:136 margin: 0 6px (off the 4px scale) on .stages .sep | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:137 gap: 7px (off the 4px scale) on .stages button | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:137 padding: 5px 10px (off the 4px scale) on .stages button | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:144 gap: 6px (off the 4px scale) on .side | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:150 gap: 6px (off the 4px scale) on .main | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:160 padding: 6px 8px (off the 4px scale) on .btab th,.btab td | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:167 margin-top: 10px (off the 4px scale) on .ball | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:168 margin-top: 6px (off the 4px scale) on .ball .btab | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:177 margin: 0 0 10px (off the 4px scale) on .gchips | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:178 padding: 4px 10px (off the 4px scale) on .gchips button | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:180 margin: 0 0 6px (off the 4px scale) on .psum | fix: Use the 4px spacing scale
+REFLEX 24b 05_twin_2d\style.css:181 padding: 12px 14px 6px (off the 4px scale) on .rows li.grp | fix: Use the 4px spacing scale
+REFLEX 26b 05_twin_2d\style.css:1 no :active styling anywhere | fix: All eight states; guard: not a form control, no aria-disabled anywhere
+WARN 40 05_twin_2d\style.css:33 3.57:1 < 4.5:1 on button.start | fix: Raise the contrast to threshold
+WARN 40 05_twin_2d\style.css:35 3.90:1 < 4.5:1 on button.estop | fix: Raise the contrast to threshold
+WARN F1 05_twin_2d\index.html:125 straight quote in prose x1 (first: evel at the plant's pace. Plot u) | fix: Use typographic quotes: “ ” ’
+WARN F3 05_twin_2d\style.css:22 no text-wrap: balance on any display head (4 head rule(s), e.g. h1) | fix: Add text-wrap: balance to h1/h2-level heads
+WARN F23 05_twin_2d\index.html:1 the document lacks a meta description | fix: Name the language, title the page in its own words, and describe it in one sentence for link previews

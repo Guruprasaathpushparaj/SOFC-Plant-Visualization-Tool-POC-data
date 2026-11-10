@@ -12,7 +12,7 @@
 // beyond their minimum is split evenly over the cold shutdown stays and the final plant-off time.
 // Run:   node 04_synthetic_data/twin_dataset.js --days 181 --availability 95 --part-loads 5 --hot-standbys 7 --cold-shutdowns 1
 //          [--rated-powers 0] [--rated-hours 4] [--start 2027-01-01] [--out folder] [--check]
-//        → 04_synthetic_data/twin_<days>d_<avail>pct_<P>pl_<C>cs[_<R>rp<h>h]/ (sofc_twin_dataset.csv.gz, events.csv, summary.json, preview.json)
+//        → 04_synthetic_data/datasets/twin_<days>d_<avail>pct_<P>pl_<C>cs[_<R>rp<h>h]/ (sofc_twin_dataset.csv.gz, events.csv, summary.json, preview.json)
 // --check: only validate the inputs and print "@plan {...}" (used by the app). Progress lines "@progress f", result "@done {...}".
 // Needs Node.js and the sibling folder 05_twin_2d (app.js, data/sensors.js, data/bends.js). Nothing else.
 const fs=require("fs"), path=require("path"), vm=require("vm"), zlib=require("zlib"), {parseArgs}=require("util");
@@ -48,7 +48,7 @@ const minDays=Math.ceil(DOWN_MIN/(1-AVAIL/100)/DAY), maxAvail=Math.floor(10000*(
 if(DOWN<DOWN_MIN) stop(`${AVAIL} % of ${DAYS} days leaves ${DOWN.toLocaleString("en")} not available minutes, but start up, ${C} cold shutdown${C===1?"":"s"} and the final shutdown need about ${DOWN_MIN.toLocaleString("en")}. `
   +`Use availability up to ${maxAvail} %, at least ${minDays} days, or fewer cold shutdowns.`);
 if(DUR.some((m,i)=>W[SEQ[i]]&&m<MIN_SEG)) stop(`${AVAIL} % of ${DAYS} days leaves ${AV.toLocaleString("en")} available minutes for ${P+H} part load and hot standby blocks${R?` and ${R} rated power${R===1?"":"s"} of ${RP_MIN.toLocaleString("en")} min`:""}: some would be under ${MIN_SEG} minutes. Use more days or fewer blocks.`);
-const OUT=path.resolve(__dirname,arg.out||`twin_${DAYS}d_${AVAIL}pct_${P}pl_${C}cs`+(R?`_${R}rp${RH}h`:""));
+const OUT=path.resolve(__dirname,"datasets",arg.out||`twin_${DAYS}d_${AVAIL}pct_${P}pl_${C}cs`+(R?`_${R}rp${RH}h`:""));
 const plan={order:SEQ,folder:path.basename(OUT),minutes:N,available_min:AV,not_available_min:DOWN,min_days:minDays,max_availability_pct:maxAvail,
   start:new Date(START).toISOString().slice(0,10),end:new Date(END).toISOString().slice(0,16).replace("T"," ")};
 if(arg.check){ console.log("@plan "+JSON.stringify(plan)); process.exit(0); }
@@ -79,15 +79,16 @@ const press={
 // ---- record ----
 fs.mkdirSync(OUT,{recursive:true});
 const CSV=path.join(OUT,"sofc_twin_dataset.csv.gz");
-const cols=[...IDX], gz=zlib.createGzip(), file=fs.createWriteStream(CSV), I_P=cols.findIndex(([c])=>c==="P_total_kW");
+const cols=[...IDX], gz=zlib.createGzip(), file=fs.createWriteStream(CSV), I_P=cols.findIndex(([c])=>c==="P_total_kW"), I_ETA=IDX.get("eta_module_pct");
 gz.pipe(file);
 gz.write("timestamp,minute,plant_stage,"+cols.map(([c])=>c).join(",")+"\n");
-const stMin={}, events=[], hourly=[], STEP=Math.max(1,Math.ceil(N/400)); let rec=0, last=null, rpMax=-Infinity;
+const stMin={}, events=[], hourly=[], STEP=Math.max(1,Math.ceil(N/400)); let rec=0, last=null, rpMax=-Infinity; const ETA={"Part load":[],"Rated power":[]};
 function minute(){
   tick(1);
   const h=S.hist[S.hist.length-1], st=h.st;
   gz.write([new Date(START+rec*60000).toISOString().slice(0,16).replace("T"," "),rec,`"${st}"`,...cols.map(([,i])=>isNaN(h.v[i])?"":+h.v[i].toFixed(3))].join(",")+"\n");
   stMin[st]=(stMin[st]||0)+1; if(st==="Rated power") rpMax=Math.max(rpMax,S.T);
+  if(ETA[st]&&h.v[I_ETA]===h.v[I_ETA]) ETA[st].push(h.v[I_ETA]);
   if(st!==last){ events.push({minute:rec,time:new Date(START+rec*60000).toISOString().slice(0,16).replace("T"," "),stage:st,stack_C:+S.T.toFixed(1)}); last=st; }
   if(rec%60===0) hourly.push([rec,+S.T.toFixed(1),+(h.v[cols[I_P][1]]||0).toFixed(2)]);
   if(rec%STEP===0) console.log("@progress "+(rec/N).toFixed(4));
@@ -116,11 +117,13 @@ if(stage(S)!=="Shutdown") fail(`The final shutdown did not reach plant off (air 
 gz.end();
 
 // ---- self-check ----
+const med=a=>{ if(!a.length) return null; a.sort((p,q)=>p-q); return +a[a.length>>1].toFixed(1); };
 const visits=st=>events.filter(e=>e.stage===st).length;
 const summary={period:`${new Date(START).toISOString().slice(0,16).replace("T"," ")} to ${new Date(END).toISOString().slice(0,16).replace("T"," ")}`,days:DAYS,minutes:rec,
   availability_target_pct:AVAIL,availability_pct:+(100*availNow()/rec).toFixed(3),order:SEQ.join(" "),minutes_per_stage:stMin,
   part_loads:visits("Part load"),rated_powers:visits("Rated power"),rated_hours:R?RH:0,
-  rated_stack_max_C:R?+rpMax.toFixed(1):null,hot_standbys:visits(HS),cold_shutdowns:C,shutdowns:visits("Shutdown"),trips:visits("Trip: purge"),
+  rated_stack_max_C:R?+rpMax.toFixed(1):null,
+  eta_part_load_pct:med(ETA["Part load"]),eta_rated_pct:med(ETA["Rated power"]),sensors:cols.length,hot_standbys:visits(HS),cold_shutdowns:C,shutdowns:visits("Shutdown"),trips:visits("Trip: purge"),
   first_stage:events[0].stage,last_stage:events[events.length-1].stage,startup_min:heatup,folder:path.basename(OUT)};
 const assert=(c,m)=>{ if(!c) fail("Self check failed: "+m+"\n"+JSON.stringify(summary,null,1)); };
 assert(rec===N,"length"); assert(availNow()===AV,`available minutes ${availNow()} vs ${AV}`);

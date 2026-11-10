@@ -1,0 +1,110 @@
+{
+ "v": 1,
+ "at": "2026-11-06T15:26:03.473Z",
+ "scope": "app",
+ "summary": {
+  "fails": 4,
+  "reflex": 1,
+  "warns": 1
+ },
+ "files": {
+  "04_synthetic_data\\dataset_app\\index.html": {
+   "handlers": [],
+   "links": [
+    "#result",
+    "/download?name=${encodeURIComponent(c.name)}&file=${f}"
+   ],
+   "fields": [
+    "+encodeURIComponent(name)).then(r=>r.json());\n  current={name,summary:d.summary,...p};\n  $("
+   ],
+   "hooks": [],
+   "ids": [
+    "availability",
+    "chart",
+    "cs",
+    "cur",
+    "days",
+    "empty",
+    "facts",
+    "fixHs",
+    "form",
+    "formErr",
+    "go",
+    "hit",
+    "hs",
+    "pl",
+    "prog",
+    "progBar",
+    "progEta",
+    "progFill",
+    "progName",
+    "progPct",
+    "result",
+    "ro",
+    "saved",
+    "savedH",
+    "skel",
+    "start",
+    "story",
+    "theme",
+    "view"
+   ],
+   "scripts": [
+    "https://unpkg.com/@phosphor-icons/web@2.1.1"
+   ]
+  }
+ },
+ "wiring": {
+  "handlers": [],
+  "links": [
+   "#result",
+   "/download?name=${encodeURIComponent(c.name)}&file=${f}"
+  ],
+  "fields": [
+   "+encodeURIComponent(name)).then(r=>r.json());\n  current={name,summary:d.summary,...p};\n  $("
+  ],
+  "hooks": [],
+  "ids": [
+   "availability",
+   "chart",
+   "cs",
+   "cur",
+   "days",
+   "empty",
+   "facts",
+   "fixHs",
+   "form",
+   "formErr",
+   "go",
+   "hit",
+   "hs",
+   "pl",
+   "prog",
+   "progBar",
+   "progEta",
+   "progFill",
+   "progName",
+   "progPct",
+   "result",
+   "ro",
+   "saved",
+   "savedH",
+   "skel",
+   "start",
+   "story",
+   "theme",
+   "view"
+  ]
+ },
+ "scripts": {
+  "04_synthetic_data\\dataset_app\\index.html": {
+   "queried": [
+    "button",
+    "svg"
+   ],
+   "hooked": [],
+   "hides": true
+  }
+ },
+ "pages": {}
+}

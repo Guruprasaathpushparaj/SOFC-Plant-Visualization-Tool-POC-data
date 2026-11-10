@@ -3,6 +3,8 @@ No efficiency tag is logged. This computes:
   gross electrical efficiency = DC power (sum V x I of 5 strings) / fuel energy (PLC_pv_rM_CH4 kg/h x LHV)
   fuel utilisation            = current x 476 cells / (8 F x CH4 mol/s)   -> compared with PLC_pv_rFU_Worst_1..5
   after-heater efficiency     = (DC power - heater power) / fuel energy  (heater IIR current x 230 V assumed + EAPH power)
+  string efficiency           = string V x I / (fuel energy / 5)  -- one gas meter only, so each string is given 1/5 of the gas
+                                (same split as the PLC rFU_Worst tags): ranks the strings, not a measured per-string value
 Blower / inverter power is not logged.
 """
 import pandas as pd, glob, numpy as np, pyarrow.parquet as pq, sys
@@ -30,6 +32,8 @@ nCH4=on.PLC_pv_rM_CH4/3600*1000/16.04
 on["FU_calc"]=on[I].sum(axis=1)*NCELL/(8*F*nCH4)*100
 on["heat_kW"]=on[[c for c in H if c in on]].fillna(0).sum(axis=1)*230/1000+on[[c for c in E if c in on]].fillna(0).sum(axis=1)/1000
 on["eta_net"]=(on.P-on.heat_kW)/on.fuel_kW*100
+ETA=[f"eta_s{k+1}" for k in range(5)]
+for k in range(5): on[ETA[k]]=on[V[k]]*on[I[k]]/1000/(on.fuel_kW/5)*100
 on["Vcell"]=on[TV].median(axis=1)/NCELL
 print("rows (1 s each):",len(on))
 print(on.groupby(pd.cut(on.P,[3,10,15,20,25,30,35])).agg(n=("P","size"),eta=("eta","median"),eta_net=("eta_net","median"),heat=("heat_kW","median"),FU=("FU_calc","median"),FU_tag=(W[0],"median"),fuel=("fuel_kW","median"),Vcell=("Vcell","median")).round(2))
@@ -37,5 +41,7 @@ print(on.groupby("file").agg(n=("P","size"),P=("P","median"),Pmax=("P","max"),et
 for k in range(5):
     fu=on[I[k]]*NCELL/(8*F*nCH4/5)*100
     print(f"string {k+1}: FU calc {fu.median():.1f}  tag {on[W[k]].median():.1f}  r={fu.corr(on[W[k]]):.3f}  tag/calc={(on[W[k]]/fu).median():.3f}")
+print("string efficiency % (gas split 1/5 each) by power band:")
+print(on.groupby(pd.cut(on.P,[3,10,15,20,25,30,35]))[ETA].median().round(1))
 print("heater parts median kW:", (on[H].median()*230/1000).round(2).to_dict(), (on[E].median()/1000).round(2).to_dict())
-on[["file","P","fuel_kW","eta","eta_net","heat_kW","FU_calc"]+W+["Vcell"]].to_csv(OUT,index=False)
+on[["file","P","fuel_kW","eta","eta_net","heat_kW","FU_calc"]+W+ETA+["Vcell"]].to_csv(OUT,index=False)

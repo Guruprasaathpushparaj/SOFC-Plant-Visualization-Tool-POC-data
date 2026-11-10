@@ -402,13 +402,14 @@ with st.container(border=True):
     c2.download_button(f"All {len(pats)} patterns (CSV)", allp.to_csv(index=False),
                        f"patterns_{st.session_state.seed}_x{len(pats)}.csv", "text/csv",
                        width="stretch", icon=":material/download:")
-    if c3.button("Save to patterns/ folder", width="stretch", icon=":material/save:"):
-        pg.OUT.mkdir(parents=True, exist_ok=True)
+    if c3.button("Save to datasets/ folder", width="stretch", icon=":material/save:"):
+        day = pg.day_dir(st.session_state.seed if len(pats) > 1 else df['seed'].iat[0])
+        day.mkdir(parents=True, exist_ok=True)
         name = (f"pattern_{df['seed'].iat[0]}.csv" if len(pats) == 1
                 else f"patterns_{st.session_state.seed}_x{len(pats)}.csv")
-        (allp if len(pats) > 1 else df.drop(columns=["pattern"])).to_csv(pg.OUT / name, index=False)
-        ph.to_csv(pg.OUT / name.replace(".csv", "_phases.csv"), index=False)
-        st.success(f"Saved {pg.OUT / name} (+ _phases.csv of the pattern shown)", icon=":material/check_circle:")
+        (allp if len(pats) > 1 else df.drop(columns=["pattern"])).to_csv(day / name, index=False)
+        ph.to_csv(day / name.replace(".csv", "_phases.csv"), index=False)
+        st.success(f"Saved {day / name} (+ _phases.csv of the pattern shown)", icon=":material/check_circle:")
 
 # ---------------------------------------------------------------- fill with real data
 with t_fill:
@@ -474,8 +475,8 @@ with t_fill:
             c1, c2 = st.columns(2)
             c1.download_button("Synthetic data (CSV)", syn.to_csv(), f"{name}.csv", "text/csv",
                                width="stretch", icon=":material/download:")
-            if c2.button("Save to patterns/ folder (parquet)", width="stretch", icon=":material/save:"):
-                pg.OUT.mkdir(parents=True, exist_ok=True)
-                syn.to_parquet(pg.OUT / f"{name}.parquet")
-                used_ep.to_csv(pg.OUT / f"{name}_blocks.csv", index=False)
-                st.success(f"Saved {pg.OUT / name}.parquet and {name}_blocks.csv", icon=":material/check_circle:")
+            if c2.button("Save to datasets/ folder (parquet)", width="stretch", icon=":material/save:"):
+                day = pf.day_folder(syn, df['seed'].iat[0])
+                syn.to_parquet(day / f"{name}.parquet")
+                used_ep.to_csv(day / f"{name}_blocks.csv", index=False)
+                st.success(f"Saved {day / name}.parquet and {name}_blocks.csv", icon=":material/check_circle:")

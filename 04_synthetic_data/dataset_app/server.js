@@ -2,7 +2,7 @@
 // Start with dataset_app.bat (one level up). It stops by itself about 40 s after the last app window closes.
 // Node.js only, no packages.
 const http=require("http"), fs=require("fs"), path=require("path"), {spawn}=require("child_process");
-const PORT=8517, ROOT=path.join(__dirname,".."), GEN=path.join(ROOT,"twin_dataset.js");
+const PORT=8517, ROOT=path.join(__dirname,"..","datasets"), GEN=path.join(__dirname,"..","twin_dataset.js");
 const FILES=["sofc_twin_dataset.csv.gz","events.csv","summary.json"];
 const NAME=/^twin_[A-Za-z0-9_.]+$/;                 // dataset folder names the generator makes; nothing else is served
 let job=null, lastPing=Date.now();

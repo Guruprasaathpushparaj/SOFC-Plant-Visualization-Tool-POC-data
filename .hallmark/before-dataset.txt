@@ -1,0 +1,6 @@
+FAIL 34 04_synthetic_data\dataset_app\index.html:1 no overflow-x: clip on html and body | fix: overflow-x: clip on both html and body
+FAIL 48 04_synthetic_data\dataset_app\index.html:61 colour literal #fff outside tokens (background on button.primary:hover) | fix: Lift the value into the token block
+FAIL 56 04_synthetic_data\dataset_app\index.html:102 two sticky top:0 elements: .bar + th | fix: Offset the second sticky by banner height
+FAIL 67 04_synthetic_data\dataset_app\index.html:35 .caption-3: uppercase tracked 0.04em at 12px in a label role | fix: Labels, captions, table heads, nav links and meta are the body face (or the theme's label face), a step smaller, sentence case, untracked
+REFLEX 64 04_synthetic_data\dataset_app\index.html:78 monospace label voice on .saved small | fix: Labels in the body face, a step smaller, sentence case; mono only for code and figures
+WARN F3 04_synthetic_data\dataset_app\index.html:48 no text-wrap: balance on any display head (1 head rule(s), e.g. .card h2) | fix: Add text-wrap: balance to h1/h2-level heads

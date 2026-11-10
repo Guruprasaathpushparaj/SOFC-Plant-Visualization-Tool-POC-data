@@ -1,0 +1,17 @@
+[
+ {
+  "mode": "redesign",
+  "depth": "restyle",
+  "scope": "app",
+  "theme": "console",
+  "shape": "app screen",
+  "signature": "plant schematic (twin), stage strip over stack trace (dataset app)",
+  "waived": [],
+  "prompt": "fuel cell plant digital twin control screen and dataset maker for process engineers",
+  "targets": [
+   "05_twin_2d/index.html",
+   "04_synthetic_data/dataset_app/index.html"
+  ],
+  "date": "2026-11-06"
+ }
+]
