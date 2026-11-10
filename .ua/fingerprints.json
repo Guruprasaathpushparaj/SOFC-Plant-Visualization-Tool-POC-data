@@ -1,0 +1,4663 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "04ae8cf07f446ce86cec1757a66d546ecaedf7b3",
+  "generatedAt": "2026-11-10T13:01:01.748Z",
+  "files": {
+    ".gitattributes": {
+      "filePath": ".gitattributes",
+      "contentHash": "90577dd896cb616ccd4dd2959b5bcb1f49e7f5183799ead856789263f6666649",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 4,
+      "hasStructuralAnalysis": false
+    },
+    ".graphifyignore": {
+      "filePath": ".graphifyignore",
+      "contentHash": "4cd003eec8de352c7c7e035b46c4b91e72c83beacb74b3cc14097ef3e289e707",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 7,
+      "hasStructuralAnalysis": false
+    },
+    ".ua/config.json": {
+      "filePath": ".ua/config.json",
+      "contentHash": "4b66f98f8a815dfeb2d3a29eeb73418e07c40ed020a1498c07e908b2254f0c8c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": false
+    },
+    "01_docs/README.md": {
+      "filePath": "01_docs/README.md",
+      "contentHash": "5c4975cf9bfa054e6b2ed8c0683c06c26f82e068c7b30103571999cc989c95fe",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": false
+    },
+    "01_docs/SKILL.md": {
+      "filePath": "01_docs/SKILL.md",
+      "contentHash": "0c0ad9323121c0cc4f52b637f64a3a446016f065ae9ebf012dab210559f03d5f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 480,
+      "hasStructuralAnalysis": false
+    },
+    "01_docs/component_sensor_map_en.md": {
+      "filePath": "01_docs/component_sensor_map_en.md",
+      "contentHash": "fe556fa577e30f72023ce5b867ebc7b2a828f3046fced05e344182c12b725069",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 315,
+      "hasStructuralAnalysis": false
+    },
+    "01_docs/operational-modes-current.md": {
+      "filePath": "01_docs/operational-modes-current.md",
+      "contentHash": "d006bcd86bd1892cabc63d966c8289823f7e8cc07896c856904453c1c1209620",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 125,
+      "hasStructuralAnalysis": false
+    },
+    "01_docs/operational-modes.md": {
+      "filePath": "01_docs/operational-modes.md",
+      "contentHash": "48a1335c56e7bfae453499aa5eb9b00f7083fa4db11f4c1e4ce7a428da5850cc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 287,
+      "hasStructuralAnalysis": false
+    },
+    "01_docs/sofc-operational-stage-literature.md": {
+      "filePath": "01_docs/sofc-operational-stage-literature.md",
+      "contentHash": "ea4e1592405ba83baf5711d11f7e4cd1a312131a227f437f6f6f13645a179ac1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 144,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/README.md": {
+      "filePath": "03_data_analysis/README.md",
+      "contentHash": "20cc37c5a61ec798aad459b517e21cfb2806363f40d4bf3bd7017cadd27c719f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 51,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/cold_idle_analysis.ipynb": {
+      "filePath": "03_data_analysis/cold_idle_analysis.ipynb",
+      "contentHash": "325e50599e4c0b4cdd2767a42d769489c4633c63e2a998730ad28b5986dc8aa3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3628,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/excel_sensor_analysis.ipynb": {
+      "filePath": "03_data_analysis/excel_sensor_analysis.ipynb",
+      "contentHash": "93b6aebeee7fd02eb1ab4053180aaa9afa5a4aa27f72fd9c54851f92ca0b3391",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 10838,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/heater_temperatures.ipynb": {
+      "filePath": "03_data_analysis/heater_temperatures.ipynb",
+      "contentHash": "731bc939987b7116c4ff813076d4b7f68c859a6c0b605b5affc3a4895aac9e78",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2566,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/industrial_stages.ipynb": {
+      "filePath": "03_data_analysis/industrial_stages.ipynb",
+      "contentHash": "bc495cc31705fb852fc3fc71b869064e7b96e883e019fda70597321b8ad36e4e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 4431,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/operating_states.ipynb": {
+      "filePath": "03_data_analysis/operating_states.ipynb",
+      "contentHash": "f215440de5ddbb9fc78716d36e90b8dc75bbe196bae871783ea7b0cd5883f90c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8600,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/part_load_analysis.ipynb": {
+      "filePath": "03_data_analysis/part_load_analysis.ipynb",
+      "contentHash": "ec17836860986f49a2718da1b905321f0785fd413ac69a689d09ffb6691b35ac",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3267,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/preprocessing.ipynb": {
+      "filePath": "03_data_analysis/preprocessing.ipynb",
+      "contentHash": "70be250bcf6de802afbff45fef140879e4f91e035eeb852c6b5fc239b4dda5fa",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 6146,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/preprocessing/column_groups.json": {
+      "filePath": "03_data_analysis/preprocessing/column_groups.json",
+      "contentHash": "ae2d5f3c6dd835275958af67e68cbe3cd3e3156be2d53d963f75ac3614bc4808",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 233,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/preprocessing/stage/column_groups.json": {
+      "filePath": "03_data_analysis/preprocessing/stage/column_groups.json",
+      "contentHash": "e4affca0d1a4e6bc8270b6b256efa64f5d469da065881937ee3560edd46fbd9a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 75,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/rated_power_extrapolation.ipynb": {
+      "filePath": "03_data_analysis/rated_power_extrapolation.ipynb",
+      "contentHash": "35cb752251f16027665e55a054db4be077c45a3f7afd73efbfc5dd625be043a8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 13364,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/scripts/availability.py": {
+      "filePath": "03_data_analysis/scripts/availability.py",
+      "contentHash": "8b03ded7a320248798e48bc3964558ba6cb2c910cc525b4aad1f0ad5ec6f635b",
+      "functions": [
+        {
+          "name": "load",
+          "params": [],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "trip_recovery",
+          "params": [
+            "d",
+            "trips"
+          ],
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "forced_mask",
+          "params": [
+            "d",
+            "rec",
+            "rule"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "numbers",
+          "params": [
+            "d",
+            "rec",
+            "sel",
+            "rule",
+            "label",
+            "period_h"
+          ],
+          "exported": true,
+          "lineCount": 38
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 25
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        }
+      ],
+      "exports": [
+        "load",
+        "trip_recovery",
+        "forced_mask",
+        "numbers",
+        "main"
+      ],
+      "totalLines": 169,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/correlation_common.py": {
+      "filePath": "03_data_analysis/scripts/correlation_common.py",
+      "contentHash": "6e2272dc30874cf39ac7cea7fdc77df895ee2811546f6cb06c889ebef54ae290",
+      "functions": [
+        {
+          "name": "load_day",
+          "params": [
+            "args"
+          ],
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "top_pairs",
+          "params": [
+            "pear",
+            "spear"
+          ],
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "cluster_order",
+          "params": [
+            "corr"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "heatmap",
+          "params": [
+            "corr",
+            "order",
+            "title",
+            "path"
+          ],
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 94
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "argparse",
+          "specifiers": [
+            "argparse"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        },
+        {
+          "source": "concurrent.futures",
+          "specifiers": [
+            "ProcessPoolExecutor"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "matplotlib",
+          "specifiers": [
+            "matplotlib"
+          ]
+        },
+        {
+          "source": "matplotlib.pyplot",
+          "specifiers": [
+            "plt"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pyarrow.csv",
+          "specifiers": [
+            "pv"
+          ]
+        },
+        {
+          "source": "scipy.cluster.hierarchy",
+          "specifiers": [
+            "leaves_list",
+            "linkage"
+          ]
+        },
+        {
+          "source": "scipy.spatial.distance",
+          "specifiers": [
+            "squareform"
+          ]
+        }
+      ],
+      "exports": [
+        "load_day",
+        "top_pairs",
+        "cluster_order",
+        "heatmap",
+        "main"
+      ],
+      "totalLines": 194,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/downsample.py": {
+      "filePath": "03_data_analysis/scripts/downsample.py",
+      "contentHash": "0418c95056476d86bace6cd03618b78cca7564f073f05a8e99395cc2390c6098",
+      "functions": [
+        {
+          "name": "raw_to_parquet",
+          "params": [
+            "day"
+          ],
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "downsample",
+          "params": [
+            "day"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "check",
+          "params": [
+            "day"
+          ],
+          "exported": true,
+          "lineCount": 12
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pyarrow",
+          "specifiers": [
+            "pa"
+          ]
+        },
+        {
+          "source": "pyarrow.csv",
+          "specifiers": [
+            "pv"
+          ]
+        }
+      ],
+      "exports": [
+        "raw_to_parquet",
+        "downsample",
+        "check"
+      ],
+      "totalLines": 100,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/efficiency_check.py": {
+      "filePath": "03_data_analysis/scripts/efficiency_check.py",
+      "contentHash": "88ea8da76ef9c44db3301ff73e4ad4abc0b143068aa130271cd0c95db398ba4b",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "glob",
+          "specifiers": [
+            "glob"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pyarrow.parquet",
+          "specifiers": [
+            "pq"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 109,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/flow_check.py": {
+      "filePath": "03_data_analysis/scripts/flow_check.py",
+      "contentHash": "1bfb7f6bc61a99b9b2ad8fcb6b44bae1188f2326eaf8fa90a95a524923017661",
+      "functions": [
+        {
+          "name": "transition_ok",
+          "params": [
+            "prv",
+            "e"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "stitch",
+          "params": [
+            "days"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "episodes",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 40
+        },
+        {
+          "name": "judge",
+          "params": [
+            "value",
+            "lo",
+            "hi",
+            "limit"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "band_rate",
+          "params": [
+            "T",
+            "top",
+            "bottom"
+          ],
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "med",
+          "params": [
+            "x"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "share",
+          "params": [
+            "g",
+            "phases"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "forming_switch_T",
+          "params": [
+            "g",
+            "on"
+          ],
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "check_startup",
+          "params": [
+            "e",
+            "g"
+          ],
+          "exported": true,
+          "lineCount": 70
+        },
+        {
+          "name": "check_standby",
+          "params": [
+            "e",
+            "g"
+          ],
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "check_load",
+          "params": [
+            "e",
+            "g"
+          ],
+          "exported": true,
+          "lineCount": 52
+        },
+        {
+          "name": "check_shutdown",
+          "params": [
+            "e",
+            "g"
+          ],
+          "exported": true,
+          "lineCount": 72
+        },
+        {
+          "name": "check_adjust",
+          "params": [
+            "e",
+            "g"
+          ],
+          "exported": true,
+          "lineCount": 57
+        },
+        {
+          "name": "check_idle",
+          "params": [
+            "e",
+            "g"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "run",
+          "params": [
+            "days"
+          ],
+          "exported": true,
+          "lineCount": 100
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "contextlib",
+          "specifiers": [
+            "contextlib"
+          ]
+        },
+        {
+          "source": "io",
+          "specifiers": [
+            "io"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "industrial_stages",
+          "specifiers": [
+            "ins"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "ops"
+          ]
+        }
+      ],
+      "exports": [
+        "transition_ok",
+        "stitch",
+        "episodes",
+        "judge",
+        "band_rate",
+        "med",
+        "share",
+        "forming_switch_T",
+        "check_startup",
+        "check_standby",
+        "check_load",
+        "check_shutdown",
+        "check_adjust",
+        "check_idle",
+        "run"
+      ],
+      "totalLines": 638,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/heater_temps.py": {
+      "filePath": "03_data_analysis/scripts/heater_temps.py",
+      "contentHash": "f6d207ade62d5bb70824cdf0f64d31df61766b3d86481a37b0f61cfb588d869b",
+      "functions": [
+        {
+          "name": "load_heaters",
+          "params": [
+            "day"
+          ],
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "plant_days",
+          "params": [
+            "all_days"
+          ],
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "heater_states",
+          "params": [
+            "day",
+            "states"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "stage_table",
+          "params": [
+            "s",
+            "value",
+            "how"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "stretches",
+          "params": [
+            "days"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "heater_panels",
+          "params": [
+            "axs",
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "plot_stretch",
+          "params": [
+            "gi",
+            "n_groups",
+            "grp",
+            "hs",
+            "segs",
+            "path"
+          ],
+          "exported": true,
+          "lineCount": 64
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "matplotlib.dates",
+          "specifiers": [
+            "mdates"
+          ]
+        },
+        {
+          "source": "matplotlib.pyplot",
+          "specifiers": [
+            "plt"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "ops"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "plant_stages",
+          "specifiers": [
+            "ps"
+          ]
+        }
+      ],
+      "exports": [
+        "load_heaters",
+        "plant_days",
+        "heater_states",
+        "stage_table",
+        "stretches",
+        "heater_panels",
+        "plot_stretch"
+      ],
+      "totalLines": 283,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/industrial_stages.py": {
+      "filePath": "03_data_analysis/scripts/industrial_stages.py",
+      "contentHash": "a9915862a9096c48cbb89937d619df205cecb573b62e076ed3848a07c63c239e",
+      "functions": [
+        {
+          "name": "trip_events",
+          "params": [
+            "recompute"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "trip_windows",
+          "params": [
+            "events"
+          ],
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "code_of",
+          "params": [
+            "stage",
+            "sub_stage"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "add_codes",
+          "params": [
+            "s",
+            "windows"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "blocks",
+          "params": [
+            "s",
+            "col"
+          ],
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "runs",
+          "params": [
+            "label"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "episodes",
+          "params": [
+            "all_states"
+          ],
+          "exported": true,
+          "lineCount": 36
+        },
+        {
+          "name": "run_all",
+          "params": [
+            "recompute_trips"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "plot_band",
+          "params": [
+            "ax",
+            "seg",
+            "y",
+            "h"
+          ],
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "legend_handles",
+          "params": [
+            "codes"
+          ],
+          "exported": true,
+          "lineCount": 4
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "ops"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "trip_check",
+          "specifiers": [
+            "tc"
+          ]
+        }
+      ],
+      "exports": [
+        "trip_events",
+        "trip_windows",
+        "code_of",
+        "add_codes",
+        "blocks",
+        "runs",
+        "episodes",
+        "run_all",
+        "plot_band",
+        "legend_handles"
+      ],
+      "totalLines": 294,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/ladder_stages.py": {
+      "filePath": "03_data_analysis/scripts/ladder_stages.py",
+      "contentHash": "40d9c985d7edd200bd428eed7326dd65fcea3d8fa86e3ae4445736fad92b7312",
+      "functions": [
+        {
+          "name": "ton",
+          "params": [
+            "x",
+            "n"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "tof",
+          "params": [
+            "x",
+            "n"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "contacts",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "scan",
+          "params": [
+            "c"
+          ],
+          "exported": true,
+          "lineCount": 81
+        },
+        {
+          "name": "output_filter",
+          "params": [
+            "rung",
+            "n"
+          ],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "run",
+          "params": [
+            "signals",
+            "filter_min"
+          ],
+          "exported": true,
+          "lineCount": 16
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "ops"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        }
+      ],
+      "exports": [
+        "ton",
+        "tof",
+        "contacts",
+        "scan",
+        "output_filter",
+        "run"
+      ],
+      "totalLines": 237,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/operating_states.py": {
+      "filePath": "03_data_analysis/scripts/operating_states.py",
+      "contentHash": "6a14fc4d2d972c49c79aca390662a1f450f1b32d4cf2559847d67ebfab0006c3",
+      "functions": [
+        {
+          "name": "num",
+          "params": [
+            "d",
+            "cols"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "stale",
+          "params": [
+            "out",
+            "*sources"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "load_signals",
+          "params": [
+            "day"
+          ],
+          "exported": true,
+          "lineCount": 72
+        },
+        {
+          "name": "steady_hold",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "long_hold",
+          "params": [
+            "day",
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "classify_row",
+          "params": [
+            "r"
+          ],
+          "exported": true,
+          "lineCount": 56
+        },
+        {
+          "name": "gas_phase",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 38
+        },
+        {
+          "name": "fuel_rules",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 46
+        },
+        {
+          "name": "ng_tail",
+          "params": [
+            "s",
+            "idx"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "plant_off_cold",
+          "params": [
+            "stage",
+            "op"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "blocks",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "merge_short",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "apply_context",
+          "params": [
+            "s",
+            "prev_stage"
+          ],
+          "exported": true,
+          "lineCount": 224
+        },
+        {
+          "name": "restarts_next_day",
+          "params": [
+            "day"
+          ],
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "thermal_adjustment",
+          "params": [
+            "s",
+            "day",
+            "prev_stage"
+          ],
+          "exported": true,
+          "lineCount": 82
+        },
+        {
+          "name": "sub_stage",
+          "params": [
+            "stage",
+            "op"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "prev_day",
+          "params": [
+            "day"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "last_stage",
+          "params": [
+            "day"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "segment",
+          "params": [
+            "day"
+          ],
+          "exported": true,
+          "lineCount": 69
+        },
+        {
+          "name": "count_episodes",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "stage_minutes",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "segment_all",
+          "params": [
+            "days"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "plot_flows",
+          "params": [
+            "s",
+            "ax_fuel",
+            "ax_air",
+            "legend"
+          ],
+          "exported": true,
+          "lineCount": 36
+        },
+        {
+          "name": "phase_band",
+          "params": [
+            "s",
+            "ax"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "plot",
+          "params": [
+            "day",
+            "s",
+            "seg",
+            "path"
+          ],
+          "exported": true,
+          "lineCount": 89
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "functools",
+          "specifiers": [
+            "lru_cache"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        }
+      ],
+      "exports": [
+        "num",
+        "stale",
+        "load_signals",
+        "steady_hold",
+        "long_hold",
+        "classify_row",
+        "gas_phase",
+        "fuel_rules",
+        "ng_tail",
+        "plant_off_cold",
+        "blocks",
+        "merge_short",
+        "apply_context",
+        "restarts_next_day",
+        "thermal_adjustment",
+        "sub_stage",
+        "prev_day",
+        "last_stage",
+        "segment",
+        "count_episodes",
+        "stage_minutes",
+        "segment_all",
+        "plot_flows",
+        "phase_band",
+        "plot"
+      ],
+      "totalLines": 1082,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/plant_stages.py": {
+      "filePath": "03_data_analysis/scripts/plant_stages.py",
+      "contentHash": "b1a66ce81a6342b97e33d3761c16a6524f1f5df1e1b9efc071606b93b70a2fd0",
+      "functions": [
+        {
+          "name": "base_stage",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "trip_kind",
+          "params": [
+            "cut"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "add_trips",
+          "params": [
+            "s",
+            "lab",
+            "windows"
+          ],
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "label",
+          "params": [
+            "s",
+            "windows"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "blocks",
+          "params": [
+            "s",
+            "col"
+          ],
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "episodes",
+          "params": [
+            "b"
+          ],
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "transitions",
+          "params": [
+            "e"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "rule_210_check",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "per_day",
+          "params": [
+            "s",
+            "how"
+          ],
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "plot_band",
+          "params": [
+            "ax",
+            "b",
+            "y",
+            "h"
+          ],
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "legend_handles",
+          "params": [
+            "stages"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "run_all",
+          "params": [],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "save",
+          "params": [],
+          "exported": true,
+          "lineCount": 18
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "industrial_stages",
+          "specifiers": [
+            "ins"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "ops"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        }
+      ],
+      "exports": [
+        "base_stage",
+        "trip_kind",
+        "add_trips",
+        "label",
+        "blocks",
+        "episodes",
+        "transitions",
+        "rule_210_check",
+        "per_day",
+        "plot_band",
+        "legend_handles",
+        "run_all",
+        "save"
+      ],
+      "totalLines": 289,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/rated_power_curves.py": {
+      "filePath": "03_data_analysis/scripts/rated_power_curves.py",
+      "contentHash": "0a5c8119893900111e654d5c4912fdebf60db2de66b49b25c2b03a1ee786c3e3",
+      "functions": [
+        {
+          "name": "lag",
+          "params": [
+            "P",
+            "run",
+            "tau"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "models",
+          "params": [
+            "P",
+            "L"
+          ],
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "_fit",
+          "params": [
+            "X",
+            "y"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "fit_sensor",
+          "params": [
+            "y",
+            "P",
+            "L",
+            "run",
+            "M"
+          ],
+          "exported": true,
+          "lineCount": 32
+        },
+        {
+          "name": "pick",
+          "params": [
+            "f",
+            "order"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "at_power",
+          "params": [
+            "name",
+            "r",
+            "p"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "fit_all",
+          "params": [
+            "d",
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 59
+        },
+        {
+          "name": "apply_best",
+          "params": [
+            "t",
+            "fits"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "plot_rows",
+          "params": [
+            "d",
+            "res",
+            "fits",
+            "sensors",
+            "axs"
+          ],
+          "exported": true,
+          "lineCount": 57
+        },
+        {
+          "name": "plot_all",
+          "params": [
+            "d",
+            "res",
+            "fits",
+            "path",
+            "per_page"
+          ],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "self_check",
+          "params": [],
+          "exported": true,
+          "lineCount": 19
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "rated_power_extrapolation",
+          "specifiers": [
+            "rp"
+          ]
+        }
+      ],
+      "exports": [
+        "lag",
+        "models",
+        "_fit",
+        "fit_sensor",
+        "pick",
+        "at_power",
+        "fit_all",
+        "apply_best",
+        "plot_rows",
+        "plot_all",
+        "self_check"
+      ],
+      "totalLines": 306,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/rated_power_extrapolation.py": {
+      "filePath": "03_data_analysis/scripts/rated_power_extrapolation.py",
+      "contentHash": "b46ee7a4ec5070cc6cb50f378c0199106223cf7a2e6e533ae5960ea42ba74cf4",
+      "functions": [
+        {
+          "name": "pl_minutes",
+          "params": [],
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "fit",
+          "params": [
+            "x",
+            "y"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "robust_keep",
+          "params": [
+            "x",
+            "y"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "extrapolate",
+          "params": [
+            "d"
+          ],
+          "exported": true,
+          "lineCount": 60
+        },
+        {
+          "name": "add_notes",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 29
+        },
+        {
+          "name": "ng_faraday",
+          "params": [
+            "I",
+            "fu_pct"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "electrical",
+          "params": [
+            "d",
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 78
+        },
+        {
+          "name": "self_check",
+          "params": [],
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        }
+      ],
+      "exports": [
+        "pl_minutes",
+        "fit",
+        "robust_keep",
+        "extrapolate",
+        "add_notes",
+        "ng_faraday",
+        "electrical",
+        "self_check"
+      ],
+      "totalLines": 291,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/slopes_jerk.py": {
+      "filePath": "03_data_analysis/scripts/slopes_jerk.py",
+      "contentHash": "f643bf833b1b5eb918bebd0fdcbf729fc2b8f1f619296cc53798b658db269c8a",
+      "functions": [
+        {
+          "name": "_days",
+          "params": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "load_frame",
+          "params": [
+            "rebuild"
+          ],
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "load_all_columns",
+          "params": [
+            "rebuild"
+          ],
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "slope_group",
+          "params": [
+            "d"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "block_ids",
+          "params": [
+            "index",
+            "labels"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "stage_runs",
+          "params": [
+            "d",
+            "labels",
+            "min_len",
+            "clean"
+          ],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "line_slope",
+          "params": [
+            "t_h",
+            "y"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "window_slope",
+          "params": [
+            "s",
+            "t0",
+            "t1"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "centred_rate",
+          "params": [
+            "T",
+            "win"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "band",
+          "params": [
+            "T"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "stack_block_slopes",
+          "params": [
+            "d"
+          ],
+          "exported": true,
+          "lineCount": 30
+        },
+        {
+          "name": "summarise_blocks",
+          "params": [
+            "r"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "stack_rate_table",
+          "params": [
+            "d",
+            "min_minutes"
+          ],
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "onset_lags",
+          "params": [
+            "d",
+            "cases",
+            "move",
+            "min_len"
+          ],
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "_cut_at_gap",
+          "params": [
+            "g",
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "heatup_runs",
+          "params": [
+            "d",
+            "levels"
+          ],
+          "exported": true,
+          "lineCount": 31
+        },
+        {
+          "name": "cooling_runs",
+          "params": [
+            "d",
+            "min_start_C"
+          ],
+          "exported": true,
+          "lineCount": 29
+        },
+        {
+          "name": "other_curve_slopes",
+          "params": [
+            "d",
+            "groups",
+            "min_len"
+          ],
+          "exported": true,
+          "lineCount": 49
+        },
+        {
+          "name": "column_kind",
+          "params": [
+            "c"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "column_area",
+          "params": [
+            "c",
+            "kind"
+          ],
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "sensor_descriptions",
+          "params": [
+            "columns"
+          ],
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "all_column_slopes",
+          "params": [
+            "d",
+            "X",
+            "move_pct"
+          ],
+          "exported": true,
+          "lineCount": 69
+        },
+        {
+          "name": "_smooth",
+          "params": [
+            "v",
+            "n"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "border_shape",
+          "params": [
+            "y",
+            "tm"
+          ],
+          "exported": true,
+          "lineCount": 30
+        },
+        {
+          "name": "bend_time",
+          "params": [
+            "slope",
+            "i",
+            "pre",
+            "post",
+            "min_change"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "_grid",
+          "params": [
+            "d"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "border_table",
+          "params": [
+            "d"
+          ],
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "border_type_curves",
+          "params": [
+            "d",
+            "signals"
+          ],
+          "exported": true,
+          "lineCount": 73
+        },
+        {
+          "name": "stage_exits",
+          "params": [
+            "d",
+            "frm",
+            "skip_to",
+            "windows",
+            "drops"
+          ],
+          "exported": true,
+          "lineCount": 41
+        },
+        {
+          "name": "run_all",
+          "params": [
+            "parts",
+            "rebuild"
+          ],
+          "exported": true,
+          "lineCount": 98
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "contextlib",
+          "specifiers": [
+            "contextlib"
+          ]
+        },
+        {
+          "source": "io",
+          "specifiers": [
+            "io"
+          ]
+        },
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "re",
+          "specifiers": [
+            "re"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "heater_temps",
+          "specifiers": [
+            "ht"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "ops"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "plant_stages",
+          "specifiers": [
+            "ps"
+          ]
+        }
+      ],
+      "exports": [
+        "_days",
+        "load_frame",
+        "load_all_columns",
+        "slope_group",
+        "block_ids",
+        "stage_runs",
+        "line_slope",
+        "window_slope",
+        "centred_rate",
+        "band",
+        "stack_block_slopes",
+        "summarise_blocks",
+        "stack_rate_table",
+        "onset_lags",
+        "_cut_at_gap",
+        "heatup_runs",
+        "cooling_runs",
+        "other_curve_slopes",
+        "column_kind",
+        "column_area",
+        "sensor_descriptions",
+        "all_column_slopes",
+        "_smooth",
+        "border_shape",
+        "bend_time",
+        "_grid",
+        "border_table",
+        "border_type_curves",
+        "stage_exits",
+        "run_all"
+      ],
+      "totalLines": 910,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/stage_crosswalk.py": {
+      "filePath": "03_data_analysis/scripts/stage_crosswalk.py",
+      "contentHash": "d67686668e8217b8a81c68c7b03ccb6767ca3ae38eff339ad33666798ea4a371",
+      "functions": [
+        {
+          "name": "signature",
+          "params": [
+            "d",
+            "lim"
+          ],
+          "exported": true,
+          "lineCount": 27
+        },
+        {
+          "name": "translate",
+          "params": [
+            "sig",
+            "vocab"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "run",
+          "params": [],
+          "exported": true,
+          "lineCount": 33
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        }
+      ],
+      "exports": [
+        "signature",
+        "translate",
+        "run"
+      ],
+      "totalLines": 279,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/stage_signals.py": {
+      "filePath": "03_data_analysis/scripts/stage_signals.py",
+      "contentHash": "0e4729cac5923613b16a41cc55b52635b23c3f482c57aee9dad8b5cbe97256d2",
+      "functions": [
+        {
+          "name": "_columns",
+          "params": [],
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "load",
+          "params": [],
+          "exported": true,
+          "lineCount": 68
+        },
+        {
+          "name": "episodes",
+          "params": [],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "all_cuts",
+          "params": [],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "neighbours",
+          "params": [
+            "e"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "band_rates",
+          "params": [
+            "T",
+            "t",
+            "bands",
+            "rising"
+          ],
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "robust_sigma",
+          "params": [
+            "x"
+          ],
+          "exported": true,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "glob",
+          "specifiers": [
+            "glob"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "ops"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        }
+      ],
+      "exports": [
+        "_columns",
+        "load",
+        "episodes",
+        "all_cuts",
+        "neighbours",
+        "band_rates",
+        "robust_sigma"
+      ],
+      "totalLines": 230,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/stage_split.py": {
+      "filePath": "03_data_analysis/scripts/stage_split.py",
+      "contentHash": "654edab35fecf706d5cc96bf2fcc3abfafaa564edc5b47b2f32ed75fef0fc2c5",
+      "functions": [
+        {
+          "name": "stage_dir",
+          "params": [
+            "stage",
+            "sub_stage"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "file_id",
+          "params": [
+            "episode_id",
+            "sub_stage"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "file_path",
+          "params": [
+            "stage",
+            "sub_stage",
+            "fid"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "load_labels",
+          "params": [],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "pieces",
+          "params": [
+            "lab",
+            "ep"
+          ],
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "build",
+          "params": [],
+          "exported": true,
+          "lineCount": 87
+        },
+        {
+          "name": "summary",
+          "params": [
+            "idx"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "load_stage",
+          "params": [
+            "stage",
+            "sub_stage",
+            "columns",
+            "training_only"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "load_episode",
+          "params": [
+            "episode_id",
+            "columns"
+          ],
+          "exported": true,
+          "lineCount": 8
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "shutil",
+          "specifiers": [
+            "shutil"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pyarrow",
+          "specifiers": [
+            "pa"
+          ]
+        },
+        {
+          "source": "pyarrow.parquet",
+          "specifiers": [
+            "pq"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "SD_AMBIENT",
+            "SD_COOLING",
+            "STAGES"
+          ]
+        }
+      ],
+      "exports": [
+        "stage_dir",
+        "file_id",
+        "file_path",
+        "load_labels",
+        "pieces",
+        "build",
+        "summary",
+        "load_stage",
+        "load_episode"
+      ],
+      "totalLines": 241,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/trip_check.py": {
+      "filePath": "03_data_analysis/scripts/trip_check.py",
+      "contentHash": "a474073a3580dd7b16343dafb2c2c7334fa2124cf256f9f6bd59e4a7a2d968e2",
+      "functions": [
+        {
+          "name": "exhaust_limit",
+          "params": [
+            "day"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "days",
+          "params": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "load",
+          "params": [
+            "day",
+            "cols"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "trip_margins",
+          "params": [],
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "_valves",
+          "params": [
+            "x"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "_classify",
+          "params": [
+            "vb",
+            "va",
+            "I_b",
+            "H_b",
+            "H_a",
+            "air_b",
+            "air_a"
+          ],
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "cut_events",
+          "params": [
+            "day_list"
+          ],
+          "exported": true,
+          "lineCount": 71
+        },
+        {
+          "name": "exhaust_crossings",
+          "params": [
+            "events",
+            "day_list"
+          ],
+          "exported": true,
+          "lineCount": 29
+        },
+        {
+          "name": "window",
+          "params": [
+            "t",
+            "before",
+            "after"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "plot_event",
+          "params": [
+            "t",
+            "ax",
+            "title",
+            "before",
+            "after",
+            "exh_limit"
+          ],
+          "exported": true,
+          "lineCount": 31
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pyarrow.parquet",
+          "specifiers": [
+            "pq"
+          ]
+        }
+      ],
+      "exports": [
+        "exhaust_limit",
+        "days",
+        "load",
+        "trip_margins",
+        "_valves",
+        "_classify",
+        "cut_events",
+        "exhaust_crossings",
+        "window",
+        "plot_event"
+      ],
+      "totalLines": 272,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/scripts/twin_fits.py": {
+      "filePath": "03_data_analysis/scripts/twin_fits.py",
+      "contentHash": "c4dd5c4510c5a0a5925335cc037e62e85fb75fc0cdebb4cadcc543f41125ee66",
+      "functions": [
+        {
+          "name": "frame",
+          "params": [],
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "mode10",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "fit_heat",
+          "params": [
+            "F"
+          ],
+          "exported": true,
+          "lineCount": 71
+        },
+        {
+          "name": "fit_eaph",
+          "params": [
+            "F"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "fit_targets",
+          "params": [
+            "F"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "tin_sim",
+          "params": [
+            "F",
+            "e6",
+            "ehi"
+          ],
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "fit_tin",
+          "params": [
+            "F"
+          ],
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "fit_rec",
+          "params": [
+            "F"
+          ],
+          "exported": true,
+          "lineCount": 38
+        },
+        {
+          "name": "hs_exits",
+          "params": [
+            "F"
+          ],
+          "exported": true,
+          "lineCount": 30
+        },
+        {
+          "name": "fit_hsc",
+          "params": [
+            "F",
+            "q"
+          ],
+          "exported": true,
+          "lineCount": 52
+        },
+        {
+          "name": "app_values",
+          "params": [],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "save",
+          "params": [
+            "new"
+          ],
+          "exported": true,
+          "lineCount": 28
+        },
+        {
+          "name": "main",
+          "params": [
+            "parts"
+          ],
+          "exported": true,
+          "lineCount": 10
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "re",
+          "specifiers": [
+            "re"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "plant_stages",
+          "specifiers": [
+            "ps"
+          ]
+        },
+        {
+          "source": "scipy.optimize",
+          "specifiers": [
+            "minimize",
+            "nnls"
+          ]
+        }
+      ],
+      "exports": [
+        "frame",
+        "mode10",
+        "fit_heat",
+        "fit_eaph",
+        "fit_targets",
+        "tin_sim",
+        "fit_tin",
+        "fit_rec",
+        "hs_exits",
+        "fit_hsc",
+        "app_values",
+        "save",
+        "main"
+      ],
+      "totalLines": 437,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/sensor_trace/analyse.py": {
+      "filePath": "03_data_analysis/sensor_trace/analyse.py",
+      "contentHash": "ad4d881620a5bfaa6fa1ac0504fbecb88989aec0b41f4e4e3a490d510397e465",
+      "functions": [
+        {
+          "name": "trace",
+          "params": [
+            "tag"
+          ],
+          "exported": true,
+          "lineCount": 40
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "glob",
+          "specifiers": [
+            "glob"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "re",
+          "specifiers": [
+            "re"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "openpyxl",
+          "specifiers": [
+            "openpyxl"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        }
+      ],
+      "exports": [
+        "trace"
+      ],
+      "totalLines": 218,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/sensor_trace/classify.py": {
+      "filePath": "03_data_analysis/sensor_trace/classify.py",
+      "contentHash": "20df3c74e75b9ef8acf3f3b83010f47a8dc54b184c1a1a6f82e56fd131c0a2e9",
+      "functions": [
+        {
+          "name": "nums",
+          "params": [
+            "tag"
+          ],
+          "exported": true,
+          "lineCount": 2
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "re",
+          "specifiers": [
+            "re"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        }
+      ],
+      "exports": [
+        "nums"
+      ],
+      "totalLines": 306,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/sensors_by_stage.ipynb": {
+      "filePath": "03_data_analysis/sensors_by_stage.ipynb",
+      "contentHash": "76046d7d9f52fefcd72f5da02b1ff7743e043485883721117fc85878cab00caf",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2153,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/shutdown_analysis.ipynb": {
+      "filePath": "03_data_analysis/shutdown_analysis.ipynb",
+      "contentHash": "03b23cbbf23beab8ea08665415a6e6a7ff4dee7c5d046dd772fc4157afdb29e5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 4120,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/slopes_jerk.ipynb": {
+      "filePath": "03_data_analysis/slopes_jerk.ipynb",
+      "contentHash": "72aed4fd08644fb2a22551358a4da67113afdabb370f2cf9da13c319ee7db999",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3949,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/slopes_jerk/border_type_curves.json": {
+      "filePath": "03_data_analysis/slopes_jerk/border_type_curves.json",
+      "contentHash": "9821e9876621aa06dd45468a52eb4f3abe06719da80eebc26c652e240f689b51",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/slopes_jerk/run_curves.json": {
+      "filePath": "03_data_analysis/slopes_jerk/run_curves.json",
+      "contentHash": "78d6a218b94a29145347b17ac33c97d8ed69786aea6a414038f773d40cdc0d3b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/stage_sensor_runs.ipynb": {
+      "filePath": "03_data_analysis/stage_sensor_runs.ipynb",
+      "contentHash": "d024824d5d92fb05864064006bc330d5d1343aef4f58bddda4b5fa9e53d02651",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1307,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/stage_vs_other_correlation.ipynb": {
+      "filePath": "03_data_analysis/stage_vs_other_correlation.ipynb",
+      "contentHash": "9e4c6f07d7582efa00bb06226897fb61f8ac9b67c422383ffc9ab8a30ce067fd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3023,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/startup_analysis.ipynb": {
+      "filePath": "03_data_analysis/startup_analysis.ipynb",
+      "contentHash": "6736ad8c3697af62a5dd3b48b121db5b2688ec1007fef424530798fc00b30835",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 4153,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/tests/test_rules.py": {
+      "filePath": "03_data_analysis/tests/test_rules.py",
+      "contentHash": "ccc7bed90823f2af416e14a3267a33c72c51c369a121cda94584738074143bd9",
+      "functions": [
+        {
+          "name": "minutes",
+          "params": [
+            "n"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "toy_trip_day",
+          "params": [],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "test_every_plant_stage_has_a_bucket",
+          "params": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "test_forced_minutes_after_a_trip",
+          "params": [
+            "rule",
+            "forced_min"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "test_trip_without_recovery_is_skipped",
+          "params": [],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "test_gas_in_shutdown_is_cooling_and_gas_in_hot_standby_is_fuel_switch",
+          "params": [],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "cuts_at",
+          "params": [
+            "*mins"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "test_cuts_within_30_min_chain_into_one_trip",
+          "params": [],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "test_cuts_more_than_30_min_apart_are_two_trips",
+          "params": [],
+          "exported": true,
+          "lineCount": 2
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "availability",
+          "specifiers": [
+            "av"
+          ]
+        },
+        {
+          "source": "industrial_stages",
+          "specifiers": [
+            "ins"
+          ]
+        },
+        {
+          "source": "plant_stages",
+          "specifiers": [
+            "ps"
+          ]
+        }
+      ],
+      "exports": [
+        "minutes",
+        "toy_trip_day",
+        "test_every_plant_stage_has_a_bucket",
+        "test_forced_minutes_after_a_trip",
+        "test_trip_without_recovery_is_skipped",
+        "test_gas_in_shutdown_is_cooling_and_gas_in_hot_standby_is_fuel_switch",
+        "cuts_at",
+        "test_cuts_within_30_min_chain_into_one_trip",
+        "test_cuts_more_than_30_min_apart_are_two_trips"
+      ],
+      "totalLines": 100,
+      "hasStructuralAnalysis": true
+    },
+    "03_data_analysis/thermal_adjustment_analysis.ipynb": {
+      "filePath": "03_data_analysis/thermal_adjustment_analysis.ipynb",
+      "contentHash": "bef6e486d01b15ff2120f85889f1c1db984091b56544fbdc71758ebedcd57e81",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 4428,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/twin_fits.ipynb": {
+      "filePath": "03_data_analysis/twin_fits.ipynb",
+      "contentHash": "dfdd69d8d9f379c00c30ad60e7e203544d6fc89cc55e35b206ceeeb3a7e51a96",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1308,
+      "hasStructuralAnalysis": false
+    },
+    "03_data_analysis/twin_fits/twin_fits.json": {
+      "filePath": "03_data_analysis/twin_fits/twin_fits.json",
+      "contentHash": "b59b506ece8f3d3712d7a5f653563c0bc0f0fbb1eab20498eea1a8bc65989452",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 85,
+      "hasStructuralAnalysis": false
+    },
+    "04_synthetic_data/.streamlit/config.toml": {
+      "filePath": "04_synthetic_data/.streamlit/config.toml",
+      "contentHash": "fa019ac4826118efb4b5ade40edc7bf8688c56ef15633d467d139aaa28719881",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 12,
+      "hasStructuralAnalysis": false
+    },
+    "04_synthetic_data/README.md": {
+      "filePath": "04_synthetic_data/README.md",
+      "contentHash": "66345323d75749cbac170dad95b4a26c4126b8e506f79acb812c2f89aeb433e1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 48,
+      "hasStructuralAnalysis": false
+    },
+    "04_synthetic_data/build_library.py": {
+      "filePath": "04_synthetic_data/build_library.py",
+      "contentHash": "aad39e1d6429f84f6d5c4d8d45676647224b1a614aaaf7e695a18ddea21ebe48",
+      "functions": [
+        {
+          "name": "quiet",
+          "params": [
+            "fn",
+            "*a"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "label_all",
+          "params": [],
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "episodes",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 67
+        },
+        {
+          "name": "flag_faults",
+          "params": [
+            "e",
+            "tr"
+          ],
+          "exported": true,
+          "lineCount": 54
+        },
+        {
+          "name": "transitions",
+          "params": [
+            "e"
+          ],
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "folds",
+          "params": [
+            "s",
+            "e"
+          ],
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "load_sensors",
+          "params": [
+            "days"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "rebuild_check",
+          "params": [
+            "s",
+            "days"
+          ],
+          "exported": true,
+          "lineCount": 64
+        },
+        {
+          "name": "stack_shapes",
+          "params": [
+            "x",
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 76
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "contextlib",
+          "specifiers": [
+            "contextlib"
+          ]
+        },
+        {
+          "source": "io",
+          "specifiers": [
+            "io"
+          ]
+        },
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "ops"
+          ]
+        }
+      ],
+      "exports": [
+        "quiet",
+        "label_all",
+        "episodes",
+        "flag_faults",
+        "transitions",
+        "folds",
+        "load_sensors",
+        "rebuild_check",
+        "stack_shapes",
+        "main"
+      ],
+      "totalLines": 485,
+      "hasStructuralAnalysis": true
+    },
+    "04_synthetic_data/dataset_app.bat": {
+      "filePath": "04_synthetic_data/dataset_app.bat",
+      "contentHash": "b4553ee7ad5a79db15d0e7fc3e9b49dcc306e280212c800d423176a54ed27d8e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 20,
+      "hasStructuralAnalysis": false
+    },
+    "04_synthetic_data/dataset_app/index.html": {
+      "filePath": "04_synthetic_data/dataset_app/index.html",
+      "contentHash": "a556ee73ed109fb554fdd7441140189c677dacdff95f42d3e0eb7dc89bb5e1d3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 372,
+      "hasStructuralAnalysis": false
+    },
+    "04_synthetic_data/dataset_app/server.js": {
+      "filePath": "04_synthetic_data/dataset_app/server.js",
+      "contentHash": "e03d2c402b7879549702e4892d33499cf0ac6b1ee2f683c9cb1d65f00b90b090",
+      "functions": [
+        {
+          "name": "args",
+          "params": [
+            "q"
+          ],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "check",
+          "params": [
+            "a"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "start",
+          "params": [
+            "a"
+          ],
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "datasets",
+          "params": [],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "send",
+          "params": [
+            "res",
+            "code",
+            "body"
+          ],
+          "exported": false,
+          "lineCount": 1
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 64,
+      "hasStructuralAnalysis": true
+    },
+    "04_synthetic_data/library/stack_shapes.json": {
+      "filePath": "04_synthetic_data/library/stack_shapes.json",
+      "contentHash": "a197845985e8158e04e1e67fc335e1cdfbf2762c481efcb37af98253ffaa560c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": false
+    },
+    "04_synthetic_data/make_tables.py": {
+      "filePath": "04_synthetic_data/make_tables.py",
+      "contentHash": "a839ca9e294ad39268779622bf4575bbde8667633f182e7dbf505b79eba10abb",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "re",
+          "specifiers": [
+            "re"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "plant_stages",
+          "specifiers": [
+            "ps"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 211,
+      "hasStructuralAnalysis": true
+    },
+    "04_synthetic_data/pattern_app.py": {
+      "filePath": "04_synthetic_data/pattern_app.py",
+      "contentHash": "0dc2898da4a07a5cccc887bfd98c1ac43abd092300b63df10059042e7fc7d966",
+      "functions": [
+        {
+          "name": "sofc_theme",
+          "params": [],
+          "exported": true,
+          "lineCount": 45
+        },
+        {
+          "name": "chart",
+          "params": [
+            "c",
+            "**kw"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "section",
+          "params": [
+            "text"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "legend",
+          "params": [
+            "items"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "real_library",
+          "params": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "library",
+          "params": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "flow_levels",
+          "params": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "stage_map",
+          "params": [
+            "df"
+          ],
+          "exported": true,
+          "lineCount": 29
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "datetime",
+          "specifiers": [
+            "dt"
+          ]
+        },
+        {
+          "source": "random",
+          "specifiers": [
+            "random"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "altair",
+          "specifiers": [
+            "alt"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "streamlit",
+          "specifiers": [
+            "st"
+          ]
+        },
+        {
+          "source": "pattern_filler",
+          "specifiers": [
+            "pf"
+          ]
+        },
+        {
+          "source": "pattern_generator",
+          "specifiers": [
+            "pg"
+          ]
+        }
+      ],
+      "exports": [
+        "sofc_theme",
+        "chart",
+        "section",
+        "legend",
+        "real_library",
+        "library",
+        "flow_levels",
+        "stage_map"
+      ],
+      "totalLines": 882,
+      "hasStructuralAnalysis": true
+    },
+    "04_synthetic_data/pattern_filler.py": {
+      "filePath": "04_synthetic_data/pattern_filler.py",
+      "contentHash": "3125f9328f2dd7f65ab4b13b2a34ae922018957c26e56c578a93e2045f7de704",
+      "functions": [
+        {
+          "name": "day_name",
+          "params": [
+            "syn",
+            "seed"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "day_folder",
+          "params": [
+            "syn",
+            "seed",
+            "plan_dir"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "real_minutes",
+          "params": [
+            "rebuild"
+          ],
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "raw_extra",
+          "params": [],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "phase_mix",
+          "params": [
+            "phase"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "mix_cost",
+          "params": [
+            "a",
+            "b"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "plan_mix",
+          "params": [
+            "runs"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "ng_tail_len",
+          "params": [
+            "s"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "best",
+          "params": [
+            "c",
+            "score",
+            "rng"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "take",
+          "params": [
+            "s",
+            "i0",
+            "n"
+          ],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "warp",
+          "params": [
+            "s",
+            "n"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "neighbour_cost",
+          "params": [
+            "c",
+            "prev"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "air_cost",
+          "params": [
+            "lib",
+            "c",
+            "plan"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "hold",
+          "params": [
+            "lib",
+            "stage",
+            "n",
+            "T_prev",
+            "rng",
+            "prev",
+            "nxt",
+            "plan"
+          ],
+          "exported": true,
+          "lineCount": 32
+        },
+        {
+          "name": "path",
+          "params": [
+            "lib",
+            "stage",
+            "n",
+            "T_prev",
+            "rng",
+            "prev",
+            "nxt",
+            "plan"
+          ],
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "sub_frame",
+          "params": [
+            "lib",
+            "eid",
+            "sub_stage"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "ambient_start_T",
+          "params": [
+            "lib"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "chain",
+          "params": [
+            "lib",
+            "stage",
+            "n",
+            "T_prev",
+            "rng",
+            "prev",
+            "nxt",
+            "sub_stage",
+            "goal_T",
+            "plan"
+          ],
+          "exported": true,
+          "lineCount": 79
+        },
+        {
+          "name": "blend",
+          "params": [
+            "piece",
+            "prev_last",
+            "cols"
+          ],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "sub_of",
+          "params": [
+            "b"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "plant_stage_of",
+          "params": [],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "fill",
+          "params": [
+            "pattern",
+            "seed",
+            "lib"
+          ],
+          "exported": true,
+          "lineCount": 96
+        },
+        {
+          "name": "plot",
+          "params": [
+            "syn",
+            "path_png"
+          ],
+          "exported": true,
+          "lineCount": 52
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 57
+        }
+      ],
+      "classes": [
+        {
+          "name": "Library",
+          "methods": [
+            "__init__",
+            "of",
+            "frame",
+            "dry",
+            "mixes"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 51
+        }
+      ],
+      "imports": [
+        {
+          "source": "argparse",
+          "specifiers": [
+            "argparse"
+          ]
+        },
+        {
+          "source": "functools",
+          "specifiers": [
+            "functools"
+          ]
+        },
+        {
+          "source": "random",
+          "specifiers": [
+            "random"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "ops"
+          ]
+        },
+        {
+          "source": "pattern_generator",
+          "specifiers": [
+            "pg"
+          ]
+        },
+        {
+          "source": "plant_stages",
+          "specifiers": [
+            "ps"
+          ]
+        }
+      ],
+      "exports": [
+        "day_name",
+        "day_folder",
+        "real_minutes",
+        "raw_extra",
+        "phase_mix",
+        "mix_cost",
+        "plan_mix",
+        "ng_tail_len",
+        "Library",
+        "best",
+        "take",
+        "warp",
+        "neighbour_cost",
+        "air_cost",
+        "hold",
+        "path",
+        "sub_frame",
+        "ambient_start_T",
+        "chain",
+        "blend",
+        "sub_of",
+        "plant_stage_of",
+        "fill",
+        "plot",
+        "main"
+      ],
+      "totalLines": 704,
+      "hasStructuralAnalysis": true
+    },
+    "04_synthetic_data/pattern_generator.py": {
+      "filePath": "04_synthetic_data/pattern_generator.py",
+      "contentHash": "da2aa01b689ed040b7b73a1b3a6cf95bdf6654c2d423587dad59a113ccbdb2cc",
+      "functions": [
+        {
+          "name": "day_dir",
+          "params": [
+            "seed"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "with_air",
+          "params": [
+            "d"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "split_arrows",
+          "params": [
+            "allowed"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "step_name",
+          "params": [
+            "stage",
+            "sub_stage"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "labels",
+          "params": [
+            "step"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "canon",
+          "params": [
+            "name"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "parse_pairs",
+          "params": [
+            "text",
+            "conv"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "sub_pieces",
+          "params": [],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "library_bounds",
+          "params": [],
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "to_ambient_min_h",
+          "params": [
+            "T_hot"
+          ],
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "library_counts",
+          "params": [],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "order",
+          "params": [
+            "counts",
+            "start",
+            "end",
+            "rng",
+            "extra",
+            "fillers"
+          ],
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "order_closest",
+          "params": [
+            "counts",
+            "start",
+            "end",
+            "rng",
+            "fillers",
+            "max_extra"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "durations",
+          "params": [
+            "seq",
+            "hours",
+            "bounds",
+            "rng",
+            "cool_min"
+          ],
+          "exported": true,
+          "lineCount": 28
+        },
+        {
+          "name": "runs_of",
+          "params": [
+            "phase"
+          ],
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "phase_profiles",
+          "params": [],
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "scale_runs",
+          "params": [
+            "runs",
+            "n",
+            "step"
+          ],
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "phases_text",
+          "params": [
+            "runs"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "parse_phases",
+          "params": [
+            "text"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "gas_faults",
+          "params": [
+            "step",
+            "runs",
+            "prev",
+            "nxt"
+          ],
+          "exported": true,
+          "lineCount": 43
+        },
+        {
+          "name": "_merge",
+          "params": [
+            "runs"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "_take",
+          "params": [
+            "runs",
+            "m",
+            "at_end"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "fix_gas",
+          "params": [
+            "step",
+            "runs",
+            "prev",
+            "nxt"
+          ],
+          "exported": true,
+          "lineCount": 97
+        },
+        {
+          "name": "plan_phases",
+          "params": [
+            "steps",
+            "minutes",
+            "rng"
+          ],
+          "exported": true,
+          "lineCount": 36
+        },
+        {
+          "name": "flow_medians",
+          "params": [],
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "flow_levels",
+          "params": [],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "phase_table",
+          "params": [
+            "df"
+          ],
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "plot",
+          "params": [
+            "df",
+            "path"
+          ],
+          "exported": true,
+          "lineCount": 59
+        },
+        {
+          "name": "generate",
+          "params": [
+            "hours",
+            "counts",
+            "bounds",
+            "start",
+            "end",
+            "seed",
+            "start_time",
+            "phases"
+          ],
+          "exported": true,
+          "lineCount": 75
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 44
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "argparse",
+          "specifiers": [
+            "argparse"
+          ]
+        },
+        {
+          "source": "functools",
+          "specifiers": [
+            "functools"
+          ]
+        },
+        {
+          "source": "random",
+          "specifiers": [
+            "random"
+          ]
+        },
+        {
+          "source": "re",
+          "specifiers": [
+            "re"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "flow_check",
+          "specifiers": [
+            "ALLOWED"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "AIR_FLOW_ON",
+            "DT_AMBIENT",
+            "GAS_BLIP_MIN",
+            "PH_FORMING",
+            "PH_NG",
+            "PH_OFF",
+            "SD_AMBIENT",
+            "SD_COOLING",
+            "T_AMB_DEFAULT"
+          ]
+        },
+        {
+          "source": "operating_states",
+          "specifiers": [
+            "OPS_PHASES"
+          ]
+        }
+      ],
+      "exports": [
+        "day_dir",
+        "with_air",
+        "split_arrows",
+        "step_name",
+        "labels",
+        "canon",
+        "parse_pairs",
+        "sub_pieces",
+        "library_bounds",
+        "to_ambient_min_h",
+        "library_counts",
+        "order",
+        "order_closest",
+        "durations",
+        "runs_of",
+        "phase_profiles",
+        "scale_runs",
+        "phases_text",
+        "parse_phases",
+        "gas_faults",
+        "_merge",
+        "_take",
+        "fix_gas",
+        "plan_phases",
+        "flow_medians",
+        "flow_levels",
+        "phase_table",
+        "plot",
+        "generate",
+        "main"
+      ],
+      "totalLines": 938,
+      "hasStructuralAnalysis": true
+    },
+    "04_synthetic_data/to_twin.py": {
+      "filePath": "04_synthetic_data/to_twin.py",
+      "contentHash": "ebd0c84264d96fa8c5341313946978568a1f40c07c72c6faa65f2a80abd930d1",
+      "functions": [
+        {
+          "name": "to_twin",
+          "params": [
+            "src"
+          ],
+          "returnType": "Path",
+          "exported": true,
+          "lineCount": 14
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        }
+      ],
+      "exports": [
+        "to_twin"
+      ],
+      "totalLines": 42,
+      "hasStructuralAnalysis": true
+    },
+    "04_synthetic_data/twin_dataset.js": {
+      "filePath": "04_synthetic_data/twin_dataset.js",
+      "contentHash": "6d58bf444fa2a1e6e5f3b4f60bc3192f5db46436e93dd69951d7abcfc78a1603",
+      "functions": [
+        {
+          "name": "stop",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "minute",
+          "params": [],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "run",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "runUntil",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "availNow",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "fail",
+          "params": [
+            "msg"
+          ],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "med",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "visits",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "assert",
+          "params": [
+            "c",
+            "m"
+          ],
+          "exported": false,
+          "lineCount": 1
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 139,
+      "hasStructuralAnalysis": true
+    },
+    "05_twin_2d/README.md": {
+      "filePath": "05_twin_2d/README.md",
+      "contentHash": "c9138eff8b09f69723e19b0460812f21b32b59f3f413d73f7dba255f00a89cdf",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 211,
+      "hasStructuralAnalysis": false
+    },
+    "05_twin_2d/app.bat": {
+      "filePath": "05_twin_2d/app.bat",
+      "contentHash": "aef169aedb6a40e6262ec14daf16a15c0e31e0f28b56aac2942ac8ae39639d5e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 9,
+      "hasStructuralAnalysis": false
+    },
+    "05_twin_2d/app.js": {
+      "filePath": "05_twin_2d/app.js",
+      "contentHash": "cd4946fe2eebfa8853271e52540f0dae83a4f5a0b22bc43199305e0c48a3ea10",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1073,
+      "hasStructuralAnalysis": true
+    },
+    "05_twin_2d/data/bends.js": {
+      "filePath": "05_twin_2d/data/bends.js",
+      "contentHash": "80791125e6eb5a0112f188512eb809c2c68c403a1cce2d057203c21d0823735b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": true
+    },
+    "05_twin_2d/data/sensors.js": {
+      "filePath": "05_twin_2d/data/sensors.js",
+      "contentHash": "bf08bdc57856a04d53920423367dfbdaed3482e320d0e2ee4f06dd18a597c9fe",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3,
+      "hasStructuralAnalysis": true
+    },
+    "05_twin_2d/index.html": {
+      "filePath": "05_twin_2d/index.html",
+      "contentHash": "7909925d2a2b3d2a26a54dbbb228c06a477a71b3727cf53708bf07ac9d443a31",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 153,
+      "hasStructuralAnalysis": false
+    },
+    "05_twin_2d/install_shortcut.bat": {
+      "filePath": "05_twin_2d/install_shortcut.bat",
+      "contentHash": "96f30b1d57377540cd3fa511e3ae6f96eb768683469b47926aa5c62bde10bb9d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 5,
+      "hasStructuralAnalysis": false
+    },
+    "05_twin_2d/manifest.webmanifest": {
+      "filePath": "05_twin_2d/manifest.webmanifest",
+      "contentHash": "ee68b6aea3146b15385cfc8dca6ea505b04cc2747c5a8f64a3cd482d160eee79",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": false
+    },
+    "05_twin_2d/start.bat": {
+      "filePath": "05_twin_2d/start.bat",
+      "contentHash": "3850c0c363ff547677671df68a967b53e27ffbabccccb57068b7d021da8f58a4",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 6,
+      "hasStructuralAnalysis": false
+    },
+    "05_twin_2d/style.css": {
+      "filePath": "05_twin_2d/style.css",
+      "contentHash": "91a274f39273e1c0f9364a0e3744afda0e6fae6b1f452e0673394f316150b8f5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 251,
+      "hasStructuralAnalysis": false
+    },
+    "05_twin_2d/sw.js": {
+      "filePath": "05_twin_2d/sw.js",
+      "contentHash": "1e3c594bd0f8deb1dd0c21fc6a628de68c00b170a6b8dc06cf2fa4957fbbd42c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 13,
+      "hasStructuralAnalysis": true
+    },
+    "05_twin_2d/tools/bends.py": {
+      "filePath": "05_twin_2d/tools/bends.py",
+      "contentHash": "cf36e909609ad7a6bc673fca031c3e8af7f13356086836e042b7c6d90fa4d125",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "slopes_jerk",
+          "specifiers": [
+            "sj"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 117,
+      "hasStructuralAnalysis": true
+    },
+    "05_twin_2d/tools/feed_check.js": {
+      "filePath": "05_twin_2d/tools/feed_check.js",
+      "contentHash": "581690e4a3616ffcde035f6e00b6ece5e4a01323a9a7736a9cb1473310a711b1",
+      "functions": [
+        {
+          "name": "assert",
+          "params": [
+            "c",
+            "m"
+          ],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "blob",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "fileRows",
+          "params": [
+            "p"
+          ],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "count",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 46,
+      "hasStructuralAnalysis": true
+    },
+    "05_twin_2d/tools/prep.py": {
+      "filePath": "05_twin_2d/tools/prep.py",
+      "contentHash": "5cf2e8beb2e3320c37fe43ae4c2036621affa6a40c36eefb511355a5d4860fba",
+      "functions": [
+        {
+          "name": "add_rated",
+          "params": [
+            "out"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "clean",
+          "params": [
+            "s",
+            "unit"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "crossing",
+          "params": [
+            "y",
+            "span"
+          ],
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "ease",
+          "params": [
+            "col",
+            "key"
+          ],
+          "exported": true,
+          "lineCount": 10
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        }
+      ],
+      "exports": [
+        "add_rated",
+        "clean",
+        "crossing",
+        "ease"
+      ],
+      "totalLines": 399,
+      "hasStructuralAnalysis": true
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "ed1f91d09a19afe752e80d894644ad65d823fe33b91afe524b640f08e01a57bb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 139,
+      "hasStructuralAnalysis": false
+    },
+    "requirements.txt": {
+      "filePath": "requirements.txt",
+      "contentHash": "a518e5afb629bf4dd3900f9fbe15fe7bcb5f7b914ae506bd9324c06640d2219d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": false
+    }
+  }
+}
