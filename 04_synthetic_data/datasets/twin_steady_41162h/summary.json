@@ -1,0 +1,31 @@
+{
+ "period": "2027-01-01 00:00 to 2031-09-14 05:06",
+ "days": 1717.21,
+ "minutes": 2472786,
+ "availability_target_pct": null,
+ "availability_pct": 99.881,
+ "order": "SU HS PL HS SD",
+ "minutes_per_stage": {
+  "Heat-up air": 273,
+  "Heat-up N₂+H₂": 461,
+  "Fuel switch": 121,
+  "Part load": 2469720,
+  "Air-flow cooling": 2210,
+  "Shutdown": 1
+ },
+ "part_loads": 1,
+ "rated_powers": 0,
+ "rated_hours": 0,
+ "rated_stack_max_C": null,
+ "eta_part_load_pct": 17.9,
+ "eta_rated_pct": null,
+ "sensors": 120,
+ "hot_standbys": 2,
+ "cold_shutdowns": 0,
+ "shutdowns": 1,
+ "trips": 0,
+ "first_stage": "Heat-up air",
+ "last_stage": "Shutdown",
+ "startup_min": 735,
+ "folder": "twin_steady_41162h"
+}

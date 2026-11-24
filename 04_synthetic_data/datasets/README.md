@@ -1,80 +1,45 @@
 # Synthetic plant datasets
 
-Each folder is **one made-up plant run**. There are two kinds:
+Each folder is **one made-up plant run** from the 2D twin, run without its window (`../twin_dataset.js`, or the
+dataset app `../dataset_app.bat`). One row per minute. The data is smooth (no sensor noise) and is twin physics, not
+plant data.
 
-| Kind | Folders | Length | Made from | Made by |
-|---|---|---|---|---|
-| **Stitched runs** | `200h_…_seed<seed>` (4) | 200 hours | Real plant minutes, copied stage by stage | `pattern_generator.py` → `pattern_filler.py` → `to_twin.py` |
-| **Twin runs** | `twin_…` (2) | 181 days | The 2D twin, run without its window | Dataset app (`../dataset_app.bat`) or `../twin_dataset.js` |
+## The three runs
 
----
-
-# Stitched runs (200 h)
-
-Each runs 200 hours (1 Jan 00:00 → 9 Jan 08:00 2026) and is stitched together from real stage episodes of the
-plant. The folder name says how much of the time the plant was available and how many times it went through each stage.
-
-## Reading a folder name
-
-`200h_af32pct_4hua_4hun_5hs_3fs_3pl_7afc_7sd_seed7`
-
-| Part | Means |
-|---|---|
-| `200h` | length of the run |
-| `af32pct` | **availability 32 %**: share of time in Part load, Hot standby or Fuel switch (same rule as `03_data_analysis/scripts/availability.py`) |
-| `4hua` | 4 × Heat-up with air |
-| `4hun` | 4 × Heat-up with N₂ + H₂ |
-| `5hs` | 5 × Hot standby |
-| `3fs` | 3 × Fuel switch |
-| `3pl` | 3 × Part load |
-| `7afc` | 7 × Air-flow cooling |
-| `7sd` | 7 × Shutdown |
-| `1trip` | 1 × Trip / emergency purge (left out when there is none) |
-| `seed7` | the random number that made it; same seed → same plan |
-
-Counts are stage episodes in the `plant_stage` column (the 8 decided plant stages). Each folder comes from a plan
-with 3 start-ups, 5 hot standbys, 3 part loads, 2 thermal adjustments and 4 shut-downs. The real episodes copied in
-split these into more plant-stage episodes, so the counts differ from folder to folder.
-
-## The four runs
-
-| Folder | Availability | Part load episodes | Trips |
+| Folder | Length | What happens | Rows |
 |---|---|---|---|
-| `200h_af25pct_3hua_3hun_6hs_3fs_3pl_5afc_5sd_1trip_seed42` | 25 % | 3 | 1 |
-| `200h_af32pct_4hua_3hun_6hs_4fs_3pl_6afc_6sd_seed419230` | 32 % | 3 | 0 |
-| `200h_af32pct_4hua_4hun_5hs_3fs_3pl_7afc_7sd_seed7` | 32 % | 3 | 0 |
-| `200h_af55pct_2hua_3hun_5hs_3fs_3pl_3afc_3sd_1trip_seed184571` | 55 % | 3 | 1 |
+| `twin_181d_85pct_4pl_1cs_4rp4h` | 181 days | 4 part loads, each going up to rated power for 4 h; 1 cold shutdown; availability 85 % | 260,640 |
+| `twin_181d_85pct_4pl_1cs_4rp50h` | 181 days | the same, with 50 h of rated power each time | 260,640 |
+| `twin_steady_41162h` | 1,717 days (4.7 years) | heat up → 1 h hot standby → **41,162 h of part load** → 1 h hot standby → air flow cooling → shutdown | 2,472,786 |
 
-## Files in each folder (in the order they are made)
+## Stage names
 
-| File | What it is | Open with |
+The twin app shows seven stages. The data files (`plant_stage` column, `events.csv`, `summary.json`) keep the twin's
+storage names for them:
+
+| Stage in the twin app | Name in the files | What happens |
 |---|---|---|
-| `pattern_<seed>.csv` | **The plan.** One row per stage block: stage, start, end, hours | Excel |
-| `pattern_<seed>_phases.csv` | The plan's gas / air supply steps inside each block, with flows (ln/min) | Excel |
-| `pattern_<seed>.png` | Picture of the plan (stage timeline) | Image viewer |
-| `synthetic_<seed>.parquet` | **The dataset.** One row per minute (12,000), all sensors, copied from real plant minutes | Python / pandas |
-| `synthetic_<seed>_blocks.csv` | Which real episode filled each plan block, and how well it fits | Excel |
-| `synthetic_<seed>.png` | Picture of the main sensors over the 200 h | Image viewer |
-| `synthetic_<seed>.csv.gz` | **Twin-ready copy** of the dataset (heater power in kW). Open in the 2D twin: Source → Data file… | 2D twin |
+| Heat up | `Heat-up air`, then `Heat-up N₂+H₂` | the stack is heated in air (25 → 211 °C), then under forming gas (→ 495 °C) |
+| Hot standby | `Fuel switch` | natural gas on, no current |
+| Part load | `Part load` | power at low current (about 6 A per string, 14.6 kW) |
+| Rated power | `Rated power` | 30 A per string, 52 kW; reached only from part load |
+| Air flow cooling | `Air-flow cooling` | air cools the stack down to 40 °C |
+| Shutdown | `Shutdown` | plant off |
+| Trip / Emergency purge | `Trip: purge` | emergency stop (in none of the runs here) |
 
-## How the folders are made
+The storage names stay on purpose: the twin reads them back when it replays a file (Source → Data file…), and its own
+"Save data" writes them the same way. A file that said `Hot standby` would replay as Heat up.
 
-```
-pattern_generator.py / pattern_app.py  →  seed_<seed>/pattern_<seed>.csv       (plan only: named by seed)
-pattern_filler.py / app "Save"         →  folder renamed to 200h_af…_seed<seed>/ + synthetic_<seed>.parquet
-to_twin.py                             →  synthetic_<seed>.csv.gz in the same folder
-```
-
-A folder still called `seed_<seed>` is a plan that has not been filled yet.
+Short names in folder names and in `summary.json` → `order`: SU = heat up (start up), HS = hot standby, PL = part load,
+RP = rated power, CS = cold shutdown, SD = shutdown.
 
 ---
 
-# Twin runs (181 days)
+# 181-day runs
 
-Each runs 181 days (1 Jan 00:00 → 1 Jul 00:00 2027), one row per minute (260,640 rows). The twin presses its own
-buttons in a fixed story: it **starts up from 25 °C at minute 0**, cycles hot standby ↔ part load (some part loads go up
-to rated power and back), has a cold shutdown in the middle, and **ends in shutdown**. Availability is exact to the
-minute. The data is smooth (no sensor noise) and is twin physics, not plant data.
+Each runs 181 days (1 Jan 00:00 → 1 Jul 00:00 2027). The twin presses its own buttons in a fixed story: it **heats up
+from 25 °C at minute 0**, cycles hot standby ↔ part load (some part loads go up to rated power and back), has a cold
+shutdown in the middle, and **ends in shutdown**. Availability is exact to the minute.
 
 ## Reading a folder name
 
@@ -83,10 +48,10 @@ minute. The data is smooth (no sensor noise) and is twin physics, not plant data
 | Part | Means |
 |---|---|
 | `181d` | length of the run in days |
-| `85pct` | **availability 85 %**: share of time in Part load, Rated power or Fuel switch (hot standby with gas on) |
-| `4pl` | 4 × Part load |
-| `1cs` | 1 × Cold shutdown (plant cools and stays off, then starts up again) |
-| `4rp4h` | 4 × Rated power, 4 hours each (left out when there is none) |
+| `85pct` | **availability 85 %**: share of time in hot standby, part load or rated power |
+| `4pl` | 4 × part load |
+| `1cs` | 1 × cold shutdown (plant cools and stays off, then heats up again) |
+| `4rp4h` | 4 × rated power, 4 hours each (left out when there is none) |
 
 ## The two runs
 
@@ -97,9 +62,35 @@ They are the same run except for how long each rated-power spell lasts.
 | `twin_181d_85pct_4pl_1cs_4rp4h` | 85 % | 4 | 4 × 4 h (960 min) | 6 | 1 | 968 °C |
 | `twin_181d_85pct_4pl_1cs_4rp50h` | 85 % | 4 | 4 × 50 h (12,000 min) | 6 | 1 | 984 °C |
 
-Stage order (both): start up → HS → PL → RP → HS → PL → RP → HS → cold shutdown → HS → PL → RP → HS → PL → RP → HS →
-shutdown. Efficiency: about 18 % in part load, 48 % at rated power. The twin never trips or cools the stack by
-temperature, so stack temperatures at rated power go far above the plant's 720 °C trip limit.
+Stage order (both): SU HS PL RP HS PL RP HS CS HS PL RP HS PL RP HS SD. Efficiency: about 18 % in part load, 48 % at
+rated power. The twin never trips or cools the stack by temperature, so stack temperatures at rated power go far above
+the plant's 720 °C trip limit.
+
+---
+
+# Steady run (41,162 h)
+
+Made with `node 04_synthetic_data/twin_dataset.js --steady-hours 41162` (folder name `twin_steady_<hours>h`).
+
+41,162 h is the longest cell life in the NEST stack data for the Elcogen stacks (condition S0054, 30 A held; cell 16).
+Only this timing is taken from the NEST data: current, voltage and fuel are the twin's own.
+
+| Stage | Minutes |
+|---|---|
+| Heat up | 734 (273 in air, 461 under forming gas) |
+| Hot standby | 121 (1 h before and 1 h after part load) |
+| Part load | 2,469,720 (exactly 41,162 h) |
+| Air flow cooling | 2,210 |
+| Shutdown | 1 (the file ends at plant off) |
+
+Period 1 Jan 2027 00:00 → 14 Sep 2031 05:06.
+
+- Part load settles after about 10 h: stack 758.2 °C, 14.6 kW. From then on the rows are the same apart from the time.
+- The stack safety thermocouple `TIRZ_8_1_3` reads 789 °C all through part load, above the plant's 720 °C limit
+  (the twin never trips on temperature).
+- 23 MB compressed, about 2.4 GB once loaded in pandas: read it in parts if memory is short.
+
+---
 
 ## Files in each folder
 
@@ -111,3 +102,6 @@ temperature, so stack temperatures at rated power go far above the plant's 720 �
 | `preview.json` | Hourly summary the dataset app uses to draw its charts | (dataset app) |
 
 New runs from the dataset app are saved here and listed under "Saved datasets". See `../README.md` for all options.
+
+Stitched 200-hour runs (`200h_…_seed<seed>/`, made from real plant minutes by `../pattern_filler.py`) also land in
+this folder. None are here at the moment; they use the plant data's own eight stage names (see `../README.md`).
